@@ -10,35 +10,53 @@ namespace ChessLibrary.ConsoleApp
         {
             var game = new Game();
             var keepPlaying = true;
+            BoardRenderer.PrintBoard(game);
 
             do
             {
                 var turn = game.GetTurn();
-
-                BoardRenderer.PrintBoard(game);
-                keepPlaying = ExecuteCommand(game, turn);
+                var cmd = GetCommand(turn);
+                keepPlaying = ExecuteCommand(game, cmd);
 
                 Console.WriteLine();
             } while (keepPlaying);
         }
 
-        private static bool ExecuteCommand(Game game, PieceColor turn)
+        private static Command GetCommand(PieceColor turn)
         {
             Console.Write($"Enter command ({turn}'s turn): ");
             var input = Console.ReadLine().Trim().ToLower();
 
             var endOfCommandName = input.IndexOf(' ');
-
             var commandName = endOfCommandName == -1 ? input : input.Substring(0, endOfCommandName).ToLower();
-            var commandArgs = (endOfCommandName == -1 || endOfCommandName == input.Length - 1) ? input : input.Substring(endOfCommandName + 1);
+            var commandArgs = (endOfCommandName == -1 || endOfCommandName == input.Length - 1) ? string.Empty : input.Substring(endOfCommandName + 1);
 
-            switch (commandName)
+            return new Command()
             {
-                // TODO: More commands
-                // - prompt a2 -> gives possible moves for a2
-                case Commands.Move:
+                TotalInput = input,
+                CommandName = commandName,
+                CommandArgs = commandArgs
+            };
+        }
+
+        private static bool ExecuteCommand(Game game, Command cmd)
+        {
+            switch (cmd.CommandName)
+            {
+                case Commands.Prompt:
                     {
-                        PerformMove(game, commandArgs);
+                        if (string.IsNullOrEmpty(cmd.CommandArgs))
+                        {
+                            Console.WriteLine("Please enter a square (ex: 'prompt a4')");
+                            BoardRenderer.PrintBoard(game);
+                        }
+                        else
+                        {
+                            var sq = Game.ParseSquare(cmd.CommandArgs);
+                            var moves = game.GetValidMoves(sq.File, sq.Rank);
+                            BoardRenderer.PrintBoard(game, moves);
+                        }
+
                         return true;
                     }
 
@@ -56,13 +74,21 @@ namespace ChessLibrary.ConsoleApp
                             Console.WriteLine($"- {kvp.Key}: {kvp.Value}");
 
                         Console.WriteLine("Not entering a command is assumed to be a move");
+                        BoardRenderer.PrintBoard(game);
+
+                        return true;
+                    }
+
+                case Commands.Move:
+                    {
+                        PerformMove(game, cmd.CommandArgs);
                         return true;
                     }
 
                 default:
                     {
                         // By default, treat no command as a move
-                        PerformMove(game, input);
+                        PerformMove(game, cmd.TotalInput);
                         return true;
                     }
             }
@@ -76,6 +102,7 @@ namespace ChessLibrary.ConsoleApp
                 // TODO: Better error reporting
                 Console.WriteLine($"Invalid move ({errorCode}), please try again");
             }
+            BoardRenderer.PrintBoard(game);
         }
     }
 }

@@ -134,7 +134,7 @@ namespace ChessLibrary
 
                 var attackSquares = (ShiftLeft(input, 7) & ~FileH)
                     | (ShiftLeft(input, 9) & ~FileA);
-                newSquares |= attackSquares;
+                newSquares |= (attackSquares & state.BlackPieces);
             }
             else
             {
@@ -144,7 +144,7 @@ namespace ChessLibrary
 
                 var attackSquares = (ShiftRight(input, 7) & ~FileA)
                     | (ShiftRight(input, 9) & ~FileH);
-                newSquares |= attackSquares;
+                newSquares |= (attackSquares & state.WhitePieces);
             }
 
             return newSquares;

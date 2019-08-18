@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ChessLibrary
 {
-    internal static class BitTranslator
+    public static class BitTranslator
     {
         internal static bool IsValidSquare(char file, int rank)
         {
@@ -20,10 +20,16 @@ namespace ChessLibrary
 
         internal static ulong TranslateToBit(char file, int rank)
         {
-            int fileNumber = Char.ToLower(file) - 'a';
-            int idx = ((rank - 1) * 8) + fileNumber;
+            int idx = GetSquareIndex(file, rank);
             ulong result = 1UL << idx;
             return result;
+        }
+
+        public static int GetSquareIndex(char file, int rank)
+        {
+            int fileNumber = Char.ToLower(file) - 'a';
+            int idx = ((rank - 1) * 8) + fileNumber;
+            return idx;
         }
 
         private static Dictionary<ulong, Square> BitSquares = GenerateBitSquares();

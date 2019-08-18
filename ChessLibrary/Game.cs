@@ -122,5 +122,10 @@ namespace ChessLibrary
 
             return move;
         }
+
+        public static Square ParseSquare(string input)
+        {
+            return MoveParser.ParseSquare(input);
+        }
     }
 }

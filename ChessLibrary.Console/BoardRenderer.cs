@@ -1,7 +1,6 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ChessLibrary.ConsoleApp
 {
@@ -23,69 +22,63 @@ namespace ChessLibrary.ConsoleApp
             { SquareContents.Black | SquareContents.Knight, 'n' },
             { SquareContents.Black | SquareContents.Pawn, 'p' },
         };
-        private static Dictionary<SquareContents, char> PiecesAsGlyphs => new Dictionary<SquareContents, char>
-        {
-            { SquareContents.White | SquareContents.King, '♔' },
-            { SquareContents.White | SquareContents.Queen, '♕' },
-            { SquareContents.White | SquareContents.Rook, '♖' },
-            { SquareContents.White | SquareContents.Bishop, '♗' },
-            { SquareContents.White | SquareContents.Knight, '♘' },
-            { SquareContents.White | SquareContents.Pawn, '♙' },
 
-            { SquareContents.Black | SquareContents.King, '♚' },
-            { SquareContents.Black | SquareContents.Queen, '♛' },
-            { SquareContents.Black | SquareContents.Rook, '♜' },
-            { SquareContents.Black | SquareContents.Bishop, '♝' },
-            { SquareContents.Black | SquareContents.Knight, '♞' },
-            { SquareContents.Black | SquareContents.Pawn, '♟' },
-        };
-
-        public static void PrintBoard(Game game)
+        public static void PrintBoard(Game game, List<Square> highlighted)
         {
             const string rankDivider = "  -----------------";
+            var highlightSquares = new bool[64];
 
-            // This could instead just be a char[] or Span<char>
-            // At 2 EOL markers (\r\n) it's 380 in length
-            var output = new StringBuilder(
-                // row = 8 squares + row number. Each has a delimiter (so *2)
-                ((8 + 1) * 2 + Environment.NewLine.Length + 1)
-                // rows to output = 8 squares + delimiter for each
-                * (8 + 1) * 2
-                 + Environment.NewLine.Length
-            );
+            foreach (var sq in highlighted)
+                highlightSquares[BitTranslator.GetSquareIndex(sq.File, sq.Rank)] = true;
 
-            output.Append(rankDivider);
-            output.Append(Environment.NewLine);
+            Console.Write(rankDivider);
+            Console.Write(Environment.NewLine);
 
             for (var rank = 8; rank > 0; rank--)
             {
-                output.Append((char)(rank + '0'));
-                output.Append(" |");
+                Console.Write((char)(rank + '0'));
+                Console.Write(" |");
 
                 for (var file = 'a'; file <= 'h'; file++)
                 {
                     var contents = game.GetSquareContents(file, rank);
                     var representation = GetPieceRepresentation(contents);
 
-                    output.Append(representation);
-                    output.Append('|');
+                    var currentIndex = BitTranslator.GetSquareIndex(file, rank);
+
+                    if (highlightSquares[currentIndex])
+                    {
+                        var currentBrush = ConsolePaintBrush.Current;
+                        ConsolePaintBrush.Current = ConsolePaintBrush.Highlight;
+                        Console.Write(representation);
+                        ConsolePaintBrush.Current = currentBrush;
+                    }
+                    else
+                    {
+                        Console.Write(representation);
+                    }
+
+                    Console.Write('|');
                 }
 
-                output.Append(Environment.NewLine);
-                output.Append(rankDivider);
-                output.Append(Environment.NewLine);
+                Console.Write(Environment.NewLine);
+                Console.Write(rankDivider);
+                Console.Write(Environment.NewLine);
             }
 
-            output.Append("  ");
+            Console.Write("  ");
             for (var file = 'A'; file <= 'H'; file++)
             {
-                output.Append(' ');
-                output.Append(file);
+                Console.Write(' ');
+                Console.Write(file);
             }
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
+            Console.Write(Environment.NewLine);
+            Console.Write(Environment.NewLine);
+        }
 
-            Console.Write(output.ToString());
+        public static void PrintBoard(Game game)
+        {
+            PrintBoard(game, new List<Square>(0));
         }
 
         private static char GetPieceRepresentation(SquareContents contents)
