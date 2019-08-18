@@ -16,6 +16,7 @@ namespace ChessLibrary.ConsoleApp
             {
                 var turn = game.GetTurn();
                 var cmd = GetCommand(turn);
+
                 keepPlaying = ExecuteCommand(game, cmd);
 
                 Console.WriteLine();

@@ -25,8 +25,9 @@ namespace ChessLibrary
             // ✔ Account for long-form capture (Ne2xa4)
             // ❔ Account for short-form capture (Nxg4, axb4)
             // ❔ Account for disambiguation (Ngg4)
-            // ❔ Account for descriptive marks (Na4+, e2#)
-            // ❔ Account for good/bad marks (Na4!, e2??, b5!?)
+            // ❔ Account for piece promotions (e8=Q)
+            // ✔ Account for state change marks (Na4+, e2#)
+            // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
 
 
@@ -39,39 +40,35 @@ namespace ChessLibrary
 
             var isWhiteMove = piecesOnCurrentSide == state.WhitePieces;
 
-            var castleKingside = trimmedInput.Equals("0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
-            var castleQueenside = trimmedInput.Equals("0-0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
-            if (castleKingside || castleQueenside)
-            {
-                result.StartFile = 'e';
-                result.EndFile = castleKingside ? 'g' : 'c';
+            var moveNotation = TrimMoveDescriptors(trimmedInput);
+            var moveDescriptors = moveNotation.IsEmpty || moveNotation.Length == trimmedInput.Length
+                ? ReadOnlySpan<char>.Empty
+                : trimmedInput.Slice(moveNotation.Length);
 
-                if (isWhiteMove)
-                    result.StartRank = result.EndRank = 1;
-                else
-                    result.StartRank = result.EndRank = 8;
+            result.Annotation = GetAnnotation(moveDescriptors);
+            result.AttackState = GetAttackState(moveDescriptors);
 
+            // Handle castling
+            if (TryHandleCastling(moveNotation, isWhiteMove, ref result))
                 return true;
-            }
-
 
             int squareIdx = 0;
             char pieceDesignation = '\0';
-            if (PieceDesignations.Contains(input[squareIdx]))
-                pieceDesignation = input[squareIdx++];
+            if (PieceDesignations.Contains(moveNotation[squareIdx]))
+                pieceDesignation = moveNotation[squareIdx++];
 
-            char file = Char.ToLower(input[squareIdx++]);
-            int rank = input[squareIdx++] - '0';
+            char file = Char.ToLower(moveNotation[squareIdx++]);
+            int rank = moveNotation[squareIdx++] - '0';
 
-            if (squareIdx < input.Length && (
-                input[squareIdx] == '-' || input[squareIdx] == 'x' || input[squareIdx] == ' '
+            if (squareIdx < moveNotation.Length && (
+                moveNotation[squareIdx] == '-' || moveNotation[squareIdx] == 'x' || moveNotation[squareIdx] == ' '
                 ))
             {
                 result.StartFile = file;
                 result.StartRank = rank;
 
-                result.EndFile = Char.ToLower(input[++squareIdx]);
-                result.EndRank = input[++squareIdx] - '0';
+                result.EndFile = Char.ToLower(moveNotation[++squareIdx]);
+                result.EndRank = moveNotation[++squareIdx] - '0';
 
                 return true;
             }
@@ -164,7 +161,6 @@ namespace ChessLibrary
                             return true;
                         }
 
-                    // TODO: Extrapolate start square for form like Na4
                     case '\0':
                     case 'P':
                         {
@@ -197,6 +193,78 @@ namespace ChessLibrary
                         return false;
                 }
             }
+        }
+
+        private static ReadOnlySpan<char> TrimMoveDescriptors(ReadOnlySpan<char> move)
+        {
+            for (var i = move.Length - 1; i >= 0; i--)
+                if (Char.IsDigit(move[i]))
+                    return move.Slice(0, i + 1);
+
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        private static bool TryHandleCastling(ReadOnlySpan<char> moveNotation, bool isWhiteMove, ref Move result)
+        {
+            var castleKingside = moveNotation.Equals("0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var castleQueenside = moveNotation.Equals("0-0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+            if (castleKingside || castleQueenside)
+            {
+                result.StartFile = 'e';
+                result.EndFile = castleKingside ? 'g' : 'c';
+
+                if (isWhiteMove)
+                    result.StartRank = result.EndRank = 1;
+                else
+                    result.StartRank = result.EndRank = 8;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static MoveAnnotation GetAnnotation(ReadOnlySpan<char> descriptor)
+        {
+            if (descriptor.IsEmpty)
+                return MoveAnnotation.Normal;
+            else if (descriptor[0] == '!')
+            {
+                if (descriptor.Length == 1)
+                    return MoveAnnotation.Excellent;
+                else if (descriptor[1] == '!')
+                    return MoveAnnotation.Brilliancy;
+                else if (descriptor[1] == '?')
+                    return MoveAnnotation.Interesting;
+
+                throw new InvalidOperationException("Unknown move annotation");
+            }
+            else if (descriptor[0] == '?')
+            {
+                if (descriptor.Length == 1)
+                    return MoveAnnotation.Mistake;
+                else if (descriptor[1] == '?')
+                    return MoveAnnotation.Blunder;
+                else if (descriptor[1] == '!')
+                    return MoveAnnotation.Dubious;
+
+                throw new InvalidOperationException("Unknown move annotation");
+            }
+
+            return MoveAnnotation.Normal;
+        }
+        private static AttackState GetAttackState(ReadOnlySpan<char> descriptor)
+        {
+            if (descriptor.Length == 1)
+            {
+                if (descriptor[0] == '+')
+                    return AttackState.Check;
+                else if (descriptor[0] == '#')
+                    return AttackState.Checkmate;
+            }
+
+            return AttackState.Normal;
         }
 
         // TODO: Move this + below to a different class?

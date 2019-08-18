@@ -1,11 +1,119 @@
 ﻿using ChessLibrary.Models;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace ChessLibrary.Tests
 {
     [TestFixture]
     public class MoveParserTests
     {
+        private static IEnumerable<TestCaseData> MoveAnnotationTestCases
+        {
+            get
+            {
+                var annotations = (MoveAnnotation[])Enum.GetValues(typeof(MoveAnnotation));
+                var map = annotations.ToDictionary(
+                    o => o,
+                    o => MoveDescriptionHelper.GetAnnotationString(o)
+                );
+
+                var data = new[]
+                {
+                    ("0-0", "e1", "g1"),
+                    ("0-0-0", "e1", "c1"),
+                    ("Kd1", "e1", "d1"),
+                    ("a4", "a2", "a4")
+                };
+
+                foreach(var datum in data)
+                {
+                    foreach(var kvp in map)
+                    {
+                        yield return new TestCaseData(
+                            datum.Item1 + kvp.Value,
+                            datum.Item2,
+                            datum.Item3,
+                            kvp.Key
+                        );
+                    }
+                }
+            }
+        }
+        private static IEnumerable<TestCaseData> AttackStateTestCases
+        {
+            get
+            {
+                var annotations = (AttackState[])Enum.GetValues(typeof(AttackState));
+                var map = annotations.ToDictionary(
+                    o => o,
+                    o => MoveDescriptionHelper.GetAttackString(o)
+                );
+
+                var data = new[]
+                {
+                    ("0-0", "e1", "g1"),
+                    ("0-0-0", "e1", "c1"),
+                    ("Kd1", "e1", "d1"),
+                    ("a4", "a2", "a4")
+                };
+
+                foreach (var datum in data)
+                {
+                    foreach (var kvp in map)
+                    {
+                        yield return new TestCaseData(
+                            datum.Item1 + kvp.Value,
+                            datum.Item2,
+                            datum.Item3,
+                            kvp.Key
+                        );
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(MoveAnnotationTestCases))]
+        public void TryParseMove_ParsesAnnotation(string input, string expectedStart, string expectedEnd, MoveAnnotation expectedState)
+        {
+            var board = BoardState.DefaultPositions;
+            var startSq = MoveParser.ParseSquare(expectedStart);
+            var endSq = MoveParser.ParseSquare(expectedEnd);
+            Move move;
+
+            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out move);
+
+            Assert.That(success, Is.True);
+
+            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Annotation, Is.EqualTo(expectedState));
+        }
+
+
+        [TestCaseSource(nameof(AttackStateTestCases))]
+        public void TryParseMove_ParsesAttackState(string input, string expectedStart, string expectedEnd, AttackState expectedState)
+        {
+            var board = BoardState.DefaultPositions;
+            var startSq = MoveParser.ParseSquare(expectedStart);
+            var endSq = MoveParser.ParseSquare(expectedEnd);
+            Move move;
+
+            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out move);
+
+            Assert.That(success, Is.True);
+
+            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.AttackState, Is.EqualTo(expectedState));
+        }
+
         [TestCase("0-0", PieceColor.White, "e1", "g1")]
         [TestCase("0-0-0", PieceColor.White, "e1", "c1")]
         [TestCase("Kd1", PieceColor.White, "e1", "d1")]
