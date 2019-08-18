@@ -58,11 +58,10 @@ namespace ChessLibrary
 
         public ErrorConditions Move(string input)
         {
-            Move move;
-            if (!MoveParser.TryParseMove(input, BoardState, CurrentTurn, out move))
-                return ErrorConditions.InvalidInput;
+            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
+                return Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
 
-            return Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+            return ErrorConditions.InvalidInput;
         }
 
         public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)

@@ -192,7 +192,6 @@ namespace ChessLibrary
                             result.StartRank = startSquare.Rank;
                             return true;
                         }
-                        return false;
 
                     default:
                         return false;
