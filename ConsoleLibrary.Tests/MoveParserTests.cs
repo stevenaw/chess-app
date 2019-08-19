@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace ChessLibrary.Tests
 {
@@ -94,7 +93,6 @@ namespace ChessLibrary.Tests
             Assert.That(move.Annotation, Is.EqualTo(expectedState));
         }
 
-
         [TestCaseSource(nameof(AttackStateTestCases))]
         public void TryParseMove_ParsesAttackState(string input, string expectedStart, string expectedEnd, AttackState expectedState)
         {
@@ -113,6 +111,35 @@ namespace ChessLibrary.Tests
             Assert.That(move.EndFile, Is.EqualTo(endSq.File));
             Assert.That(move.AttackState, Is.EqualTo(expectedState));
         }
+
+
+        [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
+        [TestCase("a1=Q", "a2", "a1", PieceColor.Black, SquareContents.Black | SquareContents.Queen)]
+        [TestCase("a7", "a6", "a7", PieceColor.White, SquareContents.Empty)]
+        [TestCase("a2", "a3", "a2", PieceColor.Black, SquareContents.Empty)]
+        public void TryParseMove_ParsesPromotion(string input, string expectedStart, string expectedEnd, PieceColor color, SquareContents piece)
+        {
+            var board = BoardState.Empty;
+            var endSq = MoveParser.ParseSquare(expectedEnd);
+            var startSq = MoveParser.ParseSquare(expectedStart);
+            var pieceColor = color == PieceColor.White ? SquareContents.White : SquareContents.Black;
+
+            Move move;
+
+            BoardStateManipulator.SetPiece(board, startSq, SquareContents.Pawn | pieceColor);
+            var pieceMask = (pieceColor == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
+
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+
+            Assert.That(success, Is.True);
+
+            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.PromotedPiece, Is.EqualTo(piece));
+        }
+
 
         [TestCase("0-0", PieceColor.White, "e1", "g1")]
         [TestCase("0-0-0", PieceColor.White, "e1", "c1")]

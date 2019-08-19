@@ -9,5 +9,6 @@
 
         public MoveAnnotation Annotation { get; set; }
         public AttackState AttackState { get; set; }
+        public SquareContents PromotedPiece { get; set; }
     }
 }

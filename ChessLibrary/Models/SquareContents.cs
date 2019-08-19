@@ -5,6 +5,7 @@ namespace ChessLibrary.Models
     [Flags]
     public enum SquareContents
     {
+        Empty = 0,
         Pawn = 1,
         Knight = 2,
         Bishop = 4,

@@ -25,7 +25,7 @@ namespace ChessLibrary
             // ✔ Account for long-form capture (Ne2xa4)
             // ❔ Account for short-form capture (Nxg4, axb4)
             // ❔ Account for disambiguation (Ngg4)
-            // ❔ Account for piece promotions (e8=Q)
+            // ✔ Account for piece promotions (e8=Q)
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
@@ -56,6 +56,10 @@ namespace ChessLibrary
             char pieceDesignation = '\0';
             if (PieceDesignations.Contains(moveNotation[squareIdx]))
                 pieceDesignation = moveNotation[squareIdx++];
+
+            // TODO: Sanity check for if at end of board too
+            if (pieceDesignation == '\0' || pieceDesignation == 'P')
+                result.PromotedPiece = GetPromotion(moveDescriptors, isWhiteMove);
 
             char file = Char.ToLower(moveNotation[squareIdx++]);
             int rank = moveNotation[squareIdx++] - '0';
@@ -265,6 +269,44 @@ namespace ChessLibrary
             }
 
             return AttackState.Normal;
+        }
+
+        private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)
+        {
+            if (descriptor.Length == 2 && descriptor[0] == '=')
+            {
+                var contents = GetSquareContents(descriptor[1], isWhiteTurn);
+
+                // Invalid to promote to pawn. Should this throw?
+                if ((contents & SquareContents.Pawn) != 0)
+                    return SquareContents.Empty;
+
+                return contents;
+            }
+
+            return SquareContents.Empty;
+        }
+
+        public static SquareContents GetSquareContents(char piece, bool isWhiteTurn)
+        {
+            SquareContents side = isWhiteTurn ? SquareContents.White : SquareContents.Black;
+            switch (piece)
+            {
+                case 'K':
+                    return SquareContents.King | side;
+                case 'Q':
+                    return SquareContents.Queen | side;
+                case 'R':
+                    return SquareContents.Rook | side;
+                case 'B':
+                    return SquareContents.Bishop | side;
+                case 'N':
+                    return SquareContents.Knight | side;
+                case 'P':
+                    return SquareContents.Pawn | side;
+            }
+
+            return SquareContents.Empty;
         }
 
         // TODO: Move this + below to a different class?
