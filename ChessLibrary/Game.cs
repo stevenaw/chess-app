@@ -9,14 +9,16 @@ namespace ChessLibrary
         private BoardState BoardState { get; set; }
         private ulong CurrentTurn { get; set; }
 
-        public Game() : this(BoardState.DefaultPositions)
-        {
-        }
+        public Game() : this(BoardState.DefaultPositions, PieceColor.White)
+        { }
 
-        internal Game(BoardState state)
+        internal Game(BoardState state) : this(state, PieceColor.White)
+        { }
+
+        internal Game(BoardState state, PieceColor turn)
         {
             BoardState = state;
-            CurrentTurn = BoardState.WhitePieces;
+            CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
         }
 
         public PieceColor GetTurn()
@@ -59,23 +61,23 @@ namespace ChessLibrary
         public ErrorConditions Move(string input)
         {
             if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
-                return Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                return Move(move);
 
             return ErrorConditions.InvalidInput;
         }
 
-        public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
+        public ErrorConditions Move(Move move)
         {
-            if (!BitTranslator.IsValidSquare(startFile, startRank))
+            if (!BitTranslator.IsValidSquare(move.StartFile, move.StartRank))
                 return ErrorConditions.InvalidSquare;
-            if (!BitTranslator.IsValidSquare(endFile, endRank))
+            if (!BitTranslator.IsValidSquare(move.EndFile, move.EndRank))
                 return ErrorConditions.InvalidSquare;
 
-            ulong startSquare = BitTranslator.TranslateToBit(startFile, startRank);
+            ulong startSquare = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
             if ((CurrentTurn & startSquare) == 0)
                 return ErrorConditions.MustMoveOwnPiece; // Can't move if not your turn
 
-            ulong endSquare = BitTranslator.TranslateToBit(endFile, endRank);
+            ulong endSquare = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
             if ((CurrentTurn & endSquare) != 0)
                 return ErrorConditions.CantTakeOwnPiece; // Can't end move on own piece
 
@@ -86,6 +88,9 @@ namespace ChessLibrary
             // The move is good, so update state
             // Update current state 
             BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
+            if (move.PromotedPiece != SquareContents.Empty)
+                BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);
+
             if ((endSquare & BoardState.WhitePieces) != 0)
                 CurrentTurn = BoardState.BlackPieces;
             else
@@ -100,6 +105,17 @@ namespace ChessLibrary
             // -- of piece moved
             // -- of piece captured (en passant)
             // TODO: Detect checkmate
+        }
+
+        public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
+        {
+            return Move(new Move()
+            {
+                StartFile = startFile,
+                StartRank = startRank,
+                EndFile = endFile,
+                EndRank = endRank
+            });
         }
 
         public List<Square> GetValidMoves(char file, int rank)

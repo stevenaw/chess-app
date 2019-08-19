@@ -4,9 +4,8 @@ namespace ChessLibrary
 {
     internal static class BoardStateManipulator
     {
-        public static void SetPiece(BoardState state, Square square, SquareContents contents)
+        public static void SetPiece(BoardState state, ulong bitSquare, SquareContents contents)
         {
-            var bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
             var bitContents = (ulong)contents;
 
             if ((bitContents & (int)SquareContents.White) != 0)
@@ -27,6 +26,12 @@ namespace ChessLibrary
                 state.Queens |= bitSquare;
             else if ((bitContents & (int)SquareContents.King) != 0)
                 state.Kings |= bitSquare;
+        }
+
+        public static void SetPiece(BoardState state, Square square, SquareContents contents)
+        {
+            var bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
+            SetPiece(state, bitSquare, contents);
         }
 
         public static void MovePiece(BoardState state, ulong from, ulong to)

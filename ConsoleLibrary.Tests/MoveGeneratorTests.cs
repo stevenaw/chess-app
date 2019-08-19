@@ -32,7 +32,7 @@ namespace ChessLibrary.Tests
             var square = MoveParser.ParseSquare(sq);
             ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
 
-            ApplyToBoard(bitSquare, piece, board);
+            BoardStateManipulator.SetPiece(board, bitSquare, piece);
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank);
@@ -49,49 +49,12 @@ namespace ChessLibrary.Tests
             ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
             var expected = expectedSquares.Split(',').Select(MoveParser.ParseSquare).ToArray();
 
-            ApplyToBoard(bitSquare, piece, board);
+            BoardStateManipulator.SetPiece(board, bitSquare, piece);
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank).ToArray();
 
             Assert.That(validMoves, Is.EquivalentTo(expected));
-        }
-
-        private static void ApplyToBoard(ulong bitSquare, SquareContents contents, BoardState board)
-        {
-            if (contents.HasFlag(SquareContents.White))
-            {
-                board.WhitePieces |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.Black))
-            {
-                board.BlackPieces |= bitSquare;
-            }
-
-            if (contents.HasFlag(SquareContents.Pawn))
-            {
-                board.Pawns |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.Knight))
-            {
-                board.Knights |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.Bishop))
-            {
-                board.Bishops |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.Rook))
-            {
-                board.Rooks |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.Queen))
-            {
-                board.Queens |= bitSquare;
-            }
-            else if (contents.HasFlag(SquareContents.King))
-            {
-                board.Kings |= bitSquare;
-            }
         }
     }
 }

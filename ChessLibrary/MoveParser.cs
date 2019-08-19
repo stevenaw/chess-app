@@ -26,6 +26,7 @@ namespace ChessLibrary
             // ❔ Account for short-form capture (Nxg4, axb4)
             // ❔ Account for disambiguation (Ngg4)
             // ✔ Account for piece promotions (e8=Q)
+            //   ❔ Account for if pawn moves to end without speccifying promotion
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
@@ -52,6 +53,7 @@ namespace ChessLibrary
             if (TryHandleCastling(moveNotation, isWhiteMove, ref result))
                 return true;
 
+            // TODO: Change this so it parses from end first (always have end square, infer start square any any other things)
             int squareIdx = 0;
             char pieceDesignation = '\0';
             if (PieceDesignations.Contains(moveNotation[squareIdx]))

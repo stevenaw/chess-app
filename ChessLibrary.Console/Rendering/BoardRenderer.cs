@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ChessLibrary.ConsoleApp
+namespace ChessLibrary.ConsoleApp.Rendering
 {
     public static class BoardRenderer
     {
@@ -26,18 +26,21 @@ namespace ChessLibrary.ConsoleApp
         public static void PrintBoard(Game game, List<Square> highlighted)
         {
             const string rankDivider = "  -----------------";
-            var highlightSquares = new bool[64];
 
+            bool bufferOutput = highlighted.Count == 0;
+            var outputDevice = bufferOutput ? (IOutputMethod)new BufferedOutput() : new UnbufferedOutput();
+
+            var highlightSquares = new bool[64];
             foreach (var sq in highlighted)
                 highlightSquares[BitTranslator.GetSquareIndex(sq.File, sq.Rank)] = true;
 
-            Console.Write(rankDivider);
-            Console.Write(Environment.NewLine);
+            outputDevice.Write(rankDivider);
+            outputDevice.Write(Environment.NewLine);
 
             for (var rank = 8; rank > 0; rank--)
             {
-                Console.Write((char)(rank + '0'));
-                Console.Write(" |");
+                outputDevice.Write((char)(rank + '0'));
+                outputDevice.Write(" |");
 
                 for (var file = 'a'; file <= 'h'; file++)
                 {
@@ -50,30 +53,32 @@ namespace ChessLibrary.ConsoleApp
                     {
                         var currentBrush = ConsolePaintBrush.Current;
                         ConsolePaintBrush.Current = ConsolePaintBrush.Highlight;
-                        Console.Write(representation);
+                        outputDevice.Write(representation);
                         ConsolePaintBrush.Current = currentBrush;
                     }
                     else
                     {
-                        Console.Write(representation);
+                        outputDevice.Write(representation);
                     }
 
-                    Console.Write('|');
+                    outputDevice.Write('|');
                 }
 
-                Console.Write(Environment.NewLine);
-                Console.Write(rankDivider);
-                Console.Write(Environment.NewLine);
+                outputDevice.Write(Environment.NewLine);
+                outputDevice.Write(rankDivider);
+                outputDevice.Write(Environment.NewLine);
             }
 
-            Console.Write("  ");
+            outputDevice.Write("  ");
             for (var file = 'A'; file <= 'H'; file++)
             {
-                Console.Write(' ');
-                Console.Write(file);
+                outputDevice.Write(' ');
+                outputDevice.Write(file);
             }
-            Console.Write(Environment.NewLine);
-            Console.Write(Environment.NewLine);
+            outputDevice.Write(Environment.NewLine);
+            outputDevice.Write(Environment.NewLine);
+
+            outputDevice.Flush();
         }
 
         public static void PrintBoard(Game game)

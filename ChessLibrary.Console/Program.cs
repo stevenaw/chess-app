@@ -1,6 +1,6 @@
-﻿using ChessLibrary.Models;
+﻿using ChessLibrary.ConsoleApp.Rendering;
+using ChessLibrary.Models;
 using System;
-using System.Text;
 
 namespace ChessLibrary.ConsoleApp
 {
@@ -26,7 +26,7 @@ namespace ChessLibrary.ConsoleApp
         private static Command GetCommand(PieceColor turn)
         {
             Console.Write($"Enter command ({turn}'s turn): ");
-            var input = Console.ReadLine().Trim().ToLower();
+            var input = Console.ReadLine().Trim();
 
             var endOfCommandName = input.IndexOf(' ');
             var commandName = endOfCommandName == -1 ? input : input.Substring(0, endOfCommandName).ToLower();
@@ -44,17 +44,20 @@ namespace ChessLibrary.ConsoleApp
         {
             switch (cmd.CommandName)
             {
-                case Commands.Prompt:
+                case Commands.Hint:
                     {
                         if (string.IsNullOrEmpty(cmd.CommandArgs))
                         {
-                            Console.WriteLine("Please enter a square (ex: 'prompt a4')");
+                            Console.WriteLine("Please enter a square (ex: 'hint a4')");
                             BoardRenderer.PrintBoard(game);
                         }
                         else
                         {
                             var sq = Game.ParseSquare(cmd.CommandArgs);
                             var moves = game.GetValidMoves(sq.File, sq.Rank);
+                            if (moves.Count == 0)
+                                Console.WriteLine("No valid moves for that square");
+
                             BoardRenderer.PrintBoard(game, moves);
                         }
 
