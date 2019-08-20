@@ -2,7 +2,7 @@
 {
     public enum AttackState
     {
-        Normal,
+        None = 0,
         Check,      // +
         Checkmate   // #
     }

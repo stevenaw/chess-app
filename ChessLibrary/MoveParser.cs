@@ -270,7 +270,7 @@ namespace ChessLibrary
                     return AttackState.Checkmate;
             }
 
-            return AttackState.Normal;
+            return AttackState.None;
         }
 
         private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)

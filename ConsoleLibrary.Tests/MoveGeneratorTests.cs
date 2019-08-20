@@ -24,6 +24,22 @@ namespace ChessLibrary.Tests
             Assert.That(actualContents, Is.EqualTo(expectedContents));
         }
 
+        [Test]
+        public void Queen_CanMoveFromEdge()
+        {
+            var startSquare = MoveParser.ParseSquare("h5");
+            var endSquare = MoveParser.ParseSquare("e8");
+            var endBit = BitTranslator.TranslateToBit(endSquare.File, endSquare.Rank);
+
+            BoardState state = BoardState.Empty;
+            BoardStateManipulator.SetPiece(state, startSquare, SquareContents.White | SquareContents.Queen);
+            BoardStateManipulator.SetPiece(state, endSquare, SquareContents.Black | SquareContents.King);
+
+            var squares = MoveGenerator.GenerateAttackingSquares(state, state.WhitePieces);
+
+            Assert.That(squares & endBit, Is.Not.EqualTo(0));
+        }
+
         [TestCase("h5", SquareContents.White | SquareContents.King, 5)]
         [TestCase("a2", SquareContents.White | SquareContents.King, 5)]
         public void GeneratesExpectedSquares_MatchesCount(string sq, SquareContents piece, int expectedSquares)

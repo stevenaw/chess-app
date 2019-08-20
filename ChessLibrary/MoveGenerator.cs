@@ -14,17 +14,51 @@ namespace ChessLibrary
 
         private const ulong PawnStartRowWhite = 0x000000000000FF00;
         private const ulong PawnStartRowBlack = 0x00FF000000000000;
-        
-        public static ulong GenerateMoves(BoardState state, ulong square)
+
+        public static ulong GenerateMovesForPiece(BoardState state, ulong square)
+        {
+            // Detect type of piece
+            // Create bitmask of all moves for that piece
+            // ✔ Account for can't end in check
+            //   ✔ Account for pins
+            //   ✔ Account for can't move king into check
+            // ❔ Account for can't castle through check
+
+            var isWhite = (square & state.WhitePieces) != 0;
+            var moves = GenerateStandardMovesForPiece(state, square);
+            var validMoves = 0UL;
+
+            for(var i = 0; i < 64; i++)
+            {
+                var targetMove = moves & (1UL << i);
+                if (targetMove != 0)
+                {
+                    // Try the move and see if it lands in check
+                    var newState = new BoardState(state);
+                    BoardStateManipulator.MovePiece(newState, square, targetMove);
+
+                    var ownPieces = isWhite ? newState.WhitePieces : newState.BlackPieces;
+                    var opposingPieces = newState.AllPieces & ~ownPieces;
+
+                    var opposingAttack = GenerateAttackingSquares(newState, opposingPieces);
+                    var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
+
+                    if (isKingUnderAttack == 0)
+                        validMoves |= targetMove;
+                }
+            }
+
+            return validMoves;
+        }
+        private static ulong GenerateStandardMovesForPiece(BoardState state, ulong square)
         {
             // Detect type of piece
             // Create bitmask of all moves for that piece
             // ✔ Detect if pieces in way (unless knight is moving)
             // ✔ Detect if moving onto own piece
             // ✔ Detect standard patterns of movement
-            // ❔ Account for pins
-            // ❔ Account for special stateful moves (en passant, castling)
-            // ❔ Account for can't move into/through check
+            // ❔ Account for en passant
+            // ❔ Account for castling
 
             ulong result = 0;
 
@@ -57,6 +91,24 @@ namespace ChessLibrary
                 return result & ~state.WhitePieces;
             else
                 return result & ~state.BlackPieces;
+        }
+
+        public static ulong GenerateAttackingSquares(BoardState state, ulong squareMask)
+        {
+            ulong result = 0;
+
+            for (var i = 0; i < 64; i++)
+            {
+                var targetBit = squareMask & (1UL << i);
+                var piece = state.AllPieces & targetBit;
+                if (piece != 0)
+                {
+                    var attackingSquares = GenerateStandardMovesForPiece(state, piece);
+                    result |= attackingSquares;
+                }
+            }
+
+            return result;
         }
 
         private static ulong ShiftLeft(ulong lvalue, int rvalue)

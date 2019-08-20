@@ -86,7 +86,7 @@ namespace ChessLibrary.ConsoleApp
                 case Commands.Move:
                     {
                         PerformMove(game, cmd.CommandArgs);
-                        return true;
+                        return game.AttackState != AttackState.Checkmate;
                     }
 
                 default:
@@ -106,7 +106,13 @@ namespace ChessLibrary.ConsoleApp
                 // TODO: Better error reporting
                 Console.WriteLine($"Invalid move ({errorCode}), please try again");
             }
+
             BoardRenderer.PrintBoard(game);
+            if (game.AttackState != AttackState.None)
+            {
+                Console.Write(game.AttackState.ToString());
+                Console.WriteLine("!");
+            }
         }
     }
 }

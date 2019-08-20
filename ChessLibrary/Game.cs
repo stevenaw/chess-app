@@ -7,6 +7,7 @@ namespace ChessLibrary
     public class Game
     {
         private BoardState BoardState { get; set; }
+        public AttackState AttackState { get; private set; }
         private ulong CurrentTurn { get; set; }
 
         public Game() : this(BoardState.DefaultPositions, PieceColor.White)
@@ -19,6 +20,7 @@ namespace ChessLibrary
         {
             BoardState = state;
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
+            AttackState = AttackState.None;
         }
 
         public PieceColor GetTurn()
@@ -81,20 +83,13 @@ namespace ChessLibrary
             if ((CurrentTurn & endSquare) != 0)
                 return ErrorConditions.CantTakeOwnPiece; // Can't end move on own piece
 
-            ulong allMoves = MoveGenerator.GenerateMoves(BoardState, startSquare);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(BoardState, startSquare);
             if ((endSquare & allMoves) == 0)
                 return ErrorConditions.InvalidMovement; // End square is not a valid move
 
             // The move is good, so update state
-            // Update current state 
-            BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
-            if (move.PromotedPiece != SquareContents.Empty)
-                BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);
-
-            if ((endSquare & BoardState.WhitePieces) != 0)
-                CurrentTurn = BoardState.BlackPieces;
-            else
-                CurrentTurn = BoardState.WhitePieces;
+            // Update current state
+            UpdateState(move, startSquare, endSquare);
 
             return ErrorConditions.None;
 
@@ -105,6 +100,24 @@ namespace ChessLibrary
             // -- of piece moved
             // -- of piece captured (en passant)
             // TODO: Detect checkmate
+        }
+
+        private void UpdateState(Move move, ulong startSquare, ulong endSquare)
+        {
+            BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
+            if (move.PromotedPiece != SquareContents.Empty)
+                BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);
+
+            var ownPieces = (endSquare & BoardState.WhitePieces) != 0
+                ? BoardState.WhitePieces : BoardState.BlackPieces;
+            var attackingPieces = MoveGenerator.GenerateAttackingSquares(BoardState, ownPieces);
+
+            CurrentTurn = BoardState.AllPieces & ~ownPieces;
+
+            if ((CurrentTurn & BoardState.Kings & attackingPieces) != 0)
+                AttackState = AttackState.Check;
+            else
+                AttackState = AttackState.None;
         }
 
         public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
@@ -124,7 +137,7 @@ namespace ChessLibrary
                 throw new InvalidOperationException();
 
             var square = BitTranslator.TranslateToBit(file, rank);
-            ulong allMoves = MoveGenerator.GenerateMoves(BoardState, square);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(BoardState, square);
 
             return BitTranslator.TranslateToSquares(allMoves);
         }

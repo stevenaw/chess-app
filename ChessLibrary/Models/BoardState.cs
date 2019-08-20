@@ -34,6 +34,20 @@
         public ulong Kings { get; set; }
         public ulong Queens { get; set; }
 
+        public BoardState() { }
+        internal BoardState(BoardState copy)
+        {
+            WhitePieces = copy.WhitePieces;
+            BlackPieces = copy.BlackPieces;
+
+            Pawns = copy.Pawns;
+            Bishops = copy.Bishops;
+            Knights = copy.Knights;
+            Rooks = copy.Rooks;
+            Kings = copy.Kings;
+            Queens = copy.Queens;
+        }
+
         public ulong AllPieces
         {
             get

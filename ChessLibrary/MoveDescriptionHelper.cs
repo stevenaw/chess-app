@@ -12,7 +12,7 @@ namespace ChessLibrary
                     return "+";
                 case AttackState.Checkmate:
                     return "#";
-                case AttackState.Normal:
+                case AttackState.None:
                     return string.Empty;
                 default:
                     return string.Empty;
