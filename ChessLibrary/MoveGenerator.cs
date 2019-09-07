@@ -34,6 +34,7 @@ namespace ChessLibrary
                 if (targetMove != 0)
                 {
                     // Try the move and see if it lands in check
+                    // There's probably a better way to do this using a stateful 'squares attacked by' approach
                     var newState = new BoardState(state);
                     BoardStateManipulator.MovePiece(newState, square, targetMove);
 

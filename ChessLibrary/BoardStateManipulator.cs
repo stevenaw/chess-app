@@ -34,6 +34,12 @@ namespace ChessLibrary
             SetPiece(state, bitSquare, contents);
         }
 
+        public static void SetPiece(BoardState state, string square, SquareContents contents)
+        {
+            SetPiece(state, MoveParser.ParseSquare(square), contents);
+        }
+
+
         public static void MovePiece(BoardState state, ulong from, ulong to)
         {
             if ((from & state.Pawns) != 0)

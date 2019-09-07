@@ -4,15 +4,35 @@ using System.Linq;
 
 namespace ChessLibrary
 {
+    internal static class Constants
+    {
+        internal static class PieceNotation
+        {
+            public const char Pawn = 'P';
+            public const char Knight = 'N';
+            public const char Bishop = 'B';
+            public const char Rook = 'R';
+            public const char Queen = 'Q';
+            public const char King = 'K';
+        }
+
+        internal static class Board
+        {
+            public const int NumberOfRows = 8;
+            public const int NumberOfFiles = 8;
+            public const int NumberOfSquares = NumberOfRows * NumberOfFiles;
+        }
+    }
+
     internal static class MoveParser
     {
         private static readonly char[] PieceDesignations = new char[] {
-            'P',
-            'N',
-            'B',
-            'R',
-            'Q',
-            'K'
+            Constants.PieceNotation.Pawn,
+            Constants.PieceNotation.Knight,
+            Constants.PieceNotation.Bishop,
+            Constants.PieceNotation.Rook,
+            Constants.PieceNotation.Queen,
+            Constants.PieceNotation.King,
         };
 
         // Parses a move, but does not determine validity

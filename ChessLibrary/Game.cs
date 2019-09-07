@@ -92,32 +92,39 @@ namespace ChessLibrary
             UpdateState(move, startSquare, endSquare);
 
             return ErrorConditions.None;
-
-            // TODO: Account for piece promotions
-            // TODO: Detect checks
-            // - via direct move
-            // - via discovery
-            // -- of piece moved
-            // -- of piece captured (en passant)
-            // TODO: Detect checkmate
         }
 
         private void UpdateState(Move move, ulong startSquare, ulong endSquare)
         {
+            // TODO: All state detections
+            // ✔ Account for piece promotions
+            // ✔ Detect checks
+            // ❔ Detect checkmate
+            // ❔ Detect stalemate
+            // ❔ Ensure we clear old state on capture/promotion
+
             BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
                 BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
                 ? BoardState.WhitePieces : BoardState.BlackPieces;
-            var attackingPieces = MoveGenerator.GenerateAttackingSquares(BoardState, ownPieces);
+            var opponentPieces = BoardState.AllPieces & ~ownPieces;
 
-            CurrentTurn = BoardState.AllPieces & ~ownPieces;
+            var ownMovements = MoveGenerator.GenerateAttackingSquares(BoardState, ownPieces);
+            var opponentMovements = MoveGenerator.GenerateAttackingSquares(BoardState, opponentPieces);
 
-            if ((CurrentTurn & BoardState.Kings & attackingPieces) != 0)
-                AttackState = AttackState.Check;
+            var opponentKingUnderAttack = (opponentPieces & BoardState.Kings & ownMovements) != 0;
+            var opponentCanMove = opponentMovements != 0;
+
+            if (opponentKingUnderAttack)
+                AttackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
+            else if (!opponentCanMove)
+                AttackState = AttackState.Stalemate;
             else
                 AttackState = AttackState.None;
+
+            CurrentTurn = opponentPieces;
         }
 
         public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)

@@ -46,7 +46,7 @@ namespace ChessLibrary.Tests
             get
             {
                 var annotations = (AttackState[])Enum.GetValues(typeof(AttackState));
-                var map = annotations.ToDictionary(
+                var map = annotations.Where(a => a != AttackState.Stalemate).ToDictionary(
                     o => o,
                     o => MoveDescriptionHelper.GetAttackString(o)
                 );
