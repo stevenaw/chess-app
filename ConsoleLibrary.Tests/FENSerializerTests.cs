@@ -6,13 +6,13 @@ using System;
 namespace ChessLibrary.Tests
 {
     [TestFixture]
-    public class FENSerializerTests
+    public class FenSerializerTests
     {
         [Test]
         public void Deserialize_ShouldSetBoardState_WhenValidStringGiven()
         {
             const string FenString = "pQ4N1/3k3R/1r4n1/KbBbBppP/8/8/q7/7n";
-            FENSerializer ser = new FENSerializer();
+            FenSerializer ser = new FenSerializer();
             BoardState expected = new BoardState();
             BoardState actual;
 
@@ -48,12 +48,30 @@ namespace ChessLibrary.Tests
         }
 
         [Test]
+        public void Deserialize_ShouldThrowException_WhenEmpty()
+        {
+            const string FenString = "";
+
+            var serializer = new FenSerializer();
+            var exception = Assert.Throws<ArgumentNullException>(() => serializer.Deserialize(FenString));
+        }
+
+        [Test]
+        public void Deserialize_ShouldThrowException_WhenTooLong()
+        {
+            var FenString = new string('0', 80);
+
+            var serializer = new FenSerializer();
+            var exception = Assert.Throws<ArgumentException>(() => serializer.Deserialize(FenString));
+        }
+
+        [Test]
         public void Deserialize_ShouldThrowException_WhenTooFewRows()
         {
             const string FenString = "8/8/8/8/8/8/q7";
             const string ExpectedMessagee = "Not enough rows specified!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -65,7 +83,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/q7/8/8";
             const string ExpectedMessagee = "Too many rows!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -77,7 +95,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/q7/8/";
             const string ExpectedMessagee = "Too many rows!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -89,7 +107,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/q7/";
             const string ExpectedMessagee = "Not enough columns specified!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -101,7 +119,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/bbbbbbb/8";
             const string ExpectedMessagee = "Unanticipated new row, columns to fill!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -113,7 +131,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/7/8";
             const string ExpectedMessagee = "Unanticipated new row, columns to fill!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -125,7 +143,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/9/8";
             const string ExpectedMessagee = "Blank spot exceeds column count!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -137,19 +155,10 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/bbbbbbbbb/8";
             const string ExpectedMessagee = "Too many pieces specified in row!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenEmpty()
-        {
-            const string FenString = "";
-
-            var serializer = new FENSerializer();
-            var exception = Assert.Throws<ArgumentNullException>(() => serializer.Deserialize(FenString));
         }
 
         [Test]
@@ -158,7 +167,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/bb0bbbbb/8";
             const string ExpectedMessagee = "Can not have a 0 in a FEN diagram!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -170,7 +179,7 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/bb11bbbb/8";
             const string ExpectedMessagee = "Can not specify two consecutive blank spots!";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
@@ -182,10 +191,23 @@ namespace ChessLibrary.Tests
             const string FenString = "8/8/8/8/8/8/bb1cbbbb/8";
             const string ExpectedMessagee = "Unsupported piece notation: c";
 
-            var serializer = new FENSerializer();
+            var serializer = new FenSerializer();
             var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
             Assert.AreEqual(ExpectedMessagee, exception.Message);
+        }
+
+        [Test]
+        public void Serialize_ShouldSerializeCorrectPosition()
+        {
+            const string expectedValue = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
+            var board = BoardState.DefaultPositions;
+            var serializer = new FenSerializer();
+
+            var actualValue = serializer.Serialize(board);
+
+            Assert.AreEqual(expectedValue, actualValue);
         }
     }
 }
