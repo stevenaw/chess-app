@@ -42,6 +42,7 @@ namespace ChessLibrary
 
         public static void MovePiece(BoardState state, ulong from, ulong to)
         {
+            // TODO: Ensure we clear old state on capture/promotion
             if ((from & state.Pawns) != 0)
                 state.Pawns = MovePiece(state.Pawns, from, to);
             else if ((from & state.Knights) != 0)

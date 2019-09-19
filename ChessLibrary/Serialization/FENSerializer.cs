@@ -7,6 +7,7 @@ namespace ChessLibrary.Serialization
     {
         private const int MaximumLength = 71;
         private const char FenDelimeter = '/';
+
         public string Serialize(BoardState board)
         {
             Span<char> endResult = stackalloc char[MaximumLength];

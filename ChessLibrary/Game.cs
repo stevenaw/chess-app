@@ -96,12 +96,11 @@ namespace ChessLibrary
 
         private void UpdateState(Move move, ulong startSquare, ulong endSquare)
         {
-            // TODO: All state detections
+            // All state detections
             // ✔ Account for piece promotions
             // ✔ Detect checks
-            // ❔ Detect checkmate
-            // ❔ Detect stalemate
-            // ❔ Ensure we clear old state on capture/promotion
+            // ✔ Detect checkmate
+            // ✔ Detect stalemate
 
             BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
@@ -111,8 +110,8 @@ namespace ChessLibrary
                 ? BoardState.WhitePieces : BoardState.BlackPieces;
             var opponentPieces = BoardState.AllPieces & ~ownPieces;
 
-            var ownMovements = MoveGenerator.GenerateAttackingSquares(BoardState, ownPieces);
-            var opponentMovements = MoveGenerator.GenerateAttackingSquares(BoardState, opponentPieces);
+            var ownMovements = MoveGenerator.GenerateStandardMoves(BoardState, ownPieces, 0);
+            var opponentMovements = MoveGenerator.GenerateMoves(BoardState, opponentPieces, ownMovements);
 
             var opponentKingUnderAttack = (opponentPieces & BoardState.Kings & ownMovements) != 0;
             var opponentCanMove = opponentMovements != 0;

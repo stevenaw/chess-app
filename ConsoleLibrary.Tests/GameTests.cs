@@ -1,4 +1,5 @@
 ﻿using ChessLibrary.Models;
+using ChessLibrary.Serialization;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,20 @@ namespace ChessLibrary.Tests
 
             Assert.That(result, Is.EqualTo(ErrorConditions.None));
             Assert.That(expectedSquare, Is.EqualTo(piece));
+        }
+
+        [TestCase("k7/8/8/2b5/8/8/p7/Kb6", "Bd4", ExpectedResult = AttackState.Checkmate)]
+        [TestCase("k7/8/8/2b5/8/8/pR6/Kb6", "Bd4", ExpectedResult = AttackState.Stalemate)]
+        [TestCase("k7/8/8/2b5/8/8/pB6/Kb6", "Bd4", ExpectedResult = AttackState.None)]
+        public AttackState Move_DetectsAttackState(string position, string move)
+        {
+            var fen = new FenSerializer();
+            var board = fen.Deserialize(position);
+            var game = new Game(board, PieceColor.Black);
+
+            game.Move(move);
+
+            return game.AttackState;
         }
     }
 }

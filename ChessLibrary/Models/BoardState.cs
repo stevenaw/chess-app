@@ -1,5 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
+    // TODO: Make this a struct?
     internal class BoardState
     {
         /* 64bit long = 64 square board
@@ -34,18 +35,21 @@
         public ulong Kings { get; set; }
         public ulong Queens { get; set; }
 
-        public BoardState() { }
-        internal BoardState(BoardState copy)
+        internal BoardState Copy()
         {
-            WhitePieces = copy.WhitePieces;
-            BlackPieces = copy.BlackPieces;
+            var newState = new BoardState();
 
-            Pawns = copy.Pawns;
-            Bishops = copy.Bishops;
-            Knights = copy.Knights;
-            Rooks = copy.Rooks;
-            Kings = copy.Kings;
-            Queens = copy.Queens;
+            newState.WhitePieces = this.WhitePieces;
+            newState.BlackPieces = this.BlackPieces;
+
+            newState.Pawns = this.Pawns;
+            newState.Bishops = this.Bishops;
+            newState.Knights = this.Knights;
+            newState.Rooks = this.Rooks;
+            newState.Kings = this.Kings;
+            newState.Queens = this.Queens;
+
+            return newState;
         }
 
         public ulong AllPieces

@@ -25,33 +25,76 @@ namespace ChessLibrary
             // ❔ Account for can't castle through check
 
             var isWhite = (square & state.WhitePieces) != 0;
-            var moves = GenerateStandardMovesForPiece(state, square);
-            var validMoves = 0UL;
+            var opposingPiecesCurrent = isWhite ? state.BlackPieces : state.WhitePieces;
+            var opponentMoves = GenerateStandardMoves(state, opposingPiecesCurrent, 0);
 
-            for(var i = 0; i < 64; i++)
+            return GenerateMovesForPiece(state, square, opponentMoves);
+        }
+
+        public static ulong GenerateMovesForPiece(BoardState state, ulong square, ulong opposingMoves)
+        {
+            // Detect type of piece
+            // Create bitmask of all moves for that piece
+            // ✔ Account for can't end in check
+            //   ✔ Account for pins
+            //   ✔ Account for can't move king into check
+            // ❔ Account for can't castle through check
+
+            var isWhite = (square & state.WhitePieces) != 0;
+
+            var ownPiecesCurrent = isWhite ? state.WhitePieces : state.BlackPieces;
+            var moves = GenerateStandardMovesForPiece(state, square, opposingMoves);
+            moves &= ~ownPiecesCurrent;
+
+            var validMoves = 0UL;
+            for (var i = 0; i < 64; i++)
             {
                 var targetMove = moves & (1UL << i);
                 if (targetMove != 0)
                 {
-                    // Try the move and see if it lands in check
-                    // There's probably a better way to do this using a stateful 'squares attacked by' approach
-                    var newState = new BoardState(state);
-                    BoardStateManipulator.MovePiece(newState, square, targetMove);
-
-                    var ownPieces = isWhite ? newState.WhitePieces : newState.BlackPieces;
-                    var opposingPieces = newState.AllPieces & ~ownPieces;
-
-                    var opposingAttack = GenerateAttackingSquares(newState, opposingPieces);
-                    var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
-
-                    if (isKingUnderAttack == 0)
+                    var isKingUnderAttack = WillMovePlaceKingUnderAttack(state, square, ownPiecesCurrent, targetMove);
+                    if (isKingUnderAttack)
                         validMoves |= targetMove;
                 }
             }
 
             return validMoves;
         }
-        private static ulong GenerateStandardMovesForPiece(BoardState state, ulong square)
+
+        private static bool WillMovePlaceKingUnderAttack(BoardState state, ulong square, ulong ownPieces, ulong targetMove)
+        {
+            // Try the move and see if it lands in check
+            // There's probably a better way to do this using a stateful 'squares attacked by' approach
+
+            var newState = state.Copy();
+            BoardStateManipulator.MovePiece(newState, square, targetMove);
+
+            var opposingPieces = newState.AllPieces & ~ownPieces;
+            var opposingAttack = GenerateStandardMoves(newState, opposingPieces, 0);
+            var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
+
+            return isKingUnderAttack == 0;
+        }
+
+        public static ulong GenerateMoves(BoardState state, ulong squareMask, ulong opponentMoves)
+        {
+            ulong result = 0;
+
+            for (var i = 0; i < 64; i++)
+            {
+                var targetBit = squareMask & (1UL << i);
+                var piece = state.AllPieces & targetBit;
+                if (piece != 0)
+                {
+                    var attackingSquares = GenerateMovesForPiece(state, piece, opponentMoves);
+                    result |= attackingSquares;
+                }
+            }
+
+            return result;
+        }
+
+        private static ulong GenerateStandardMovesForPiece(BoardState state, ulong square, ulong opponentMoves)
         {
             // Detect type of piece
             // Create bitmask of all moves for that piece
@@ -85,16 +128,14 @@ namespace ChessLibrary
             }
             else if ((square & state.Kings) != 0)
             {
-                result |= GetKingMovements(square);
+                var moves = GetKingMovements(square) & ~opponentMoves;
+                result |= moves;
             }
 
-            if ((square & state.WhitePieces) != 0)
-                return result & ~state.WhitePieces;
-            else
-                return result & ~state.BlackPieces;
+            return result;
         }
 
-        public static ulong GenerateAttackingSquares(BoardState state, ulong squareMask)
+        public static ulong GenerateStandardMoves(BoardState state, ulong squareMask, ulong opponentMoves)
         {
             ulong result = 0;
 
@@ -104,7 +145,7 @@ namespace ChessLibrary
                 var piece = state.AllPieces & targetBit;
                 if (piece != 0)
                 {
-                    var attackingSquares = GenerateStandardMovesForPiece(state, piece);
+                    var attackingSquares = GenerateStandardMovesForPiece(state, piece, opponentMoves);
                     result |= attackingSquares;
                 }
             }
@@ -181,13 +222,16 @@ namespace ChessLibrary
 
             if ((input & state.WhitePieces) != 0)
             {
+                // straight ahead
                 newSquares = ShiftLeft(input, 8) & ~state.AllPieces;
+
+                // up 2 on first move
                 if (newSquares != 0 && (input & PawnStartRowWhite) != 0)
                     newSquares |= (ShiftLeft(newSquares, 8) & ~state.AllPieces);
 
                 var attackSquares = (ShiftLeft(input, 7) & ~FileH)
                     | (ShiftLeft(input, 9) & ~FileA);
-                newSquares |= (attackSquares & state.BlackPieces);
+                newSquares |= (attackSquares & state.AllPieces);
             }
             else
             {
@@ -197,7 +241,7 @@ namespace ChessLibrary
 
                 var attackSquares = (ShiftRight(input, 7) & ~FileA)
                     | (ShiftRight(input, 9) & ~FileH);
-                newSquares |= (attackSquares & state.WhitePieces);
+                newSquares |= (attackSquares & state.AllPieces);
             }
 
             return newSquares;
@@ -205,10 +249,10 @@ namespace ChessLibrary
 
         private static ulong FillDiagonals(ulong input, BoardState state)
         {
-            ulong ascendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileA | Rank1)
+            ulong descendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileA | Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8 + 1, FileH | Rank8);
 
-            ulong descendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 + 1, FileH | Rank1)
+            ulong ascendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 + 1, FileH | Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8 - 1, FileA | Rank8);
 
             return ascendingDiagonal | descendingDiagonal;
@@ -236,10 +280,15 @@ namespace ChessLibrary
         {
             ulong result = 0;
             int walkSize = stepSize;
+            var stopCondition = border | state.AllPieces;
 
-            while ((result & (border | state.AllPieces)) == 0)
+            if ((input & border) != 0)
+                return result;
+
+            while ((result & stopCondition) == 0)
             {
-                result |= shift(input, walkSize);
+                var possibleMove = shift(input, walkSize);
+                result |= possibleMove;
                 walkSize += stepSize;
             }
 
