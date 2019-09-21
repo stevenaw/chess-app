@@ -53,7 +53,7 @@ namespace ChessLibrary
                 if (targetMove != 0)
                 {
                     var isKingUnderAttack = WillMovePlaceKingUnderAttack(state, square, ownPiecesCurrent, targetMove);
-                    if (isKingUnderAttack)
+                    if (!isKingUnderAttack)
                         validMoves |= targetMove;
                 }
             }
@@ -73,7 +73,7 @@ namespace ChessLibrary
             var opposingAttack = GenerateStandardMoves(newState, opposingPieces, 0);
             var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
 
-            return isKingUnderAttack == 0;
+            return isKingUnderAttack != 0;
         }
 
         public static ulong GenerateMoves(BoardState state, ulong squareMask, ulong opponentMoves)
