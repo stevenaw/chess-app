@@ -52,7 +52,7 @@ namespace ChessLibrary
                 var targetMove = moves & (1UL << i);
                 if (targetMove != 0)
                 {
-                    var isKingUnderAttack = WillMovePlaceKingUnderAttack(state, square, ownPiecesCurrent, targetMove);
+                    var isKingUnderAttack = WillMovePlaceKingUnderAttack(state, square, targetMove);
                     if (!isKingUnderAttack)
                         validMoves |= targetMove;
                 }
@@ -61,7 +61,7 @@ namespace ChessLibrary
             return validMoves;
         }
 
-        private static bool WillMovePlaceKingUnderAttack(BoardState state, ulong square, ulong ownPieces, ulong targetMove)
+        private static bool WillMovePlaceKingUnderAttack(BoardState state, ulong square, ulong targetMove)
         {
             // Try the move and see if it lands in check
             // There's probably a better way to do this using a stateful 'squares attacked by' approach
@@ -69,6 +69,7 @@ namespace ChessLibrary
             var newState = state.Copy();
             BoardStateManipulator.MovePiece(newState, square, targetMove);
 
+            var ownPieces = (newState.WhitePieces & targetMove) != 0 ? newState.WhitePieces : newState.BlackPieces;
             var opposingPieces = newState.AllPieces & ~ownPieces;
             var opposingAttack = GenerateStandardMoves(newState, opposingPieces, 0);
             var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
