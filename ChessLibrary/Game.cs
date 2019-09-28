@@ -102,6 +102,8 @@ namespace ChessLibrary
             // ✔ Detect checkmate
             // ✔ Detect stalemate
 
+            // TODO: Ensure we clear old state on en passant
+
             BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
                 BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);

@@ -1,6 +1,5 @@
 ﻿namespace ChessLibrary.Models
 {
-    // TODO: Make this a struct?
     internal class BoardState
     {
         /* 64bit long = 64 square board

@@ -309,7 +309,7 @@ namespace ChessLibrary
             return SquareContents.Empty;
         }
 
-        public static SquareContents GetSquareContents(char piece, bool isWhiteTurn)
+        private static SquareContents GetSquareContents(char piece, bool isWhiteTurn)
         {
             SquareContents side = isWhiteTurn ? SquareContents.White : SquareContents.Black;
             switch (piece)

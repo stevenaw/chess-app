@@ -39,10 +39,22 @@ namespace ChessLibrary
             SetPiece(state, MoveParser.ParseSquare(square), contents);
         }
 
+        public static void ClearPiece(BoardState state, ulong bitSquare)
+        {
+            state.WhitePieces &= ~bitSquare;
+            state.BlackPieces &= ~bitSquare;
+            state.Pawns &= ~bitSquare;
+            state.Knights &= ~bitSquare;
+            state.Bishops &= ~bitSquare;
+            state.Rooks &= ~bitSquare;
+            state.Queens &= ~bitSquare;
+            state.Kings &= ~bitSquare;
+        }
 
         public static void MovePiece(BoardState state, ulong from, ulong to)
         {
-            // TODO: Ensure we clear old state on capture/promotion
+            ClearPiece(state, to);
+
             if ((from & state.Pawns) != 0)
                 state.Pawns = MovePiece(state.Pawns, from, to);
             else if ((from & state.Knights) != 0)
