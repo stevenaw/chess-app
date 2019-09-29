@@ -113,7 +113,6 @@ namespace ChessLibrary.Tests
             Assert.That(move.AttackState, Is.EqualTo(expectedState));
         }
 
-
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
         [TestCase("a1=Q", "a2", "a1", PieceColor.Black, SquareContents.Black | SquareContents.Queen)]
         [TestCase("a7", "a6", "a7", PieceColor.White, SquareContents.Empty)]
@@ -139,6 +138,28 @@ namespace ChessLibrary.Tests
             Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
             Assert.That(move.EndFile, Is.EqualTo(endSq.File));
             Assert.That(move.PromotedPiece, Is.EqualTo(piece));
+        }
+
+        [TestCase("a8=P", "a7", SquareContents.Pawn | SquareContents.White)]
+        [TestCase("a1=P", "a2", SquareContents.Pawn | SquareContents.Black)]
+        [TestCase("a7=Q", "a6", SquareContents.Pawn | SquareContents.White)]
+        [TestCase("a2=Q", "a3", SquareContents.Pawn | SquareContents.Black)]
+        [TestCase("a8", "a7", SquareContents.Pawn | SquareContents.White)]
+        [TestCase("a1", "a2", SquareContents.Pawn | SquareContents.Black)]
+        [TestCase("Ra8=P", "a7", SquareContents.Rook | SquareContents.White)]
+        [TestCase("Ra1=P", "a2", SquareContents.Rook | SquareContents.Black)]
+        public void TryParseMove_InvalidPromotion_ReturnsFalse(string input, string expectedStart, SquareContents piece)
+        {
+            var board = BoardState.Empty;
+            var startSq = MoveParser.ParseSquare(expectedStart);
+
+            BoardStateManipulator.SetPiece(board, startSq, piece);
+            var pieceMask = ((piece & SquareContents.Colours) == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
+
+
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out _);
+
+            Assert.That(success, Is.False);
         }
 
 
@@ -221,6 +242,7 @@ namespace ChessLibrary.Tests
             Assert.That(move.EndFile, Is.EqualTo(endSq.File));
         }
 
+        // TODO: More tests
         [TestCase("8/8/8/8/8/8/8/R6R", "Rac1", SquareContents.Rook | SquareContents.White, "a1", "c1")]
         [TestCase("8/8/8/8/8/8/8/R6R", "Rhc1", SquareContents.Rook | SquareContents.White, "h1", "c1")]
         [TestCase("5R2/8/8/8/8/8/8/5R2", "R1f2", SquareContents.Rook | SquareContents.White, "f1", "f2")]

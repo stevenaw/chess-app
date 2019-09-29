@@ -128,7 +128,7 @@ namespace ChessLibrary
             CurrentTurn = opponentPieces;
         }
 
-        public ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
+        internal ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
         {
             return Move(new Move()
             {

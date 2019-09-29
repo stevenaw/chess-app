@@ -4,26 +4,6 @@ using System.Linq;
 
 namespace ChessLibrary
 {
-    internal static class Constants
-    {
-        internal static class PieceNotation
-        {
-            public const char Pawn = 'P';
-            public const char Knight = 'N';
-            public const char Bishop = 'B';
-            public const char Rook = 'R';
-            public const char Queen = 'Q';
-            public const char King = 'K';
-        }
-
-        internal static class Board
-        {
-            public const int NumberOfRows = 8;
-            public const int NumberOfFiles = 8;
-            public const int NumberOfSquares = NumberOfRows * NumberOfFiles;
-        }
-    }
-
     internal static class MoveParser
     {
         private static readonly char[] PieceDesignations = new char[] {
@@ -41,6 +21,17 @@ namespace ChessLibrary
             '-'
         };
 
+        // TODO: Move this to another class?
+        public static Square ParseSquare(string input)
+        {
+            var result = new Square();
+
+            result.File = Char.ToLower(input[0]);
+            result.Rank = input[1] - '0';
+
+            return result;
+        }
+
         // Parses a move, but does not determine validity
         public static bool TryParseMove(string input, BoardState state, ulong piecesOnCurrentSide, out Move result)
         {
@@ -52,11 +43,15 @@ namespace ChessLibrary
             // ❔ Account for short-form capture (Nxg4, axb4)
             // ✔ Account for disambiguation (Ngg4)
             // ✔ Account for piece promotions (e8=Q)
-            //   ❔ Account for if pawn moves to end without specifying promotion
-            //   ❔ Account for if non-pawn specifies promotion
+            //   ✔ Account for promoted piece must be own colour
+            //   ✔ Account for if pawn moves to end without specifying promotion
+            //   ✔ Account for if non-pawn specifies promotion
+            //   ✔ Account for if promotion piece tries to become pawn
+            //   ✔ Account for if specify promotion when not at end
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
+            // ❔ Account for invalid ranks/files - fail in this case
 
 
             var trimmedInput = input.AsSpan().Trim();
@@ -89,12 +84,8 @@ namespace ChessLibrary
             }
             else
             {
-                pieceDesignation = 'P';
+                pieceDesignation = Constants.PieceNotation.Pawn;
             }
-
-            // Read promotion (if present)
-            if (pieceDesignation == 'P')
-                result.PromotedPiece = GetPromotion(moveDescriptors, isWhiteMove);
 
 
             int squareIdx = moveNotation.Length - 1;
@@ -102,6 +93,29 @@ namespace ChessLibrary
             // Get end square (must be present)
             result.EndRank = moveNotation[squareIdx--] - '0';
             result.EndFile = Char.ToLower(moveNotation[squareIdx--]);
+
+
+            // Read promotion (if present)
+            var promotion = GetPromotion(moveDescriptors, isWhiteMove);
+            var lastRankForColor = isWhiteMove ? Constants.Board.NumberOfRows : 1;
+            // TODO: Move promotion validation + tests to Game.Move() ??
+            if (promotion != 0)
+            {
+                if (pieceDesignation != Constants.PieceNotation.Pawn) // promoted non-pawn
+                    return false;
+                else if ((promotion & SquareContents.Pawn) != 0) // promoted to invalid piece (pawn)
+                    return false;
+
+                if (result.EndRank != lastRankForColor) // promoted but not at end
+                    return false;
+
+                result.PromotedPiece = promotion;
+            }
+            else if (pieceDesignation == Constants.PieceNotation.Pawn && result.EndRank == lastRankForColor)
+            {
+                // Moved pawn to end without promoting
+                return false;
+            }
 
             // Ignore delimiter (if present)
             if (squareIdx > 0 && SquareDelimiters.Contains(moveNotation[squareIdx]))
@@ -115,143 +129,156 @@ namespace ChessLibrary
                 result.StartFile = Char.ToLower(moveNotation[squareIdx--]);
 
             if (result.StartRank != 0 && result.StartFile != 0)
-                return true;
+                return IsMoveValid(result);
 
+            if (TryInferStartSquare(state, piecesOnCurrentSide, isWhiteMove, pieceDesignation, ref result))
+                return IsMoveValid(result);
+
+            return false;
+        }
+
+        private static bool IsMoveValid(Move move)
+        {
+            return move.StartFile >= 'a' && move.StartFile <= 'h'
+                && move.EndFile >= 'a' && move.EndFile <= 'h'
+                && move.StartRank >= 1 && move.StartRank <= 8
+                && move.EndRank >= 1 && move.EndRank <= 8;
+        }
+
+        private static bool TryInferStartSquare(BoardState state, ulong piecesOnCurrentSide, bool isWhiteMove, char pieceDesignation, ref Move result)
+        {
+            var endBit = BitTranslator.TranslateToBit(result.EndFile, result.EndRank);
+            var disambiguityMask = BuildDisambiguityMask(result);
+
+            switch (pieceDesignation)
             {
-                var endBit = BitTranslator.TranslateToBit(result.EndFile, result.EndRank);
-                var disambiguityMask = BuildDisambiguityMask(result);
+                case Constants.PieceNotation.King:
+                    {
+                        var possibleStartBits = MoveGenerator.GetKingMovements(endBit);
+                        var existingOfPiece = state.Kings & piecesOnCurrentSide;
+                        var actualStartPiece = possibleStartBits & existingOfPiece;
 
-                switch(pieceDesignation)
-                {
-                    case 'K':
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
+
+                        if (actualStartPiece == 0)
+                            return false;
+
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
+
+                case Constants.PieceNotation.Knight:
+                    {
+                        var possibleStartBits = MoveGenerator.GetKnightMovements(endBit);
+                        var existingOfPiece = state.Knights & piecesOnCurrentSide;
+                        var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
+
+                        if (actualStartPiece == 0)
+                            return false;
+
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
+
+                case Constants.PieceNotation.Queen:
+                    {
+                        var possibleStartBits = MoveGenerator.GetQueenMovements(endBit, state);
+                        var existingOfPiece = state.Queens & piecesOnCurrentSide;
+                        var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
+
+                        if (actualStartPiece == 0)
+                            return false;
+
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
+
+                case Constants.PieceNotation.Rook:
+                    {
+                        var possibleStartBits = MoveGenerator.GetRookMovements(endBit, state);
+                        var existingOfPiece = state.Rooks & piecesOnCurrentSide;
+                        var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
+
+                        if (actualStartPiece == 0)
+                            return false;
+
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
+
+                case Constants.PieceNotation.Bishop:
+                    {
+                        var possibleStartBits = MoveGenerator.GetBishopMovements(endBit, state);
+                        var existingOfPiece = state.Bishops & piecesOnCurrentSide;
+                        var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
+
+                        if (actualStartPiece == 0)
+                            return false;
+
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
+
+                case Constants.PieceNotation.Pawn:
+                    {
+                        ulong actualStartPiece = 0;
+
+                        if (isWhiteMove)
                         {
-                            var possibleStartBits = MoveGenerator.GetKingMovements(endBit);
-                            var existingOfPiece = state.Kings & piecesOnCurrentSide;
-                            var actualStartPiece = possibleStartBits & existingOfPiece;
-
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
-
-                            if (actualStartPiece == 0)
-                                return false;
-
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
-
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
+                            var possibleStart = endBit >> 8 | endBit >> 16;
+                            var pawns = state.Pawns & state.WhitePieces;
+                            actualStartPiece = pawns & possibleStart;
+                        }
+                        else
+                        {
+                            var possibleStart = endBit << 8 | endBit << 16;
+                            var pawns = state.Pawns & state.BlackPieces;
+                            actualStartPiece = pawns & possibleStart;
                         }
 
-                    case 'N':
-                        {
-                            var possibleStartBits = MoveGenerator.GetKnightMovements(endBit);
-                            var existingOfPiece = state.Knights & piecesOnCurrentSide;
-                            var actualStartPiece = possibleStartBits & existingOfPiece;
+                        if (disambiguityMask != 0)
+                            actualStartPiece &= disambiguityMask;
 
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
+                        if (actualStartPiece == 0)
+                            return false;
 
-                            if (actualStartPiece == 0)
-                                return false;
+                        var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
 
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
+                        result.StartFile = startSquare.File;
+                        result.StartRank = startSquare.Rank;
+                        return true;
+                    }
 
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
-                        }
-
-                    case 'Q':
-                        {
-                            var possibleStartBits = MoveGenerator.GetQueenMovements(endBit, state);
-                            var existingOfPiece = state.Queens & piecesOnCurrentSide;
-                            var actualStartPiece = possibleStartBits & existingOfPiece;
-
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
-
-                            if (actualStartPiece == 0)
-                                return false;
-
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
-
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
-                        }
-
-                    case 'R':
-                        {
-                            var possibleStartBits = MoveGenerator.GetRookMovements(endBit, state);
-                            var existingOfPiece = state.Rooks & piecesOnCurrentSide;
-                            var actualStartPiece = possibleStartBits & existingOfPiece;
-
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
-
-                            if (actualStartPiece == 0)
-                                return false;
-
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
-
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
-                        }
-
-                    case 'B':
-                        {
-                            var possibleStartBits = MoveGenerator.GetBishopMovements(endBit, state);
-                            var existingOfPiece = state.Bishops & piecesOnCurrentSide;
-                            var actualStartPiece = possibleStartBits & existingOfPiece;
-
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
-
-                            if (actualStartPiece == 0)
-                                return false;
-
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
-
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
-                        }
-
-                    case '\0':
-                    case 'P':
-                        {
-                            ulong actualStartPiece = 0;
-
-                            if (isWhiteMove)
-                            {
-                                var possibleStart = endBit >> 8 | endBit >> 16;
-                                var pawns = state.Pawns & state.WhitePieces;
-                                actualStartPiece = pawns & possibleStart;
-                            }
-                            else
-                            {
-                                var possibleStart = endBit << 8 | endBit << 16;
-                                var pawns = state.Pawns & state.BlackPieces;
-                                actualStartPiece = pawns & possibleStart;
-                            }
-
-                            if (disambiguityMask != 0)
-                                actualStartPiece &= disambiguityMask;
-
-                            if (actualStartPiece == 0)
-                                return false;
-
-                            var startSquare = BitTranslator.TranslateToSquare(actualStartPiece);
-
-                            result.StartFile = startSquare.File;
-                            result.StartRank = startSquare.Rank;
-                            return true;
-                        }
-
-                    default:
-                        return false;
-                }
+                default:
+                    return false;
             }
         }
 
@@ -330,6 +357,7 @@ namespace ChessLibrary
 
             return MoveAnnotation.Normal;
         }
+
         private static AttackState GetAttackState(ReadOnlySpan<char> descriptor)
         {
             if (descriptor.Length == 1)
@@ -345,17 +373,8 @@ namespace ChessLibrary
 
         private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)
         {
-            // TODO: Sanity check for if at end of board too
             if (descriptor.Length == 2 && descriptor[0] == '=')
-            {
-                var contents = GetSquareContents(descriptor[1], isWhiteTurn);
-
-                // Invalid to promote to pawn. Should this throw?
-                if ((contents & SquareContents.Pawn) != 0)
-                    return SquareContents.Empty;
-
-                return contents;
-            }
+                return GetSquareContents(descriptor[1], isWhiteTurn);
 
             return SquareContents.Empty;
         }
@@ -365,32 +384,21 @@ namespace ChessLibrary
             SquareContents side = isWhiteTurn ? SquareContents.White : SquareContents.Black;
             switch (piece)
             {
-                case 'K':
+                case Constants.PieceNotation.King:
                     return SquareContents.King | side;
-                case 'Q':
+                case Constants.PieceNotation.Queen:
                     return SquareContents.Queen | side;
-                case 'R':
+                case Constants.PieceNotation.Rook:
                     return SquareContents.Rook | side;
-                case 'B':
+                case Constants.PieceNotation.Bishop:
                     return SquareContents.Bishop | side;
-                case 'N':
+                case Constants.PieceNotation.Knight:
                     return SquareContents.Knight | side;
-                case 'P':
+                case Constants.PieceNotation.Pawn:
                     return SquareContents.Pawn | side;
             }
 
             return SquareContents.Empty;
-        }
-
-        // TODO: Move this + below to a different class?
-        public static Square ParseSquare(string input)
-        {
-            var result = new Square();
-
-            result.File = Char.ToLower(input[0]);
-            result.Rank = input[1] - '0';
-
-            return result;
         }
     }
 }
