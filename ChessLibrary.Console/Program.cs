@@ -103,8 +103,8 @@ namespace ChessLibrary.ConsoleApp
             var errorCode = game.Move(move);
             if (errorCode != 0)
             {
-                // TODO: Better error reporting
-                Console.WriteLine($"Invalid move ({errorCode}), please try again");
+                var message = GetErrorMessage(errorCode);
+                Console.WriteLine($"{message}, please try again");
             }
 
             BoardRenderer.PrintBoard(game);
@@ -112,6 +112,33 @@ namespace ChessLibrary.ConsoleApp
             {
                 Console.Write(game.AttackState.ToString());
                 Console.WriteLine("!");
+            }
+        }
+
+        private static string GetErrorMessage(ErrorConditions error)
+        {
+            if (error == 0)
+                return string.Empty;
+
+            switch (error)
+            {
+                case ErrorConditions.CantTakeOwnPiece:
+                    return "Can't take own piece";
+                case ErrorConditions.InvalidInput:
+                    return "Invalid Input";
+                case ErrorConditions.InvalidMovement:
+                    return "Invalid Movement";
+                case ErrorConditions.InvalidSquare:
+                    return "Invalid square";
+                case ErrorConditions.MustMoveOwnPiece:
+                    return "Must move own piece";
+                case ErrorConditions.PieceInWay:
+                    return "Piece in way";
+                case ErrorConditions.PiecePinned:
+                    return "Piece pinned";
+
+                default:
+                    return error.ToString();
             }
         }
     }
