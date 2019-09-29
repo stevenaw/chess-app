@@ -125,9 +125,9 @@ namespace ChessLibrary.ConsoleApp
                 case ErrorConditions.CantTakeOwnPiece:
                     return "Can't take own piece";
                 case ErrorConditions.InvalidInput:
-                    return "Invalid Input";
+                    return "Invalid input";
                 case ErrorConditions.InvalidMovement:
-                    return "Invalid Movement";
+                    return "Invalid movement";
                 case ErrorConditions.InvalidSquare:
                     return "Invalid square";
                 case ErrorConditions.MustMoveOwnPiece:
