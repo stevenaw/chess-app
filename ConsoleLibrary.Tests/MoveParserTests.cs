@@ -1,4 +1,5 @@
 ﻿using ChessLibrary.Models;
+using ChessLibrary.Serialization;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -208,6 +209,30 @@ namespace ChessLibrary.Tests
             Move move;
 
             BoardStateManipulator.SetPiece(board, startSq, piece);
+            var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
+            
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+
+            Assert.That(success, Is.True);
+
+            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+        }
+
+        [TestCase("8/8/8/8/8/8/8/R6R", "Rac1", SquareContents.Rook | SquareContents.White, "a1", "c1")]
+        [TestCase("8/8/8/8/8/8/8/R6R", "Rhc1", SquareContents.Rook | SquareContents.White, "h1", "c1")]
+        [TestCase("5R2/8/8/8/8/8/8/5R2", "R1f2", SquareContents.Rook | SquareContents.White, "f1", "f2")]
+        [TestCase("5R2/8/8/8/8/8/8/5R2", "R8f2", SquareContents.Rook | SquareContents.White, "f8", "f2")]
+        public void TryParseMove_GeneratesProperSquare_WithDisambiguation(string state, string input, SquareContents piece, string expectedStart, string expectedEnd)
+        {
+            var serializer = new FenSerializer();
+            var board = serializer.Deserialize(state);
+            var endSq = MoveParser.ParseSquare(expectedEnd);
+            var startSq = MoveParser.ParseSquare(expectedStart);
+
+            Move move;
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
             
             var success = MoveParser.TryParseMove(input, board, pieceMask, out move);

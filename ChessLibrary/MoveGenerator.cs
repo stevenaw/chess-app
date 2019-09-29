@@ -5,15 +5,16 @@ namespace ChessLibrary
 {
     internal static class MoveGenerator
     {
-        private const ulong Rank1 = 0x00000000000000FF;
-        private const ulong Rank8 = 0xFF00000000000000;
-        private const ulong FileA = 0x0101010101010101;
-        private const ulong FileAB = 0x0303030303030303;
-        private const ulong FileH = 0x8080808080808080;
-        private const ulong FileGH = 0xC0C0C0C0C0C0C0C0;
+        public const ulong Rank1 = 0x00000000000000FF;
+        public const ulong Rank8 = 0xFF00000000000000;
+        public const ulong FileA = 0x0101010101010101;
+        public const ulong FileAB = 0x0303030303030303;
+        public const ulong FileH = 0x8080808080808080;
+        public const ulong FileGH = 0xC0C0C0C0C0C0C0C0;
+        public const ulong AllRanksFiles = 0xFFFFFFFFFFFFFFFF;
 
-        private const ulong PawnStartRowWhite = 0x000000000000FF00;
-        private const ulong PawnStartRowBlack = 0x00FF000000000000;
+        public const ulong PawnStartRowWhite = 0x000000000000FF00;
+        public const ulong PawnStartRowBlack = 0x00FF000000000000;
 
         public static ulong GenerateMovesForPiece(BoardState state, ulong square)
         {

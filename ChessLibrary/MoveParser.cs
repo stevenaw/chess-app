@@ -50,9 +50,10 @@ namespace ChessLibrary
             // ✔ Account for long-form move (Nb1 c3, Nb1-c3)
             // ✔ Account for long-form capture (Ne2xa4)
             // ❔ Account for short-form capture (Nxg4, axb4)
-            // ❔ Account for disambiguation (Ngg4)
+            // ✔ Account for disambiguation (Ngg4)
             // ✔ Account for piece promotions (e8=Q)
-            //   ❔ Account for if pawn moves to end without speccifying promotion
+            //   ❔ Account for if pawn moves to end without specifying promotion
+            //   ❔ Account for if non-pawn specifies promotion
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
@@ -118,6 +119,7 @@ namespace ChessLibrary
 
             {
                 var endBit = BitTranslator.TranslateToBit(result.EndFile, result.EndRank);
+                var disambiguityMask = BuildDisambiguityMask(result);
 
                 switch(pieceDesignation)
                 {
@@ -126,6 +128,9 @@ namespace ChessLibrary
                             var possibleStartBits = MoveGenerator.GetKingMovements(endBit);
                             var existingOfPiece = state.Kings & piecesOnCurrentSide;
                             var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
 
                             if (actualStartPiece == 0)
                                 return false;
@@ -143,6 +148,9 @@ namespace ChessLibrary
                             var existingOfPiece = state.Knights & piecesOnCurrentSide;
                             var actualStartPiece = possibleStartBits & existingOfPiece;
 
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
+
                             if (actualStartPiece == 0)
                                 return false;
 
@@ -158,6 +166,9 @@ namespace ChessLibrary
                             var possibleStartBits = MoveGenerator.GetQueenMovements(endBit, state);
                             var existingOfPiece = state.Queens & piecesOnCurrentSide;
                             var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
 
                             if (actualStartPiece == 0)
                                 return false;
@@ -175,6 +186,9 @@ namespace ChessLibrary
                             var existingOfPiece = state.Rooks & piecesOnCurrentSide;
                             var actualStartPiece = possibleStartBits & existingOfPiece;
 
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
+
                             if (actualStartPiece == 0)
                                 return false;
 
@@ -190,6 +204,9 @@ namespace ChessLibrary
                             var possibleStartBits = MoveGenerator.GetBishopMovements(endBit, state);
                             var existingOfPiece = state.Bishops & piecesOnCurrentSide;
                             var actualStartPiece = possibleStartBits & existingOfPiece;
+
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
 
                             if (actualStartPiece == 0)
                                 return false;
@@ -219,6 +236,9 @@ namespace ChessLibrary
                                 actualStartPiece = pawns & possibleStart;
                             }
 
+                            if (disambiguityMask != 0)
+                                actualStartPiece &= disambiguityMask;
+
                             if (actualStartPiece == 0)
                                 return false;
 
@@ -233,6 +253,22 @@ namespace ChessLibrary
                         return false;
                 }
             }
+        }
+
+        private static ulong BuildDisambiguityMask(Move result)
+        {
+            if (result.StartRank != 0)
+            {
+                int shift = (result.StartRank - 1) * 8;
+                return MoveGenerator.Rank1 << shift;
+            }
+            else if (result.StartFile != 0)
+            {
+                int shift = (result.StartFile - 'a');
+                return MoveGenerator.FileA << shift;
+            }
+            else
+                return 0;
         }
 
         private static ReadOnlySpan<char> TrimMoveDescriptors(ReadOnlySpan<char> move)
