@@ -168,7 +168,7 @@ namespace ChessLibrary.Tests
             Assert.That(move.EndFile, Is.EqualTo(endSq.File));
         }
 
-        [TestCase("a2 a4", SquareContents.Pawn | SquareContents.White, "a2", "a4")]
+        [TestCase("a2a4", SquareContents.Pawn | SquareContents.White, "a2", "a4")]
         [TestCase("a2-a4", SquareContents.Pawn | SquareContents.White, "a2", "a4")]
         [TestCase("a2xa4", SquareContents.Pawn | SquareContents.White, "a2", "a4")]
         [TestCase("a3", SquareContents.Pawn | SquareContents.White, "a2", "a3")]
@@ -176,27 +176,27 @@ namespace ChessLibrary.Tests
         [TestCase("d5", SquareContents.Pawn | SquareContents.Black, "d7", "d5")]
         [TestCase("d6", SquareContents.Pawn | SquareContents.Black, "d7", "d6")]
 
-        [TestCase("Kb1 c2", SquareContents.King | SquareContents.White, "b1", "c2")]
+        [TestCase("Kb1c2", SquareContents.King | SquareContents.White, "b1", "c2")]
         [TestCase("Kb1-c2", SquareContents.King | SquareContents.White, "b1", "c2")]
         [TestCase("Kb1xc2", SquareContents.King | SquareContents.White, "b1", "c2")]
         [TestCase("Kc2", SquareContents.King | SquareContents.White, "b1", "c2")]
 
-        [TestCase("Qb1 d3", SquareContents.Queen | SquareContents.White, "b1", "d3")]
+        [TestCase("Qb1d3", SquareContents.Queen | SquareContents.White, "b1", "d3")]
         [TestCase("Qb1-d3", SquareContents.Queen | SquareContents.White, "b1", "d3")]
         [TestCase("Qb1xd3", SquareContents.Queen | SquareContents.White, "b1", "d3")]
         [TestCase("Qd3", SquareContents.Queen | SquareContents.White, "b1", "d3")]
 
-        [TestCase("Rb1 b4", SquareContents.Rook | SquareContents.White, "b1", "b4")]
+        [TestCase("Rb1b4", SquareContents.Rook | SquareContents.White, "b1", "b4")]
         [TestCase("Rb1-b4", SquareContents.Rook | SquareContents.White, "b1", "b4")]
         [TestCase("Rb1xb4", SquareContents.Rook | SquareContents.White, "b1", "b4")]
         [TestCase("Rb4", SquareContents.Rook | SquareContents.White, "b1", "b4")]
 
-        [TestCase("Bb1 d3", SquareContents.Bishop | SquareContents.White, "b1", "d3")]
+        [TestCase("Bb1d3", SquareContents.Bishop | SquareContents.White, "b1", "d3")]
         [TestCase("Bb1-d3", SquareContents.Bishop | SquareContents.White, "b1", "d3")]
         [TestCase("Bb1xd3", SquareContents.Bishop | SquareContents.White, "b1", "d3")]
         [TestCase("Bd3", SquareContents.Bishop | SquareContents.White, "b1", "d3")]
 
-        [TestCase("Nb1 c3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
+        [TestCase("Nb1c3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
         [TestCase("Nb1-c3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
         [TestCase("Nb1xc3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
         [TestCase("Nc3", SquareContents.Knight | SquareContents.White, "b1", "c3")]

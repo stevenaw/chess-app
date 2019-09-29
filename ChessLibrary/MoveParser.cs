@@ -35,6 +35,12 @@ namespace ChessLibrary
             Constants.PieceNotation.King,
         };
 
+        private static readonly char[] SquareDelimiters = new char[]
+        {
+            'x',
+            '-'
+        };
+
         // Parses a move, but does not determine validity
         public static bool TryParseMove(string input, BoardState state, ulong piecesOnCurrentSide, out Move result)
         {
@@ -73,37 +79,45 @@ namespace ChessLibrary
             if (TryHandleCastling(moveNotation, isWhiteMove, ref result))
                 return true;
 
-            // TODO: Change this so it parses from end first (always have end square, infer start square any any other things)
-            int squareIdx = 0;
-            char pieceDesignation = '\0';
-            if (PieceDesignations.Contains(moveNotation[squareIdx]))
-                pieceDesignation = moveNotation[squareIdx++];
-
-            // TODO: Sanity check for if at end of board too
-            if (pieceDesignation == '\0' || pieceDesignation == 'P')
-                result.PromotedPiece = GetPromotion(moveDescriptors, isWhiteMove);
-
-            char file = Char.ToLower(moveNotation[squareIdx++]);
-            int rank = moveNotation[squareIdx++] - '0';
-
-            if (squareIdx < moveNotation.Length && (
-                moveNotation[squareIdx] == '-' || moveNotation[squareIdx] == 'x' || moveNotation[squareIdx] == ' '
-                ))
+            // Read leading piece designation
+            char pieceDesignation;
+            if (PieceDesignations.Contains(moveNotation[0]))
             {
-                result.StartFile = file;
-                result.StartRank = rank;
-
-                result.EndFile = Char.ToLower(moveNotation[++squareIdx]);
-                result.EndRank = moveNotation[++squareIdx] - '0';
-
-                return true;
+                pieceDesignation = moveNotation[0];
+                moveNotation = moveNotation.Slice(1);
             }
             else
             {
-                result.EndFile = file;
-                result.EndRank = rank;
+                pieceDesignation = 'P';
+            }
 
-                var endBit = BitTranslator.TranslateToBit(file, rank);
+            // Read promotion (if present)
+            if (pieceDesignation == 'P')
+                result.PromotedPiece = GetPromotion(moveDescriptors, isWhiteMove);
+
+
+            int squareIdx = moveNotation.Length - 1;
+
+            // Get end square (must be present)
+            result.EndRank = moveNotation[squareIdx--] - '0';
+            result.EndFile = Char.ToLower(moveNotation[squareIdx--]);
+
+            // Ignore delimiter (if present)
+            if (squareIdx > 0 && SquareDelimiters.Contains(moveNotation[squareIdx]))
+                squareIdx--;
+
+            // Read start squares (if present)
+            if (squareIdx >= 0 && Char.IsDigit(moveNotation[squareIdx]))
+                result.StartRank = moveNotation[squareIdx--] - '0';
+
+            if (squareIdx >= 0 && Char.IsLetter(moveNotation[squareIdx]))
+                result.StartFile = Char.ToLower(moveNotation[squareIdx--]);
+
+            if (result.StartRank != 0 && result.StartFile != 0)
+                return true;
+
+            {
+                var endBit = BitTranslator.TranslateToBit(result.EndFile, result.EndRank);
 
                 switch(pieceDesignation)
                 {
@@ -295,6 +309,7 @@ namespace ChessLibrary
 
         private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)
         {
+            // TODO: Sanity check for if at end of board too
             if (descriptor.Length == 2 && descriptor[0] == '=')
             {
                 var contents = GetSquareContents(descriptor[1], isWhiteTurn);

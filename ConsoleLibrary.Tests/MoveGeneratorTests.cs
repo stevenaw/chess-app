@@ -7,7 +7,7 @@ namespace ChessLibrary.Tests
     [TestFixture]
     public class MoveGeneratorTests
     {
-        [TestCase("h5", SquareContents.White | SquareContents.Queen, "e2 e4", "h7 h5", "d1 h5")]
+        [TestCase("h5", SquareContents.White | SquareContents.Queen, "e2-e4", "h7-h5", "d1-h5")]
         public void PlacesPieceOnIntendedSquare(string focusSquare, SquareContents expectedContents, params string[] moveStrings)
         {
             var game = new Game();
