@@ -162,6 +162,24 @@ namespace ChessLibrary.Tests
             Assert.That(success, Is.False);
         }
 
+        [TestCase("Ra1a9", "a1", SquareContents.Rook | SquareContents.Rook)]
+        [TestCase("Ra1i2", "a1", SquareContents.Rook | SquareContents.Rook)]
+        [TestCase("Ra9a2", "a1", SquareContents.Rook | SquareContents.Rook)]
+        [TestCase("Ri2a2", "a1", SquareContents.Rook | SquareContents.Rook)]
+        public void TryParseMove_InvalidSquare_ReturnsFalse(string input, string expectedStart, SquareContents piece)
+        {
+            var board = BoardState.Empty;
+            var startSq = MoveParser.ParseSquare(expectedStart);
+
+            BoardStateManipulator.SetPiece(board, startSq, piece);
+            var pieceMask = ((piece & SquareContents.Colours) == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
+
+
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out _);
+
+            Assert.That(success, Is.False);
+        }
+
 
         [TestCase("0-0", PieceColor.White, "e1", "g1")]
         [TestCase("0-0-0", PieceColor.White, "e1", "c1")]

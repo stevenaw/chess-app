@@ -17,8 +17,8 @@ namespace ChessLibrary
 
         private static readonly char[] SquareDelimiters = new char[]
         {
-            'x',
-            '-'
+            Constants.MoveType.Capture,
+            Constants.MoveType.Move
         };
 
         // TODO: Move this to another class?
@@ -40,7 +40,7 @@ namespace ChessLibrary
             // ✔ Account for regular move (a4, Ng8)
             // ✔ Account for long-form move (Nb1 c3, Nb1-c3)
             // ✔ Account for long-form capture (Ne2xa4)
-            // ❔ Account for short-form capture (Nxg4, axb4)
+            // ✔ Account for short-form capture (Nxg4, axb4)
             // ✔ Account for disambiguation (Ngg4)
             // ✔ Account for piece promotions (e8=Q)
             //   ✔ Account for promoted piece must be own colour
@@ -51,7 +51,7 @@ namespace ChessLibrary
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
             // ❔ Account for whitespace (Ne2 x a4) - fail in this case
-            // ❔ Account for invalid ranks/files - fail in this case
+            // ✔ Account for invalid ranks/files - fail in this case
 
 
             var trimmedInput = input.AsSpan().Trim();
@@ -118,8 +118,12 @@ namespace ChessLibrary
             }
 
             // Ignore delimiter (if present)
+            bool isCapture = false;
             if (squareIdx >= 0 && SquareDelimiters.Contains(moveNotation[squareIdx]))
+            {
+                isCapture = moveNotation[squareIdx] == Constants.MoveType.Capture;
                 squareIdx--;
+            }
 
             // Read start squares (if present)
             if (squareIdx >= 0 && Char.IsDigit(moveNotation[squareIdx]))
@@ -131,7 +135,7 @@ namespace ChessLibrary
             if (result.StartRank != 0 && result.StartFile != 0)
                 return IsMoveValid(result);
 
-            if (TryInferStartSquare(state, piecesOnCurrentSide, isWhiteMove, pieceDesignation, ref result))
+            if (TryInferStartSquare(state, piecesOnCurrentSide, isWhiteMove, isCapture, pieceDesignation, ref result))
                 return IsMoveValid(result);
 
             return false;
@@ -145,7 +149,7 @@ namespace ChessLibrary
                 && move.EndRank >= 1 && move.EndRank <= 8;
         }
 
-        private static bool TryInferStartSquare(BoardState state, ulong piecesOnCurrentSide, bool isWhiteMove, char pieceDesignation, ref Move result)
+        private static bool TryInferStartSquare(BoardState state, ulong piecesOnCurrentSide, bool isWhiteMove, bool isCapture, char pieceDesignation, ref Move result)
         {
             var endBit = BitTranslator.TranslateToBit(result.EndFile, result.EndRank);
             var disambiguityMask = BuildDisambiguityMask(result);
@@ -249,24 +253,22 @@ namespace ChessLibrary
 
                 case Constants.PieceNotation.Pawn:
                     {
-                        ulong actualStartPiece = 0;
-
-                        // TODO: Pawn capture
+                        ulong actualStartPiece;
                         if (isWhiteMove)
                         {
-                            var possibleStart = endBit >> 8 | endBit >> 16;
-                            // var possibleAttacks = (endBit >> 7 & (~MoveGenerator.Rank8)) | (endBit >> 9 & (~MoveGenerator.Rank1));
-                            var possibleAttacks = 0UL;
+                            var possibleMoves = endBit >> 8 | endBit >> 16;
+                            var possibleAttacks = (endBit >> 7 & (~MoveGenerator.Rank8)) | (endBit >> 9 & (~MoveGenerator.Rank1));
+                            var possibleStart = isCapture ? possibleAttacks : possibleMoves;
                             var pawns = state.Pawns & state.WhitePieces;
-                            actualStartPiece = pawns & (possibleStart | possibleAttacks);
+                            actualStartPiece = pawns & possibleStart;
                         }
                         else
                         {
-                            var possibleStart = endBit << 8 | endBit << 16;
-                            //var possibleAttacks = (endBit << 7 & (~MoveGenerator.Rank1)) | (endBit << 9 & (~MoveGenerator.Rank8));
-                            var possibleAttacks = 0UL;
+                            var possibleMoves = endBit << 8 | endBit << 16;
+                            var possibleAttacks = (endBit << 7 & (~MoveGenerator.Rank1)) | (endBit << 9 & (~MoveGenerator.Rank8));
+                            var possibleStart = isCapture ? possibleAttacks : possibleMoves;
                             var pawns = state.Pawns & state.BlackPieces;
-                            actualStartPiece = pawns & (possibleStart | possibleAttacks);
+                            actualStartPiece = pawns & possibleStart;
                         }
 
                         if (disambiguityMask != 0)

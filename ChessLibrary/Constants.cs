@@ -12,6 +12,12 @@
             public const char King = 'K';
         }
 
+        internal static class MoveType
+        {
+            public const char Move = '-';
+            public const char Capture = 'x';
+        }
+
         internal static class Board
         {
             public const int NumberOfRows = 8;
