@@ -118,7 +118,7 @@ namespace ChessLibrary
             }
 
             // Ignore delimiter (if present)
-            if (squareIdx > 0 && SquareDelimiters.Contains(moveNotation[squareIdx]))
+            if (squareIdx >= 0 && SquareDelimiters.Contains(moveNotation[squareIdx]))
                 squareIdx--;
 
             // Read start squares (if present)
@@ -251,17 +251,22 @@ namespace ChessLibrary
                     {
                         ulong actualStartPiece = 0;
 
+                        // TODO: Pawn capture
                         if (isWhiteMove)
                         {
                             var possibleStart = endBit >> 8 | endBit >> 16;
+                            // var possibleAttacks = (endBit >> 7 & (~MoveGenerator.Rank8)) | (endBit >> 9 & (~MoveGenerator.Rank1));
+                            var possibleAttacks = 0UL;
                             var pawns = state.Pawns & state.WhitePieces;
-                            actualStartPiece = pawns & possibleStart;
+                            actualStartPiece = pawns & (possibleStart | possibleAttacks);
                         }
                         else
                         {
                             var possibleStart = endBit << 8 | endBit << 16;
+                            //var possibleAttacks = (endBit << 7 & (~MoveGenerator.Rank1)) | (endBit << 9 & (~MoveGenerator.Rank8));
+                            var possibleAttacks = 0UL;
                             var pawns = state.Pawns & state.BlackPieces;
-                            actualStartPiece = pawns & possibleStart;
+                            actualStartPiece = pawns & (possibleStart | possibleAttacks);
                         }
 
                         if (disambiguityMask != 0)
