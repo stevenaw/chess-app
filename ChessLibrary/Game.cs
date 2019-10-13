@@ -100,7 +100,10 @@ namespace ChessLibrary
             // ✔ Account for piece promotions
             // ✔ Detect checks
             // ✔ Detect checkmate
+            // TODO: Detect draw conditions
             // ✔ Detect stalemate
+            // ? Detect draw by repetition
+            // ? Detect draw by inactivity (50 moves without a capture)
 
             // TODO: Ensure we clear old state on en passant
 
