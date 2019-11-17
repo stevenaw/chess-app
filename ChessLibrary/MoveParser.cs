@@ -36,7 +36,7 @@ namespace ChessLibrary
         public static bool TryParseMove(string input, BoardState state, ulong piecesOnCurrentSide, out Move result)
         {
             // TODO: Properly parse move + return
-            // ✔ Account for castling (0-0, 0-0-0)
+            // ✔ Account for castling (O-O, O-O-O)
             // ✔ Account for regular move (a4, Ng8)
             // ✔ Account for long-form move (Nb1 c3, Nb1-c3)
             // ✔ Account for long-form capture (Ne2xa4)
@@ -308,7 +308,7 @@ namespace ChessLibrary
         private static ReadOnlySpan<char> TrimMoveDescriptors(ReadOnlySpan<char> move)
         {
             for (var i = move.Length - 1; i >= 0; i--)
-                if (Char.IsDigit(move[i]))
+                if (Char.IsDigit(move[i]) || move[i] == 'O')
                     return move.Slice(0, i + 1);
 
             return ReadOnlySpan<char>.Empty;
@@ -316,8 +316,8 @@ namespace ChessLibrary
 
         private static bool TryHandleCastling(ReadOnlySpan<char> moveNotation, bool isWhiteMove, ref Move result)
         {
-            var castleKingside = moveNotation.Equals("0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
-            var castleQueenside = moveNotation.Equals("0-0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var castleKingside = moveNotation.Equals("O-O".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var castleQueenside = moveNotation.Equals("O-O-O".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
             if (castleKingside || castleQueenside)
             {
