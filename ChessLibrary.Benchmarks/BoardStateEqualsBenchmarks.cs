@@ -56,6 +56,9 @@ namespace ChessLibrary.Benchmarks
         public static Func<object, object, bool> GetFastCheck()
         {
             // Used internally by ValueType::Equals for tightly-packed structs
+            //https://github.com/dotnet/coreclr/blob/5b1c001/src/System.Private.CoreLib/src/System/ValueType.cs#L42-L43
+            //https://github.com/dotnet/coreclr/blob/e9ac7dc62becb08463a3d5a71f02eb247b1727c7/src/vm/comutilnative.cpp#L1946-L1948
+            //https://github.com/dotnet/coreclr/blob/e9ac7dc62becb08463a3d5a71f02eb247b1727c7/src/vm/comutilnative.cpp#L1966
             var member = typeof(ValueType).GetMethod(
                 "FastEqualsCheck",
                 BindingFlags.NonPublic | BindingFlags.Static
