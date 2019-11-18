@@ -1,14 +1,21 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
-using System.Text;
 
 namespace ChessLibrary.Benchmarks
 {
+    /*
+|                  Method |      Mean |      Error |    StdDev | Ratio | RatioSD |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------ |----------:|-----------:|----------:|------:|--------:|-------:|------:|------:|----------:|
+|           DefaultEquals | 40.701 ns | 56.7452 ns | 3.1104 ns |  1.00 |    0.00 | 0.1020 |     - |     - |     160 B |
+|         InternalsEquals | 25.963 ns |  2.0201 ns | 0.1107 ns |  0.64 |    0.04 | 0.1020 |     - |     - |     160 B |
+|            CustomEquals | 20.989 ns |  0.2201 ns | 0.0121 ns |  0.52 |    0.04 |      - |     - |     - |         - |
+|  CustomEqualsWithMemcmp | 22.226 ns |  0.5209 ns | 0.0286 ns |  0.55 |    0.04 |      - |     - |     - |         - |
+|  CustomEqualsWithVector | 32.526 ns | 14.1760 ns | 0.7770 ns |  0.80 |    0.07 |      - |     - |     - |         - |
+| CustomEqualsWithPropCmp |  6.180 ns |  0.4205 ns | 0.0230 ns |  0.15 |    0.01 |      - |     - |     - |         - |
+    */
     [MemoryDiagnoser, ShortRunJob]
     public class BoardStateEqualsBenchmarks
     {
