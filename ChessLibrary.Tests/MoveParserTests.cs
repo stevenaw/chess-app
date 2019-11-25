@@ -119,14 +119,12 @@ namespace ChessLibrary.Tests
         [TestCase("a2", "a3", "a2", PieceColor.Black, SquareContents.Empty)]
         public void TryParseMove_ParsesPromotion(string input, string expectedStart, string expectedEnd, PieceColor color, SquareContents piece)
         {
-            var board = BoardState.Empty;
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var startSq = MoveParser.ParseSquare(expectedStart);
             var pieceColor = color == PieceColor.White ? SquareContents.White : SquareContents.Black;
-
+            var board = BoardState.Empty.SetPiece(startSq, SquareContents.Pawn | pieceColor);
             Move move;
 
-            BoardStateManipulator.SetPiece(board, startSq, SquareContents.Pawn | pieceColor);
             var pieceMask = (pieceColor == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
 
             var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
@@ -150,12 +148,9 @@ namespace ChessLibrary.Tests
         [TestCase("Ra1=P", "a2", SquareContents.Rook | SquareContents.Black)]
         public void TryParseMove_InvalidPromotion_ReturnsFalse(string input, string expectedStart, SquareContents piece)
         {
-            var board = BoardState.Empty;
             var startSq = MoveParser.ParseSquare(expectedStart);
-
-            BoardStateManipulator.SetPiece(board, startSq, piece);
+            var board = BoardState.Empty.SetPiece(startSq, piece);
             var pieceMask = ((piece & SquareContents.Colours) == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
-
 
             var success = MoveParser.TryParseMove(input, board, pieceMask, out _);
 
@@ -168,12 +163,10 @@ namespace ChessLibrary.Tests
         [TestCase("Ri2a2", "a1", SquareContents.Rook | SquareContents.Rook)]
         public void TryParseMove_InvalidSquare_ReturnsFalse(string input, string expectedStart, SquareContents piece)
         {
-            var board = BoardState.Empty;
             var startSq = MoveParser.ParseSquare(expectedStart);
+            var board = BoardState.Empty.SetPiece(startSq, piece);
 
-            BoardStateManipulator.SetPiece(board, startSq, piece);
             var pieceMask = ((piece & SquareContents.Colours) == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
-
 
             var success = MoveParser.TryParseMove(input, board, pieceMask, out _);
 
@@ -236,15 +229,13 @@ namespace ChessLibrary.Tests
         [TestCase("Nc3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
         public void TryParseMove_GeneratesProperSquare_WhenMoving(string input, SquareContents piece, string expectedStart, string expectedEnd)
         {
-            var board = BoardState.Empty;
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var startSq = MoveParser.ParseSquare(expectedStart);
-            Move move;
+            var board = BoardState.Empty.SetPiece(startSq, piece);
 
-            BoardStateManipulator.SetPiece(board, startSq, piece);
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
             
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out Move move);
 
             Assert.That(success, Is.True);
 
@@ -269,18 +260,16 @@ namespace ChessLibrary.Tests
         [TestCase("Nxc3", SquareContents.Knight | SquareContents.White, "b1", "c3")]
         public void TryParseMove_GeneratesProperSquare_WhenCapturing(string input, SquareContents piece, string expectedStart, string expectedEnd)
         {
-            var board = BoardState.Empty;
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var startSq = MoveParser.ParseSquare(expectedStart);
-            Move move;
-
             var capturedPiece = (SquareContents.Pieces & piece) | (SquareContents.Colours & ~piece);
+            var board =  BoardState.Empty
+                            .SetPiece(startSq, piece)
+                            .SetPiece(startSq, capturedPiece);
 
-            BoardStateManipulator.SetPiece(board, startSq, piece);
-            BoardStateManipulator.SetPiece(board, startSq, capturedPiece);
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
 
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out Move move);
 
             Assert.That(success, Is.True);
 

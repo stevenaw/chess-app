@@ -31,11 +31,11 @@ namespace ChessLibrary.Tests
             var endSquare = MoveParser.ParseSquare("e8");
             var endBit = BitTranslator.TranslateToBit(endSquare.File, endSquare.Rank);
 
-            BoardState state = BoardState.Empty;
-            BoardStateManipulator.SetPiece(state, startSquare, SquareContents.White | SquareContents.Queen);
-            BoardStateManipulator.SetPiece(state, endSquare, SquareContents.Black | SquareContents.King);
+            BoardState board = BoardState.Empty
+                .SetPiece(startSquare, SquareContents.White | SquareContents.Queen)
+                .SetPiece(endSquare, SquareContents.Black | SquareContents.King);
 
-            var squares = MoveGenerator.GenerateStandardMoves(state, state.WhitePieces, 0);
+            var squares = MoveGenerator.GenerateStandardMoves(board, board.WhitePieces, 0);
 
             Assert.That(squares & endBit, Is.Not.EqualTo(0));
         }
@@ -44,11 +44,9 @@ namespace ChessLibrary.Tests
         [TestCase("a2", SquareContents.White | SquareContents.King, 5)]
         public void GeneratesExpectedSquares_MatchesCount(string sq, SquareContents piece, int expectedSquares)
         {
-            var board = BoardState.Empty;
             var square = MoveParser.ParseSquare(sq);
             ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
-
-            BoardStateManipulator.SetPiece(board, bitSquare, piece);
+            var board = BoardState.Empty.SetPiece(bitSquare, piece);
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank);
@@ -60,12 +58,12 @@ namespace ChessLibrary.Tests
         [TestCase("a2", SquareContents.White | SquareContents.King, "a1,b1,b2,b3,a3")]
         public void GeneratesExpectedSquares_HasExact(string sq, SquareContents piece, string expectedSquares)
         {
-            var board = BoardState.Empty;
             var square = MoveParser.ParseSquare(sq);
             ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
+            var board = BoardState.Empty.SetPiece(bitSquare, piece);
+
             var expected = expectedSquares.Split(',').Select(MoveParser.ParseSquare).ToArray();
 
-            BoardStateManipulator.SetPiece(board, bitSquare, piece);
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank).ToArray();
@@ -76,12 +74,11 @@ namespace ChessLibrary.Tests
         [TestCase("b1", SquareContents.White | SquareContents.Bishop, "a2,c2")]
         public void GeneratesExpectedSquares_ContainsExpected(string sq, SquareContents piece, string expectedSquares)
         {
-            var board = BoardState.Empty;
             var square = MoveParser.ParseSquare(sq);
             ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
+            var board = BoardState.Empty.SetPiece(bitSquare, piece);
             var expected = expectedSquares.Split(',').Select(MoveParser.ParseSquare).ToArray();
 
-            BoardStateManipulator.SetPiece(board, bitSquare, piece);
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank).ToArray();
@@ -93,12 +90,12 @@ namespace ChessLibrary.Tests
         [TestCase("b1", SquareContents.Black | SquareContents.Bishop, "a1")]
         public void GeneratesExpectedSquares_OmitsUnexpected(string sq, SquareContents piece, string expectedSquares)
         {
-            var board = BoardState.Empty;
-            var square = MoveParser.ParseSquare(sq);
-            ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
             var expected = expectedSquares.Split(',').Select(MoveParser.ParseSquare).ToArray();
 
-            BoardStateManipulator.SetPiece(board, bitSquare, piece);
+            var square = MoveParser.ParseSquare(sq);
+            ulong bitSquare = BitTranslator.TranslateToBit(square.File, square.Rank);
+            var board = BoardState.Empty.SetPiece(bitSquare, piece);
+
             var game = new Game(board);
 
             var validMoves = game.GetValidMoves(square.File, square.Rank).ToArray();

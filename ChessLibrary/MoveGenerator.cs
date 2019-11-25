@@ -67,8 +67,7 @@ namespace ChessLibrary
             // Try the move and see if it lands in check
             // There's probably a better way to do this using a stateful 'squares attacked by' approach
 
-            var newState = state.Copy();
-            BoardStateManipulator.MovePiece(newState, square, targetMove);
+            var newState = state.Copy().MovePiece(square, targetMove);
 
             var ownPieces = (newState.WhitePieces & targetMove) != 0 ? newState.WhitePieces : newState.BlackPieces;
             var opposingPieces = newState.AllPieces & ~ownPieces;
@@ -251,6 +250,7 @@ namespace ChessLibrary
 
         private static ulong FillDiagonals(ulong input, BoardState state)
         {
+            // TODO: FIX. Passing ShiftRight or ShiftLeft allocates
             ulong descendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileA | Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8 + 1, FileH | Rank8);
 
@@ -262,6 +262,7 @@ namespace ChessLibrary
 
         private static ulong FillVerticalAndHorizontal(ulong input, BoardState state)
         {
+            // TODO: FIX. Passing ShiftRight or ShiftLeft allocates
             ulong vertical = TraverseUntilCant(state, input, ShiftRight, 8, Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8, Rank8);
 

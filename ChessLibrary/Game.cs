@@ -107,9 +107,9 @@ namespace ChessLibrary
 
             // TODO: Ensure we clear old state on en passant
 
-            BoardStateManipulator.MovePiece(BoardState, startSquare, endSquare);
+            BoardState = BoardState.MovePiece(startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
-                BoardStateManipulator.SetPiece(BoardState, endSquare, move.PromotedPiece);
+                BoardState = BoardState.SetPiece(endSquare, move.PromotedPiece);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
                 ? BoardState.WhitePieces : BoardState.BlackPieces;

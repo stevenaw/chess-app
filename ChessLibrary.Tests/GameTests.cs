@@ -14,12 +14,10 @@ namespace ChessLibrary.Tests
         [TestCase("a1=Q", "a2", "a1", PieceColor.Black, SquareContents.Black | SquareContents.Queen)]
         public void TryParseMove_ParsesPromotion(string input, string expectedStart, string expectedEnd, PieceColor color, SquareContents piece)
         {
-            var board = BoardState.Empty;
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var startSq = MoveParser.ParseSquare(expectedStart);
             var pieceColor = color == PieceColor.White ? SquareContents.White : SquareContents.Black;
-
-            BoardStateManipulator.SetPiece(board, startSq, SquareContents.Pawn | pieceColor);
+            var board = BoardState.Empty.SetPiece(startSq, SquareContents.Pawn | pieceColor);
 
             var game = new Game(board, color);
             var result = game.Move(input);

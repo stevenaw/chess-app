@@ -1,6 +1,8 @@
-﻿namespace ChessLibrary.Models
+﻿using System.Runtime.CompilerServices;
+
+namespace ChessLibrary.Models
 {
-    internal class BoardState
+    internal readonly struct BoardState
     {
         /* 64bit long = 64 square board
          * Bit placement = squares
@@ -24,73 +26,82 @@
          *    |---------------------------------------------------------------|
          *        A       B       C       D       E       F       G       H
          */
-        public ulong WhitePieces { get; set; }
-        public ulong BlackPieces { get; set; }
+        public ulong WhitePieces { get; }
+        public ulong BlackPieces { get; }
 
-        public ulong Pawns { get; set; }
-        public ulong Bishops { get; set; }
-        public ulong Knights { get; set; }
-        public ulong Rooks { get; set; }
-        public ulong Kings { get; set; }
-        public ulong Queens { get; set; }
+        public ulong Pawns { get; }
+        public ulong Bishops { get; }
+        public ulong Knights { get; }
+        public ulong Rooks { get; }
+        public ulong Kings { get; }
+        public ulong Queens { get; }
 
-        internal BoardState Copy()
+        public ulong AllPieces => WhitePieces | BlackPieces;
+
+        public BoardState(
+            ulong white, ulong black, ulong pawns, ulong knights,
+            ulong bishops, ulong rooks, ulong queens, ulong kings
+        )
         {
-            var newState = new BoardState();
-
-            newState.WhitePieces = this.WhitePieces;
-            newState.BlackPieces = this.BlackPieces;
-
-            newState.Pawns = this.Pawns;
-            newState.Bishops = this.Bishops;
-            newState.Knights = this.Knights;
-            newState.Rooks = this.Rooks;
-            newState.Kings = this.Kings;
-            newState.Queens = this.Queens;
-
-            return newState;
+            this.WhitePieces = white;
+            this.BlackPieces = black;
+            this.Pawns = pawns;
+            this.Knights = knights;
+            this.Bishops = bishops;
+            this.Rooks = rooks;
+            this.Queens = queens;
+            this.Kings = kings;
         }
 
-        public ulong AllPieces
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BoardState SetPiece(ulong bitSquare, SquareContents contents)
         {
-            get
-            {
-                return WhitePieces | BlackPieces;
-            }
+            return BoardStateMutator.SetPiece(this, bitSquare, contents);
         }
 
-        public static BoardState Empty
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal BoardState SetPiece(Square square, SquareContents contents)
         {
-            get
-            {
-                return new BoardState();
-            }
+            return BoardStateMutator.SetPiece(this, BitTranslator.TranslateToBit(square.File, square.Rank), contents);
         }
 
-        public static BoardState DefaultPositions
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BoardState MovePiece(ulong from, ulong to)
         {
-            get
-            {
-                var v = new BoardState();
+            return BoardStateMutator.MovePiece(this, from, to);
+        }
 
-                v.WhitePieces = 0b_1111_1111_1111_1111;
-                v.Pawns = 0b_1111_1111_0000_0000;
-                v.Rooks = 0b_1000_0001;
-                v.Knights = 0b_0100_0010;
-                v.Bishops = 0b_0010_0100;
-                v.Queens = 0b_0000_1000;
-                v.Kings = 0b_0001_0000;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BoardState Copy()
+        {
+            return BoardStateMutator.Copy(this);
+        }
 
-                v.BlackPieces = (ulong)0b_1111_1111_1111_1111 << (8 * 6);
-                v.Pawns |= v.Pawns << (8 * 5);
-                v.Rooks |= v.Rooks << (8 * 7);
-                v.Knights |= v.Knights << (8 * 7);
-                v.Bishops |= v.Bishops << (8 * 7);
-                v.Queens |= v.Queens << (8 * 7);
-                v.Kings |= v.Kings << (8 * 7);
+        public static BoardState Empty { get; } = new BoardState();
 
-                return v;
-            }
+        public static BoardState DefaultPositions { get; } = GetDefaultPositions();
+
+        private static BoardState GetDefaultPositions()
+        {
+            ulong white     = 0b_1111_1111_1111_1111;
+            ulong black     = (ulong)0b_1111_1111_1111_1111 << (8 * 6);
+            ulong pawns     = 0xFF00 | ((ulong)0xFF00 << (8 * 5));
+            ulong rooks     = 0b_1000_0001 | ((ulong)0b_1000_0001 << (8 * 7));
+            ulong knights   = 0b_0100_0010 | ((ulong)0b_0100_0010 << (8 * 7));
+            ulong bishops   = 0b_0010_0100 | ((ulong)0b_0010_0100 << (8 * 7));
+            ulong queens    = 0b_0000_1000 | ((ulong)0b_0000_1000 << (8 * 7));
+            ulong kings     = 0b_0001_0000 | ((ulong)0b_0001_0000 << (8 * 7));
+
+            return new BoardState(
+                white,
+                black,
+                pawns,
+                knights,
+                bishops,
+                rooks,
+                queens,
+                kings
+            );
         }
     }
 

@@ -13,31 +13,29 @@ namespace ChessLibrary.Tests
         {
             const string FenString = "pQ4N1/3k3R/1r4n1/KbBbBppP/8/8/q7/7n";
             FenSerializer ser = new FenSerializer();
-            BoardState expected = new BoardState();
             BoardState actual;
+            BoardState expected = BoardState.Empty
+                    .SetPiece(MoveParser.ParseSquare("a8"), SquareContents.Black | SquareContents.Pawn)
+                    .SetPiece(MoveParser.ParseSquare("b8"), SquareContents.White | SquareContents.Queen)
+                    .SetPiece(MoveParser.ParseSquare("g8"), SquareContents.White | SquareContents.Knight)
 
-            // Setup
-            BoardStateManipulator.SetPiece(expected, "a8", SquareContents.Black | SquareContents.Pawn);
-            BoardStateManipulator.SetPiece(expected, "b8", SquareContents.White | SquareContents.Queen);
-            BoardStateManipulator.SetPiece(expected, "g8", SquareContents.White | SquareContents.Knight);
+                    .SetPiece(MoveParser.ParseSquare("d7"), SquareContents.Black | SquareContents.King)
+                    .SetPiece(MoveParser.ParseSquare("h7"), SquareContents.White | SquareContents.Rook)
 
-            BoardStateManipulator.SetPiece(expected, "d7", SquareContents.Black | SquareContents.King);
-            BoardStateManipulator.SetPiece(expected, "h7", SquareContents.White | SquareContents.Rook);
+                    .SetPiece(MoveParser.ParseSquare("b6"), SquareContents.Black | SquareContents.King)
+                    .SetPiece(MoveParser.ParseSquare("g6"), SquareContents.Black | SquareContents.Knight)
 
-            BoardStateManipulator.SetPiece(expected, "b6", SquareContents.Black | SquareContents.King);
-            BoardStateManipulator.SetPiece(expected, "g6", SquareContents.Black | SquareContents.Knight);
+                    .SetPiece(MoveParser.ParseSquare("a5"), SquareContents.White | SquareContents.King)
+                    .SetPiece(MoveParser.ParseSquare("b5"), SquareContents.Black | SquareContents.Bishop)
+                    .SetPiece(MoveParser.ParseSquare("c5"), SquareContents.White | SquareContents.Bishop)
+                    .SetPiece(MoveParser.ParseSquare("d5"), SquareContents.Black | SquareContents.Bishop)
+                    .SetPiece(MoveParser.ParseSquare("e5"), SquareContents.White | SquareContents.Bishop)
+                    .SetPiece(MoveParser.ParseSquare("f5"), SquareContents.Black | SquareContents.Pawn)
+                    .SetPiece(MoveParser.ParseSquare("g5"), SquareContents.Black | SquareContents.Pawn)
+                    .SetPiece(MoveParser.ParseSquare("h5"), SquareContents.White | SquareContents.Pawn)
 
-            BoardStateManipulator.SetPiece(expected, "a5", SquareContents.White | SquareContents.King);
-            BoardStateManipulator.SetPiece(expected, "b5", SquareContents.Black | SquareContents.Bishop);
-            BoardStateManipulator.SetPiece(expected, "c5", SquareContents.White | SquareContents.Bishop);
-            BoardStateManipulator.SetPiece(expected, "d5", SquareContents.Black | SquareContents.Bishop);
-            BoardStateManipulator.SetPiece(expected, "e5", SquareContents.White | SquareContents.Bishop);
-            BoardStateManipulator.SetPiece(expected, "f5", SquareContents.Black | SquareContents.Pawn);
-            BoardStateManipulator.SetPiece(expected, "g5", SquareContents.Black | SquareContents.Pawn);
-            BoardStateManipulator.SetPiece(expected, "h5", SquareContents.White | SquareContents.Pawn);
-
-            BoardStateManipulator.SetPiece(expected, "a2", SquareContents.Black | SquareContents.Queen);
-            BoardStateManipulator.SetPiece(expected, "h1", SquareContents.Black | SquareContents.Knight);
+                    .SetPiece(MoveParser.ParseSquare("a2"), SquareContents.Black | SquareContents.Queen)
+                    .SetPiece(MoveParser.ParseSquare("h1"), SquareContents.Black | SquareContents.Knight);
 
             // Act
             actual = ser.Deserialize(FenString);

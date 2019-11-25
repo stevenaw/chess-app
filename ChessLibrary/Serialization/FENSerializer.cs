@@ -97,7 +97,7 @@ namespace ChessLibrary.Serialization
                     var piece = FromNotation(input[i]);
                     var squareIdx = currRank * Constants.Board.NumberOfFiles + currFile;
 
-                    BoardStateManipulator.SetPiece(board, 1UL << squareIdx, piece);
+                    board = board.SetPiece(1UL << squareIdx, piece);
                     currFile++;
                 }
                 else
