@@ -154,15 +154,14 @@ namespace ChessLibrary
             return result;
         }
 
-        private static ulong ShiftLeft(ulong lvalue, int rvalue)
+        private static readonly Func<ulong, int, ulong> ShiftLeft = (ulong lvalue, int rvalue) =>
         {
             return lvalue << rvalue;
-        }
-
-        private static ulong ShiftRight(ulong lvalue, int rvalue)
+        };
+        private static readonly Func<ulong, int, ulong> ShiftRight = (ulong lvalue, int rvalue) =>
         {
             return lvalue >> rvalue;
-        }
+        };
 
         internal static ulong GetQueenMovements(ulong input, BoardState state)
         {
@@ -250,7 +249,6 @@ namespace ChessLibrary
 
         private static ulong FillDiagonals(ulong input, BoardState state)
         {
-            // TODO: FIX. Passing ShiftRight or ShiftLeft allocates
             ulong descendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileA | Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8 + 1, FileH | Rank8);
 
@@ -262,7 +260,6 @@ namespace ChessLibrary
 
         private static ulong FillVerticalAndHorizontal(ulong input, BoardState state)
         {
-            // TODO: FIX. Passing ShiftRight or ShiftLeft allocates
             ulong vertical = TraverseUntilCant(state, input, ShiftRight, 8, Rank1)
                 | TraverseUntilCant(state, input, ShiftLeft, 8, Rank8);
 
