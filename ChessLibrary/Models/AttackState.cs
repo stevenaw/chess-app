@@ -5,6 +5,7 @@
         None = 0,
         Check,      // +
         Checkmate,  // #
-        Stalemate
+        Stalemate,
+        DrawByRepetition
     }
 }

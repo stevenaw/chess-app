@@ -40,5 +40,26 @@ namespace ChessLibrary.Tests
 
             return game.AttackState;
         }
+
+        [Test]
+        public void Move_DetectsDrawByRepetition()
+        {
+            var game = new Game();
+            var moves = new string[]
+            {
+                "Nc3", "Nc6",
+                "Nb1", "Nb8",
+                "Nc3", "Nc6",
+                "Nb1", "Nb8"
+            };
+
+            foreach (var move in moves)
+            {
+                Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.DrawByRepetition));
+                game.Move(move);
+            }
+
+            Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByRepetition));
+        }
     }
 }

@@ -103,6 +103,31 @@ namespace ChessLibrary.Models
                 kings
             );
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is BoardState bs)
+                return Equals(this, bs);
+
+            return false;
+        }
+
+        public bool Equals(BoardState other)
+        {
+            return Equals(this, other);
+        }
+
+        private static bool Equals(BoardState a, BoardState b)
+        {
+            return a.Bishops == b.Bishops
+                && a.BlackPieces == b.BlackPieces
+                && a.Kings == b.Kings
+                && a.Knights == b.Knights
+                && a.Pawns == b.Pawns
+                && a.Queens == b.Queens
+                && a.Rooks == b.Rooks
+                && a.WhitePieces == b.WhitePieces;
+        }
     }
 
 }

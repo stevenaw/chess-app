@@ -6,7 +6,8 @@ namespace ChessLibrary
 {
     public class Game
     {
-        private BoardState BoardState { get; set; }
+        private Stack<BoardState> History { get; } = new Stack<BoardState>();
+        private BoardState BoardState { get { return History.Peek(); } }
         public AttackState AttackState { get; private set; }
         private ulong CurrentTurn { get; set; }
 
@@ -18,7 +19,8 @@ namespace ChessLibrary
 
         internal Game(BoardState state, PieceColor turn)
         {
-            BoardState = state;
+            History.Push(state);
+            //BoardState = state;
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
             AttackState = AttackState.None;
         }
@@ -102,14 +104,15 @@ namespace ChessLibrary
             // ✔ Detect checkmate
             // TODO: Detect draw conditions
             // ✔ Detect stalemate
-            // ? Detect draw by repetition
+            // ✔ Detect draw by repetition
             // ? Detect draw by inactivity (50 moves without a capture)
 
             // TODO: Ensure we clear old state on en passant
 
-            BoardState = BoardState.MovePiece(startSquare, endSquare);
+            var newState = BoardState.MovePiece(startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
-                BoardState = BoardState.SetPiece(endSquare, move.PromotedPiece);
+                newState = newState.SetPiece(endSquare, move.PromotedPiece);
+            History.Push(newState);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
                 ? BoardState.WhitePieces : BoardState.BlackPieces;
@@ -125,10 +128,23 @@ namespace ChessLibrary
                 AttackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
             else if (!opponentCanMove)
                 AttackState = AttackState.Stalemate;
+            else if (CountHistoricalOccurrences(newState) >= Constants.MoveLimits.RepetitionLimit)
+                AttackState = AttackState.DrawByRepetition;
             else
                 AttackState = AttackState.None;
 
             CurrentTurn = opponentPieces;
+        }
+
+        private int CountHistoricalOccurrences(BoardState newState)
+        {
+            var count = 0;
+
+            foreach (var state in History)
+                if (state.Equals(newState))
+                    count++;
+
+            return count;
         }
 
         internal ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
@@ -155,12 +171,10 @@ namespace ChessLibrary
 
         public Move ParseMove(string input)
         {
-            Move move;
+            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
+                return move;
 
-            if (!MoveParser.TryParseMove(input, BoardState, CurrentTurn, out move))
-                throw new FormatException($"Could not parse move '{input}' for current board state");
-
-            return move;
+            throw new FormatException($"Could not parse move '{input}' for current board state");
         }
 
         public static Square ParseSquare(string input)

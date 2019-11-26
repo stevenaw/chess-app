@@ -24,5 +24,10 @@
             public const int NumberOfFiles = 8;
             public const int NumberOfSquares = NumberOfRows * NumberOfFiles;
         }
+
+        internal static class MoveLimits
+        {
+            public const int RepetitionLimit = 3;
+        }
     }
 }
