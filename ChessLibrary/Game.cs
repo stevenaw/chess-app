@@ -20,7 +20,6 @@ namespace ChessLibrary
         internal Game(BoardState state, PieceColor turn)
         {
             History.Push(state);
-            //BoardState = state;
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
             AttackState = AttackState.None;
         }
@@ -108,10 +107,15 @@ namespace ChessLibrary
             // ? Detect draw by inactivity (50 moves without a capture)
 
             // TODO: Ensure we clear old state on en passant
+            //
+            var isCapture = (BoardState.AllPieces & endSquare) != 0;
 
             var newState = BoardState.MovePiece(startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
                 newState = newState.SetPiece(endSquare, move.PromotedPiece);
+
+            if (isCapture)
+                History.Clear();
             History.Push(newState);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
@@ -128,7 +132,9 @@ namespace ChessLibrary
                 AttackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
             else if (!opponentCanMove)
                 AttackState = AttackState.Stalemate;
-            else if (CountHistoricalOccurrences(newState) >= Constants.MoveLimits.RepetitionLimit)
+            else if (History.Count == Constants.MoveLimits.InactivityLimit)
+                AttackState = AttackState.DrawByInactivity;
+            else if (CountHistoricalOccurrences(BoardState) >= Constants.MoveLimits.RepetitionLimit)
                 AttackState = AttackState.DrawByRepetition;
             else
                 AttackState = AttackState.None;

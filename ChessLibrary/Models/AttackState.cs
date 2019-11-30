@@ -6,6 +6,7 @@
         Check,      // +
         Checkmate,  // #
         Stalemate,
-        DrawByRepetition
+        DrawByRepetition,
+        DrawByInactivity,
     }
 }

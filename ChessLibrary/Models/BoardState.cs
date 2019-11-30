@@ -112,6 +112,19 @@ namespace ChessLibrary.Models
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            var value = Bishops
+                ^ BlackPieces
+                ^ Kings
+                ^ Knights
+                ^ Pawns
+                ^ Queens
+                ^ Rooks
+                ^ WhitePieces;
+            return (int)((value >> 32) ^ (value));
+        }
+
         public bool Equals(BoardState other)
         {
             return Equals(this, other);
