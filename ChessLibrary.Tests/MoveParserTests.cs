@@ -99,6 +99,17 @@ namespace ChessLibrary.Tests
             Assert.That(move.Annotation, Is.EqualTo(expectedState));
         }
 
+        [TestCase("Nb1 c3")]
+        [TestCase("Nb1 - c3")]
+        public void TryParseMove_ReturnsFalseWhenInvalid(string input)
+        {
+            var board = BoardState.DefaultPositions;
+
+            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out _);
+
+            Assert.That(success, Is.False);
+        }
+
         [TestCaseSource(nameof(AttackStateTestCases))]
         public void TryParseMove_ParsesAttackState(string input, string expectedStart, string expectedEnd, AttackState expectedState)
         {

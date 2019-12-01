@@ -99,7 +99,6 @@ namespace ChessLibrary.Tests
             };
 
             var moves = new List<string>();
-
             for (var i = 0; i < Constants.MoveLimits.RepetitionLimit; i++)
             {
                 for (var j = 0; j < interjectionSteps.Length; j += 2)
@@ -110,10 +109,11 @@ namespace ChessLibrary.Tests
                 }
             }
 
+            Assume.That(moves.Count, Is.GreaterThanOrEqualTo(Constants.MoveLimits.InactivityLimit));
+
             foreach (var setupStep in setupSteps)
                 game.Move(setupStep);
 
-            Assume.That(moves.Count, Is.GreaterThanOrEqualTo(Constants.MoveLimits.InactivityLimit));
             for (var i = 0; i < Constants.MoveLimits.InactivityLimit-1; i++)
             {
                 Assert.That(
@@ -123,7 +123,6 @@ namespace ChessLibrary.Tests
                 );
 
                 var result = game.Move(moves[i]);
-
                 Assume.That(result, Is.EqualTo(ErrorConditions.None));
             }
 

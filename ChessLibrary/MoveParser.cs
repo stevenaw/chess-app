@@ -35,7 +35,6 @@ namespace ChessLibrary
         // Parses a move, but does not determine validity
         public static bool TryParseMove(string input, BoardState state, ulong piecesOnCurrentSide, out Move result)
         {
-            // TODO: Properly parse move + return
             // ✔ Account for castling (O-O, O-O-O)
             // ✔ Account for regular move (a4, Ng8)
             // ✔ Account for long-form move (Nb1 c3, Nb1-c3)
@@ -50,14 +49,14 @@ namespace ChessLibrary
             //   ✔ Account for if specify promotion when not at end
             // ✔ Account for state change marks (Na4+, e2#)
             // ✔ Account for annotations (Na4!, e2??, b5!?)
-            // ❔ Account for whitespace (Ne2 x a4) - fail in this case
+            // ✔ Account for whitespace (Ne2 x a4) - fail in this case
             // ✔ Account for invalid ranks/files - fail in this case
 
 
             var trimmedInput = input.AsSpan().Trim();
             result = new Move();
 
-            if (trimmedInput.IsEmpty)
+            if (trimmedInput.IsEmpty || trimmedInput.IndexOf(' ') != -1)
                 return false;
 
 
