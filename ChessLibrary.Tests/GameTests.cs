@@ -51,7 +51,8 @@ namespace ChessLibrary.Tests
                 "Nc3", "Nc6",
                 "Nb1", "Nb8",
                 "Nc3", "Nc6",
-                "Nb1", "Nb8"
+                "Nb1", "Nb8",
+                "Nc3"
             };
 
             foreach (var move in moves)
@@ -66,9 +67,12 @@ namespace ChessLibrary.Tests
         [Test]
         public void Move_DetectsDrawByInactivity()
         {
-            // TODO: This accidentally counts the start position in the test. We shouldn't do that
             var game = new Game();
-            var tourSteps = new string[]
+            var setupSteps = new string[]
+            {
+                "h3", "h6",
+            };
+            var mainTour = new string[]
             {
                 // A cycle of moves to repeat
                 "Nc3", "Nc6",
@@ -88,14 +92,39 @@ namespace ChessLibrary.Tests
                 "Ng5", "Ng4",
                 "Ne4", "Ne5",
             };
-            var moves = Enumerable.Range(1, 3).SelectMany(i => tourSteps).ToArray();
-
-            Assume.That(moves.Length, Is.GreaterThan(Constants.MoveLimits.InactivityLimit));
-
-            for(var i = 0; i < Constants.MoveLimits.InactivityLimit; i++)
+            var interjectionSteps = new[]
             {
-                Assert.That(game.AttackState, Is.EqualTo(AttackState.None));
-                game.Move(moves[i]);
+                "Rh2", "Rh7",
+                "Rh1", "Rh8",
+            };
+
+            var moves = new List<string>();
+
+            for (var i = 0; i < Constants.MoveLimits.RepetitionLimit; i++)
+            {
+                for (var j = 0; j < interjectionSteps.Length; j += 2)
+                {
+                    moves.AddRange(mainTour);
+                    moves.Add(interjectionSteps[j]);
+                    moves.Add(interjectionSteps[j + 1]);
+                }
+            }
+
+            foreach (var setupStep in setupSteps)
+                game.Move(setupStep);
+
+            Assume.That(moves.Count, Is.GreaterThanOrEqualTo(Constants.MoveLimits.InactivityLimit));
+            for (var i = 0; i < Constants.MoveLimits.InactivityLimit-1; i++)
+            {
+                Assert.That(
+                    game.AttackState,
+                    Is.EqualTo(AttackState.None),
+                    () => $"Move {(i-1)/2D} of '{moves[i-1]}' resulted in {game.AttackState}"
+                );
+
+                var result = game.Move(moves[i]);
+
+                Assume.That(result, Is.EqualTo(ErrorConditions.None));
             }
 
             Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByInactivity));

@@ -28,7 +28,7 @@
         internal static class MoveLimits
         {
             public const int RepetitionLimit = 3;
-            public const int InactivityLimit = 25 * 2;
+            public const int InactivityLimit = 50 * 2;
         }
     }
 }

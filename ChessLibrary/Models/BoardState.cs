@@ -114,15 +114,13 @@ namespace ChessLibrary.Models
 
         public override int GetHashCode()
         {
-            var value = Bishops
-                ^ BlackPieces
+            var pieces = Bishops
                 ^ Kings
                 ^ Knights
                 ^ Pawns
                 ^ Queens
-                ^ Rooks
-                ^ WhitePieces;
-            return (int)((value >> 32) ^ (value));
+                ^ Rooks;
+            return (int)((pieces >> 32) ^ (pieces));
         }
 
         public bool Equals(BoardState other)

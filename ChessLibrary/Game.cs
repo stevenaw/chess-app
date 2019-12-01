@@ -7,7 +7,7 @@ namespace ChessLibrary
     public class Game
     {
         private Stack<BoardState> History { get; } = new Stack<BoardState>();
-        private BoardState BoardState { get { return History.Peek(); } }
+        private BoardState BoardState { get; set; }
         public AttackState AttackState { get; private set; }
         private ulong CurrentTurn { get; set; }
 
@@ -19,7 +19,7 @@ namespace ChessLibrary
 
         internal Game(BoardState state, PieceColor turn)
         {
-            History.Push(state);
+            BoardState = state;
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
             AttackState = AttackState.None;
         }
@@ -101,22 +101,22 @@ namespace ChessLibrary
             // ✔ Account for piece promotions
             // ✔ Detect checks
             // ✔ Detect checkmate
-            // TODO: Detect draw conditions
             // ✔ Detect stalemate
             // ✔ Detect draw by repetition
-            // ? Detect draw by inactivity (50 moves without a capture)
+            // ✔ Detect draw by inactivity (50 moves without a capture)
 
             // TODO: Ensure we clear old state on en passant
             //
             var isCapture = (BoardState.AllPieces & endSquare) != 0;
+            var isPawn = (BoardState.Pawns & startSquare) != 0;
 
-            var newState = BoardState.MovePiece(startSquare, endSquare);
+            BoardState = BoardState.MovePiece(startSquare, endSquare);
             if (move.PromotedPiece != SquareContents.Empty)
-                newState = newState.SetPiece(endSquare, move.PromotedPiece);
+                BoardState = BoardState.SetPiece(endSquare, move.PromotedPiece);
 
-            if (isCapture)
+            if (isCapture || isPawn)
                 History.Clear();
-            History.Push(newState);
+            History.Push(BoardState);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
                 ? BoardState.WhitePieces : BoardState.BlackPieces;
