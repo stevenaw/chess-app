@@ -7,6 +7,9 @@ namespace ChessLibrary
     public class Game
     {
         private Stack<BoardState> History { get; } = new Stack<BoardState>();
+        private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
+
+        private GameState GameState { get; set; }
         private BoardState BoardState { get; set; }
         public AttackState AttackState { get; private set; }
         private ulong CurrentTurn { get; set; }
@@ -22,6 +25,7 @@ namespace ChessLibrary
             BoardState = state;
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
             AttackState = AttackState.None;
+            GameState = GameState.FromState(BoardState, AttackState);
         }
 
         public PieceColor GetTurn()
@@ -116,6 +120,7 @@ namespace ChessLibrary
 
             if (isCapture || isPawn)
                 History.Clear();
+
             History.Push(BoardState);
 
             var ownPieces = (endSquare & BoardState.WhitePieces) != 0
@@ -138,6 +143,10 @@ namespace ChessLibrary
                 AttackState = AttackState.DrawByRepetition;
             else
                 AttackState = AttackState.None;
+
+            move.AttackState = AttackState;
+            // TODO: Castling stuff
+            GameHistory.Push(GameState.FromState(BoardState, AttackState, move));
 
             CurrentTurn = opponentPieces;
         }
