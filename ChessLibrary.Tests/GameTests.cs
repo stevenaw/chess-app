@@ -24,7 +24,7 @@ namespace ChessLibrary.Tests
             var result = game.Move(input);
             var expectedSquare = game.GetSquareContents(endSq.File, endSq.Rank);
 
-            Assert.That(result, Is.EqualTo(ErrorConditions.None));
+            Assert.That(result, Is.EqualTo(ErrorCondition.None));
             Assert.That(expectedSquare, Is.EqualTo(piece));
         }
 
@@ -123,7 +123,7 @@ namespace ChessLibrary.Tests
                 );
 
                 var result = game.Move(moves[i]);
-                Assume.That(result, Is.EqualTo(ErrorConditions.None));
+                Assume.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
             Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByInactivity));

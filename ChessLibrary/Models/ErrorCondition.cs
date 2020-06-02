@@ -1,6 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
-    public enum ErrorConditions
+    public enum ErrorCondition
     {
         None = 0,
         InvalidInput,

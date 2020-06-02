@@ -115,26 +115,26 @@ namespace ChessLibrary.ConsoleApp
             }
         }
 
-        private static string GetErrorMessage(ErrorConditions error)
+        private static string GetErrorMessage(ErrorCondition error)
         {
             if (error == 0)
                 return string.Empty;
 
             switch (error)
             {
-                case ErrorConditions.CantTakeOwnPiece:
+                case ErrorCondition.CantTakeOwnPiece:
                     return "Can't take own piece";
-                case ErrorConditions.InvalidInput:
+                case ErrorCondition.InvalidInput:
                     return "Invalid input";
-                case ErrorConditions.InvalidMovement:
+                case ErrorCondition.InvalidMovement:
                     return "Invalid movement";
-                case ErrorConditions.InvalidSquare:
+                case ErrorCondition.InvalidSquare:
                     return "Invalid square";
-                case ErrorConditions.MustMoveOwnPiece:
+                case ErrorCondition.MustMoveOwnPiece:
                     return "Must move own piece";
-                case ErrorConditions.PieceInWay:
+                case ErrorCondition.PieceInWay:
                     return "Piece in way";
-                case ErrorConditions.PiecePinned:
+                case ErrorCondition.PiecePinned:
                     return "Piece pinned";
 
                 default:

@@ -16,7 +16,7 @@ namespace ChessLibrary.Tests
             foreach(var move in moves)
             {
                 var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
-                Assert.That(result, Is.EqualTo(ErrorConditions.None));
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
             var targetSquare = MoveParser.ParseSquare(focusSquare);

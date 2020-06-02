@@ -61,38 +61,38 @@ namespace ChessLibrary
             return result;
         }
 
-        public ErrorConditions Move(string input)
+        public ErrorCondition Move(string input)
         {
             if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
                 return Move(move);
 
-            return ErrorConditions.InvalidInput;
+            return ErrorCondition.InvalidInput;
         }
 
-        public ErrorConditions Move(Move move)
+        public ErrorCondition Move(Move move)
         {
             if (!BitTranslator.IsValidSquare(move.StartFile, move.StartRank))
-                return ErrorConditions.InvalidSquare;
+                return ErrorCondition.InvalidSquare;
             if (!BitTranslator.IsValidSquare(move.EndFile, move.EndRank))
-                return ErrorConditions.InvalidSquare;
+                return ErrorCondition.InvalidSquare;
 
             ulong startSquare = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
             if ((CurrentTurn & startSquare) == 0)
-                return ErrorConditions.MustMoveOwnPiece; // Can't move if not your turn
+                return ErrorCondition.MustMoveOwnPiece; // Can't move if not your turn
 
             ulong endSquare = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
             if ((CurrentTurn & endSquare) != 0)
-                return ErrorConditions.CantTakeOwnPiece; // Can't end move on own piece
+                return ErrorCondition.CantTakeOwnPiece; // Can't end move on own piece
 
             ulong allMoves = MoveGenerator.GenerateMovesForPiece(BoardState, startSquare);
             if ((endSquare & allMoves) == 0)
-                return ErrorConditions.InvalidMovement; // End square is not a valid move
+                return ErrorCondition.InvalidMovement; // End square is not a valid move
 
             // The move is good, so update state
             // Update current state
             UpdateState(move, startSquare, endSquare);
 
-            return ErrorConditions.None;
+            return ErrorCondition.None;
         }
 
         private void UpdateState(Move move, ulong startSquare, ulong endSquare)
@@ -153,7 +153,7 @@ namespace ChessLibrary
             return count;
         }
 
-        internal ErrorConditions Move(char startFile, int startRank, char endFile, int endRank)
+        internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)
         {
             return Move(new Move()
             {
