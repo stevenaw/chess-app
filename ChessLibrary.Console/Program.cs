@@ -32,12 +32,7 @@ namespace ChessLibrary.ConsoleApp
             var commandName = endOfCommandName == -1 ? input : input.Substring(0, endOfCommandName).ToLower();
             var commandArgs = (endOfCommandName == -1 || endOfCommandName == input.Length - 1) ? string.Empty : input.Substring(endOfCommandName + 1);
 
-            return new Command()
-            {
-                TotalInput = input,
-                CommandName = commandName,
-                CommandArgs = commandArgs
-            };
+            return new Command(input, commandName, commandArgs);
         }
 
         private static bool ExecuteCommand(Game game, Command cmd)

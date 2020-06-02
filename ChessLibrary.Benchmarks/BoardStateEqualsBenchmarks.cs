@@ -70,7 +70,7 @@ namespace ChessLibrary.Benchmarks
                 "FastEqualsCheck",
                 BindingFlags.NonPublic | BindingFlags.Static
             );
-            return (Func<object, object, bool>)member.CreateDelegate(typeof(Func<object, object, bool>));
+            return (Func<object, object, bool>)member!.CreateDelegate(typeof(Func<object, object, bool>));
         }
 
         private static bool MyEqualsWithPropCmp(BoardState a, BoardState b)
