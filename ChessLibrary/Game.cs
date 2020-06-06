@@ -107,7 +107,7 @@ namespace ChessLibrary
             // ✔ Detect draw by repetition
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
-            var isCapture = (BoardState.AllPieces & endSquare) != 0;
+            var isCapture = (BoardState.AllPieces & endSquare) != 0; // TODO: Account for en passant
             var isPawn = (BoardState.Pawns & startSquare) != 0;
 
             var newState = GameStateMutator.ApplyMove(GameState, move);

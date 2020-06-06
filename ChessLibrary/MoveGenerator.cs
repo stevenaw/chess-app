@@ -250,27 +250,26 @@ namespace ChessLibrary
             }
 
             // Check for en passant
-            //if (!Move.Equals(previousMove, Move.Empty))
-            //{
-            //    var squareForGeneration = BitTranslator.TranslateToSquare(input);
+            if (!Move.Equals(previousMove, Move.Empty))
+            {
+                var squareForGeneration = BitTranslator.TranslateToSquare(input);
 
-            //    // Previous move ended right next to this piece
-            //    if (squareForGeneration.Rank == previousMove.EndRank
-            //        && Math.Abs((int)squareForGeneration.File - (int)previousMove.EndFile) == 1
-            //    )
-            //    {
-            //        // Previous move was also a pawn which had moved up 2
-            //        var lastMoveEndSquare = BitTranslator.TranslateToBit(previousMove.EndFile, previousMove.EndRank);
-            //        if ((state.Pawns & lastMoveEndSquare) != 0
-            //            && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
-            //        {
-            //            // Probably a better way to do this
-            //            var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
-            //            var shifted = squareForGeneration.File > previousMove.EndFile ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
-            //            newSquares |= shifted;
-            //        }
-            //    }
-            //}
+                // Previous move ended right next to this piece
+                if (squareForGeneration.Rank == previousMove.EndRank
+                    && Math.Abs((int)squareForGeneration.File - (int)previousMove.EndFile) == 1)
+                {
+                    // Previous move was also a pawn which had moved up 2
+                    var lastMoveEndSquare = BitTranslator.TranslateToBit(previousMove.EndFile, previousMove.EndRank);
+                    if ((state.Pawns & lastMoveEndSquare) != 0
+                        && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
+                    {
+                        // Probably a better way to do this
+                        var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
+                        var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
+                        newSquares |= shifted;
+                    }
+                }
+            }
 
             return newSquares;
         }
