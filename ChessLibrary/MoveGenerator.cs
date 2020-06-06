@@ -16,7 +16,7 @@ namespace ChessLibrary
         public const ulong PawnStartRowWhite = 0x000000000000FF00;
         public const ulong PawnStartRowBlack = 0x00FF000000000000;
 
-        public static ulong GenerateMovesForPiece(BoardState state, ulong square)
+        public static ulong GenerateMovesForPiece(GameState state, ulong square)
         {
             // Detect type of piece
             // Create bitmask of all moves for that piece
@@ -25,14 +25,15 @@ namespace ChessLibrary
             //   ✔ Account for can't move king into check
             // ❔ Account for can't castle through check
 
-            var isWhite = (square & state.WhitePieces) != 0;
-            var opposingPiecesCurrent = isWhite ? state.BlackPieces : state.WhitePieces;
+            var board = state.BoardState;
+            var isWhite = (square & board.WhitePieces) != 0;
+            var opposingPiecesCurrent = isWhite ? board.BlackPieces : board.WhitePieces;
             var opponentMoves = GenerateStandardMoves(state, opposingPiecesCurrent, 0);
 
             return GenerateMovesForPiece(state, square, opponentMoves);
         }
 
-        public static ulong GenerateMovesForPiece(BoardState state, ulong square, ulong opposingMoves)
+        public static ulong GenerateMovesForPiece(GameState state, ulong square, ulong opposingMoves)
         {
             // Detect type of piece
             // Create bitmask of all moves for that piece
@@ -41,9 +42,10 @@ namespace ChessLibrary
             //   ✔ Account for can't move king into check
             // ❔ Account for can't castle through check
 
-            var isWhite = (square & state.WhitePieces) != 0;
+            var board = state.BoardState;
+            var isWhite = (square & board.WhitePieces) != 0;
 
-            var ownPiecesCurrent = isWhite ? state.WhitePieces : state.BlackPieces;
+            var ownPiecesCurrent = isWhite ? board.WhitePieces : board.BlackPieces;
             var moves = GenerateStandardMovesForPiece(state, square, opposingMoves);
             moves &= ~ownPiecesCurrent;
 
@@ -62,29 +64,30 @@ namespace ChessLibrary
             return validMoves;
         }
 
-        private static bool WillMovePlaceKingUnderAttack(BoardState state, ulong square, ulong targetMove)
+        private static bool WillMovePlaceKingUnderAttack(GameState state, ulong square, ulong targetMove)
         {
             // Try the move and see if it lands in check
             // There's probably a better way to do this using a stateful 'squares attacked by' approach
 
-            var newState = state.Copy().MovePiece(square, targetMove);
+            var newState = GameStateMutator.ApplyMove(state, square, targetMove);
+            var newBoard = newState.BoardState;
 
-            var ownPieces = (newState.WhitePieces & targetMove) != 0 ? newState.WhitePieces : newState.BlackPieces;
-            var opposingPieces = newState.AllPieces & ~ownPieces;
+            var ownPieces = (newBoard.WhitePieces & targetMove) != 0 ? newBoard.WhitePieces : newBoard.BlackPieces;
+            var opposingPieces = newBoard.AllPieces & ~ownPieces;
             var opposingAttack = GenerateStandardMoves(newState, opposingPieces, 0);
-            var isKingUnderAttack = opposingAttack & (ownPieces & newState.Kings);
+            var isKingUnderAttack = opposingAttack & (ownPieces & newBoard.Kings);
 
             return isKingUnderAttack != 0;
         }
 
-        public static ulong GenerateMoves(BoardState state, ulong squareMask, ulong opponentMoves)
+        public static ulong GenerateMoves(GameState state, ulong squareMask, ulong opponentMoves)
         {
             ulong result = 0;
 
             for (var i = 0; i < 64; i++)
             {
                 var targetBit = squareMask & (1UL << i);
-                var piece = state.AllPieces & targetBit;
+                var piece = state.BoardState.AllPieces & targetBit;
                 if (piece != 0)
                 {
                     var attackingSquares = GenerateMovesForPiece(state, piece, opponentMoves);
@@ -95,7 +98,7 @@ namespace ChessLibrary
             return result;
         }
 
-        private static ulong GenerateStandardMovesForPiece(BoardState state, ulong square, ulong opponentMoves)
+        private static ulong GenerateStandardMovesForPiece(GameState state, ulong square, ulong opponentMoves)
         {
             // Detect type of piece
             // Create bitmask of all moves for that piece
@@ -106,28 +109,29 @@ namespace ChessLibrary
             // ❔ Account for castling
 
             ulong result = 0;
+            var board = state.BoardState;
 
-            if ((square & state.Queens) != 0)
+            if ((square & board.Queens) != 0)
             {
-                result |= GetQueenMovements(square, state);
+                result |= GetQueenMovements(square, board);
             }
-            else if ((square & state.Rooks) != 0)
+            else if ((square & board.Rooks) != 0)
             {
-                result |= GetRookMovements(square, state);
+                result |= GetRookMovements(square, board);
             }
-            else if ((square & state.Bishops) != 0)
+            else if ((square & board.Bishops) != 0)
             {
-                result |= GetBishopMovements(square, state);
+                result |= GetBishopMovements(square, board);
             }
-            else if ((square & state.Pawns) != 0)
+            else if ((square & board.Pawns) != 0)
             {
-                result |= GetPawnMovements(square, state);
+                result |= GetPawnMovements(square, board, state.PrecedingMove);
             }
-            else if ((square & state.Knights) != 0)
+            else if ((square & board.Knights) != 0)
             {
                 result |= GetKnightMovements(square);
             }
-            else if ((square & state.Kings) != 0)
+            else if ((square & board.Kings) != 0)
             {
                 var moves = GetKingMovements(square) & ~opponentMoves;
                 result |= moves;
@@ -136,14 +140,14 @@ namespace ChessLibrary
             return result;
         }
 
-        public static ulong GenerateStandardMoves(BoardState state, ulong squareMask, ulong opponentMoves)
+        public static ulong GenerateStandardMoves(GameState state, ulong squareMask, ulong opponentMoves)
         {
             ulong result = 0;
 
             for (var i = 0; i < 64; i++)
             {
                 var targetBit = squareMask & (1UL << i);
-                var piece = state.AllPieces & targetBit;
+                var piece = state.BoardState.AllPieces & targetBit;
                 if (piece != 0)
                 {
                     var attackingSquares = GenerateStandardMovesForPiece(state, piece, opponentMoves);
@@ -216,11 +220,12 @@ namespace ChessLibrary
             return newSquares;
         }
 
-        internal static ulong GetPawnMovements(ulong input, BoardState state)
+        private static ulong GetPawnMovements(ulong input, BoardState state, Move previousMove)
         {
             ulong newSquares = 0;
+            var isWhite = (input & state.WhitePieces) != 0;
 
-            if ((input & state.WhitePieces) != 0)
+            if (isWhite)
             {
                 // straight ahead
                 newSquares = ShiftLeft(input, 8) & ~state.AllPieces;
@@ -243,6 +248,29 @@ namespace ChessLibrary
                     | (ShiftRight(input, 9) & ~FileH);
                 newSquares |= (attackSquares & state.AllPieces);
             }
+
+            // Check for en passant
+            //if (!Move.Equals(previousMove, Move.Empty))
+            //{
+            //    var squareForGeneration = BitTranslator.TranslateToSquare(input);
+
+            //    // Previous move ended right next to this piece
+            //    if (squareForGeneration.Rank == previousMove.EndRank
+            //        && Math.Abs((int)squareForGeneration.File - (int)previousMove.EndFile) == 1
+            //    )
+            //    {
+            //        // Previous move was also a pawn which had moved up 2
+            //        var lastMoveEndSquare = BitTranslator.TranslateToBit(previousMove.EndFile, previousMove.EndRank);
+            //        if ((state.Pawns & lastMoveEndSquare) != 0
+            //            && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
+            //        {
+            //            // Probably a better way to do this
+            //            var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
+            //            var shifted = squareForGeneration.File > previousMove.EndFile ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
+            //            newSquares |= shifted;
+            //        }
+            //    }
+            //}
 
             return newSquares;
         }

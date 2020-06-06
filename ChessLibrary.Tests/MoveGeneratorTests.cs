@@ -11,12 +11,12 @@ namespace ChessLibrary.Tests
         public void PlacesPieceOnIntendedSquare(string focusSquare, SquareContents expectedContents, params string[] moveStrings)
         {
             var game = new Game();
-            var moves = moveStrings.Select(game.ParseMove).ToArray();
 
-            foreach(var move in moves)
+            foreach(var moveString in moveStrings)
             {
+                var move = game.ParseMove(moveString);
                 var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
-                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+                Assert.That(result, Is.EqualTo(ErrorCondition.None), "Failed for move: " + moveString);
             }
 
             var targetSquare = MoveParser.ParseSquare(focusSquare);
@@ -34,8 +34,9 @@ namespace ChessLibrary.Tests
             BoardState board = BoardState.Empty
                 .SetPiece(startSquare, SquareContents.White | SquareContents.Queen)
                 .SetPiece(endSquare, SquareContents.Black | SquareContents.King);
+            GameState state = GameState.FromState(board, AttackState.None);
 
-            var squares = MoveGenerator.GenerateStandardMoves(board, board.WhitePieces, 0);
+            var squares = MoveGenerator.GenerateStandardMoves(state, board.WhitePieces, 0);
 
             Assert.That(squares & endBit, Is.Not.EqualTo(0));
         }

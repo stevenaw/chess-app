@@ -10,9 +10,9 @@ namespace ChessLibrary
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
         private GameState GameState { get; set; }
-        private BoardState BoardState { get; set; }
-        public AttackState AttackState { get; private set; }
         private ulong CurrentTurn { get; set; }
+        private BoardState BoardState { get { return GameState.BoardState; } }
+        public AttackState AttackState { get { return GameState.AttackState; } }
 
         public Game() : this(BoardState.DefaultPositions, PieceColor.White)
         { }
@@ -22,10 +22,8 @@ namespace ChessLibrary
 
         internal Game(BoardState state, PieceColor turn)
         {
-            BoardState = state;
+            GameState = GameState.FromState(state, AttackState.None);
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
-            AttackState = AttackState.None;
-            GameState = GameState.FromState(BoardState, AttackState);
         }
 
         public PieceColor GetTurn()
@@ -88,7 +86,7 @@ namespace ChessLibrary
             if ((CurrentTurn & endSquare) != 0)
                 return ErrorCondition.CantTakeOwnPiece; // Can't end move on own piece
 
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(BoardState, startSquare);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(GameState, startSquare);
             if ((endSquare & allMoves) == 0)
                 return ErrorCondition.InvalidMovement; // End square is not a valid move
 
@@ -109,44 +107,43 @@ namespace ChessLibrary
             // ✔ Detect draw by repetition
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
-            // TODO: Ensure we clear old state on en passant
-            //
             var isCapture = (BoardState.AllPieces & endSquare) != 0;
             var isPawn = (BoardState.Pawns & startSquare) != 0;
 
-            BoardState = BoardState.MovePiece(startSquare, endSquare);
-            if (move.PromotedPiece != SquareContents.Empty)
-                BoardState = BoardState.SetPiece(endSquare, move.PromotedPiece);
+            var newState = GameStateMutator.ApplyMove(GameState, move);
+            var newBoardState = newState.BoardState;
 
             if (isCapture || isPawn)
                 History.Clear();
 
-            History.Push(BoardState);
+            History.Push(newBoardState);
 
-            var ownPieces = (endSquare & BoardState.WhitePieces) != 0
-                ? BoardState.WhitePieces : BoardState.BlackPieces;
-            var opponentPieces = BoardState.AllPieces & ~ownPieces;
 
-            var ownMovements = MoveGenerator.GenerateStandardMoves(BoardState, ownPieces, 0);
-            var opponentMovements = MoveGenerator.GenerateMoves(BoardState, opponentPieces, ownMovements);
+            var ownPieces = (endSquare & newBoardState.WhitePieces) != 0
+                ? newBoardState.WhitePieces : newBoardState.BlackPieces;
+            var opponentPieces = newBoardState.AllPieces & ~ownPieces;
 
-            var opponentKingUnderAttack = (opponentPieces & BoardState.Kings & ownMovements) != 0;
+            var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
+            var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
+
+            var opponentKingUnderAttack = (opponentPieces & newBoardState.Kings & ownMovements) != 0;
             var opponentCanMove = opponentMovements != 0;
 
+            var attackState = AttackState.None;
             if (opponentKingUnderAttack)
-                AttackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
+                attackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
             else if (!opponentCanMove)
-                AttackState = AttackState.Stalemate;
+                attackState = AttackState.Stalemate;
             else if (History.Count == Constants.MoveLimits.InactivityLimit)
-                AttackState = AttackState.DrawByInactivity;
-            else if (CountHistoricalOccurrences(BoardState) >= Constants.MoveLimits.RepetitionLimit)
-                AttackState = AttackState.DrawByRepetition;
-            else
-                AttackState = AttackState.None;
+                attackState = AttackState.DrawByInactivity;
+            else if (CountHistoricalOccurrences(newBoardState) >= Constants.MoveLimits.RepetitionLimit)
+                attackState = AttackState.DrawByRepetition;
 
-            move.AttackState = AttackState;
-            // TODO: Castling stuff
-            GameHistory.Push(GameState.FromState(BoardState, AttackState, move));
+            move.AttackState = attackState;
+            newState.SetAttackState(attackState);
+
+            GameState = newState;
+            GameHistory.Push(newState);
 
             CurrentTurn = opponentPieces;
         }
@@ -179,7 +176,7 @@ namespace ChessLibrary
                 throw new InvalidOperationException();
 
             var square = BitTranslator.TranslateToBit(file, rank);
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(BoardState, square);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(GameState, square);
 
             return BitTranslator.TranslateToSquares(allMoves);
         }

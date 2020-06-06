@@ -1,16 +1,34 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ChessLibrary.Tests
 {
     [TestFixture]
     public class GameTests
     {
+        [Test]
+        public void EnPassantIsAllowedImmediatelyAfterPush()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d5", "exd6"
+            };
+
+            foreach (var moveString in moveStrings)
+            {
+                var move = game.ParseMove(moveString);
+                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            Assert.That(game.GetSquareContents('d', 4), Is.EqualTo(SquareContents.Pawn | SquareContents.White));
+            Assert.That(game.GetSquareContents('d', 5), Is.EqualTo(SquareContents.Empty));
+        }
+
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
         [TestCase("a1=Q", "a2", "a1", PieceColor.Black, SquareContents.Black | SquareContents.Queen)]
         public void TryParseMove_ParsesPromotion(string input, string expectedStart, string expectedEnd, PieceColor color, SquareContents piece)
