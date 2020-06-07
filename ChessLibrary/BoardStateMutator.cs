@@ -111,7 +111,7 @@ namespace ChessLibrary
             );
         }
 
-        private static BoardState ClearPiece(BoardState state, ulong bitSquare)
+        internal static BoardState ClearPiece(BoardState state, ulong bitSquare)
         {
             return new BoardState(
                 state.WhitePieces & ~bitSquare,

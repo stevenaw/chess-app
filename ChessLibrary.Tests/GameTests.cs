@@ -25,7 +25,7 @@ namespace ChessLibrary.Tests
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
-            Assert.That(game.GetSquareContents('d', 4), Is.EqualTo(SquareContents.Pawn | SquareContents.White));
+            Assert.That(game.GetSquareContents('d', 6), Is.EqualTo(SquareContents.Pawn | SquareContents.White));
             Assert.That(game.GetSquareContents('d', 5), Is.EqualTo(SquareContents.Empty));
         }
 

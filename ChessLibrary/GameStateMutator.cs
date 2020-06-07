@@ -7,18 +7,27 @@ namespace ChessLibrary
         public static GameState ApplyMove(GameState state, Move move)
         {
             // TODO: Castling stuff. Simplify this
-            // TODO: Ensure we clear old state on en passant
 
             var startSq = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
             var endSq = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
 
+            // Pawn moved in attacking formation, but destination square is empty
+            var isEnPassant = ((startSq & state.BoardState.Pawns) != 0
+                                && move.StartFile != move.EndFile
+                                && (endSq & state.BoardState.AllPieces) == 0);
+
             var newBoard = state.BoardState.MovePiece(startSq, endSq);
-            if (move.PromotedPiece != SquareContents.Empty)
+            if (isEnPassant)
+            {
+                var opponentPawn = BitTranslator.TranslateToBit(move.EndFile, move.StartRank);
+                newBoard = BoardStateMutator.ClearPiece(newBoard, opponentPawn);
+            }
+            else if (move.PromotedPiece != SquareContents.Empty)
+            {
                 newBoard = newBoard.SetPiece(endSq, move.PromotedPiece);
+            }
 
-            var newState = GameState.FromState(newBoard, state.AttackState, move);
-
-            return newState;
+            return GameState.FromState(newBoard, state.AttackState, move);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)
