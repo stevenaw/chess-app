@@ -1,12 +1,14 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace ChessLibrary
 {
     public class Game
     {
-        private Stack<BoardState> History { get; } = new Stack<BoardState>();
+        // TODO: ImmutableDictionary<BoardState, int>  ??
+        private ImmutableStack<BoardState> History { get; set; } = ImmutableStack<BoardState>.Empty;
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
         private GameState GameState { get; set; }
@@ -114,9 +116,9 @@ namespace ChessLibrary
             var newBoardState = newState.BoardState;
 
             if (isCapture || isPawn)
-                History.Clear();
+                History = History.Clear();
 
-            History.Push(newBoardState);
+            History = History.Push(newBoardState);
 
 
             var ownPieces = (endSquare & newBoardState.WhitePieces) != 0
@@ -134,10 +136,25 @@ namespace ChessLibrary
                 attackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
             else if (!opponentCanMove)
                 attackState = AttackState.Stalemate;
-            else if (History.Count == Constants.MoveLimits.InactivityLimit)
-                attackState = AttackState.DrawByInactivity;
-            else if (CountHistoricalOccurrences(newBoardState) >= Constants.MoveLimits.RepetitionLimit)
-                attackState = AttackState.DrawByRepetition;
+            else
+            {
+                var count = 0;
+                var duplicateCount = 0;
+
+                foreach (var state in History)
+                {
+                    count++;
+                    if (state.Equals(newBoardState))
+                        duplicateCount++;
+                }
+
+                if (count == Constants.MoveLimits.InactivityLimit)
+                    attackState = AttackState.DrawByInactivity;
+                else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
+                    attackState = AttackState.DrawByRepetition;
+            }
+
+            
 
             move.AttackState = attackState;
             newState.SetAttackState(attackState);
@@ -146,17 +163,6 @@ namespace ChessLibrary
             GameHistory.Push(newState);
 
             CurrentTurn = opponentPieces;
-        }
-
-        private int CountHistoricalOccurrences(BoardState newState)
-        {
-            var count = 0;
-
-            foreach (var state in History)
-                if (state.Equals(newState))
-                    count++;
-
-            return count;
         }
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)

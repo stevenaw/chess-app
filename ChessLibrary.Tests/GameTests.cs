@@ -73,12 +73,13 @@ namespace ChessLibrary.Tests
                 "Nc3"
             };
 
-            foreach (var move in moves)
+            for (var i = 0; i < moves.Length-1; i++)
             {
+                game.Move(moves[i]);
                 Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.DrawByRepetition));
-                game.Move(move);
             }
 
+            game.Move(moves.Last());
             Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByRepetition));
         }
 
