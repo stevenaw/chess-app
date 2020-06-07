@@ -141,6 +141,7 @@ namespace ChessLibrary
                 var count = 0;
                 var duplicateCount = 0;
 
+                // TODO: Enumerating the whole stack can be slow
                 foreach (var state in History)
                 {
                     count++;

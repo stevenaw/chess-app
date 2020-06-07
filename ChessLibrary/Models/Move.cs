@@ -12,7 +12,8 @@
         public AttackState AttackState { get; set; }
         public SquareContents PromotedPiece { get; set; }
 
-        public static Move Empty => new Move();
+        private static Move _empty = new Move();
+        public static Move Empty => _empty;
 
         public static bool Equals(Move a, Move b)
         {
