@@ -15,7 +15,7 @@ namespace ChessLibrary.Tests
             foreach(var moveString in moveStrings)
             {
                 var move = game.ParseMove(moveString);
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None), "Failed for move: " + moveString);
             }
 

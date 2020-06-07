@@ -21,7 +21,7 @@ namespace ChessLibrary.Tests
             foreach (var moveString in moveStrings)
             {
                 var move = game.ParseMove(moveString);
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
@@ -44,13 +44,13 @@ namespace ChessLibrary.Tests
             for (var i = 0; i < moveStrings.Length - 1; i++)
             {
                 var move = game.ParseMove(moveStrings[i]);
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
             {
                 var move = game.ParseMove(moveStrings.Last());
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.InvalidMovement));
             }
         }
@@ -67,13 +67,13 @@ namespace ChessLibrary.Tests
             for(var i = 0; i < moveStrings.Length-1; i++)
             {
                 var move = game.ParseMove(moveStrings[i]);
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
             {
                 var move = game.ParseMove(moveStrings.Last());
-                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                var result = game.Move(move);
                 Assert.That(result, Is.EqualTo(ErrorCondition.InvalidMovement));
             }
         }

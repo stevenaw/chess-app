@@ -34,13 +34,7 @@ namespace ChessLibrary
         {
             var start = BitTranslator.TranslateToSquare(startSq);
             var end = BitTranslator.TranslateToSquare(endSq);
-            var move = new Move()
-            {
-                StartFile = start.File,
-                StartRank = start.Rank,
-                EndFile = end.File,
-                EndRank = end.Rank
-            };
+            var move = new Move(start.File, start.Rank, end.File, end.Rank);
 
             return ApplyMove(state, move);
         }

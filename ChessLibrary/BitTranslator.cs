@@ -32,7 +32,7 @@ namespace ChessLibrary
             return idx;
         }
 
-        private static Dictionary<ulong, Square> BitSquares = GenerateBitSquares();
+        private static readonly Dictionary<ulong, Square> BitSquares = GenerateBitSquares();
 
         private static Dictionary<ulong, Square> GenerateBitSquares()
         {

@@ -67,11 +67,13 @@ namespace ChessLibrary
 
         public ErrorCondition Move(string input)
         {
-            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
-                return Move(move);
+            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out AnnotatedMove move))
+                return Move(move.Move);
 
             return ErrorCondition.InvalidInput;
         }
+
+        public ErrorCondition Move(AnnotatedMove move) => Move(move.Move);
 
         public ErrorCondition Move(Move move)
         {
@@ -157,9 +159,6 @@ namespace ChessLibrary
                     attackState = AttackState.DrawByRepetition;
             }
 
-            
-
-            move.AttackState = attackState;
             newState.SetAttackState(attackState);
 
             GameState = newState;
@@ -170,13 +169,7 @@ namespace ChessLibrary
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)
         {
-            return Move(new Move()
-            {
-                StartFile = startFile,
-                StartRank = startRank,
-                EndFile = endFile,
-                EndRank = endRank
-            });
+            return Move(new Move(startFile, startRank, endFile, endRank));
         }
 
         public List<Square> GetValidMoves(char file, int rank)
@@ -190,9 +183,9 @@ namespace ChessLibrary
             return BitTranslator.TranslateToSquares(allMoves);
         }
 
-        public Move ParseMove(string input)
+        public AnnotatedMove ParseMove(string input)
         {
-            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out Move move))
+            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out AnnotatedMove move))
                 return move;
 
             throw new FormatException($"Could not parse move '{input}' for current board state");

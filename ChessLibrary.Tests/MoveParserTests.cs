@@ -86,16 +86,15 @@ namespace ChessLibrary.Tests
             var board = BoardState.DefaultPositions;
             var startSq = MoveParser.ParseSquare(expectedStart);
             var endSq = MoveParser.ParseSquare(expectedEnd);
-            Move move;
 
-            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out move);
+            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
             Assert.That(move.Annotation, Is.EqualTo(expectedState));
         }
 
@@ -116,16 +115,15 @@ namespace ChessLibrary.Tests
             var board = BoardState.DefaultPositions;
             var startSq = MoveParser.ParseSquare(expectedStart);
             var endSq = MoveParser.ParseSquare(expectedEnd);
-            Move move;
 
-            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out move);
+            var success = MoveParser.TryParseMove(input, board, board.WhitePieces, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
             Assert.That(move.AttackState, Is.EqualTo(expectedState));
         }
 
@@ -139,19 +137,18 @@ namespace ChessLibrary.Tests
             var startSq = MoveParser.ParseSquare(expectedStart);
             var pieceColor = color == PieceColor.White ? SquareContents.White : SquareContents.Black;
             var board = BoardState.Empty.SetPiece(startSq, SquareContents.Pawn | pieceColor);
-            Move move;
 
             var pieceMask = (pieceColor == SquareContents.White) ? board.WhitePieces : board.BlackPieces;
 
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
-            Assert.That(move.PromotedPiece, Is.EqualTo(piece));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.PromotedPiece, Is.EqualTo(piece));
         }
 
         [TestCase("a8=P", "a7", SquareContents.Pawn | SquareContents.White)]
@@ -205,16 +202,15 @@ namespace ChessLibrary.Tests
             var startSq = MoveParser.ParseSquare(expectedStart);
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var activePieces = color == PieceColor.White ? board.WhitePieces : board.BlackPieces;
-            Move move;
 
-            var success = MoveParser.TryParseMove(input, board, activePieces, out move);
+            var success = MoveParser.TryParseMove(input, board, activePieces, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
         [TestCase("a2a4", SquareContents.Pawn | SquareContents.White, "a2", "a4")]
@@ -251,14 +247,14 @@ namespace ChessLibrary.Tests
 
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
             
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out Move move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
 
@@ -285,14 +281,14 @@ namespace ChessLibrary.Tests
 
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
 
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out Move move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
         // TODO: More tests
@@ -307,17 +303,16 @@ namespace ChessLibrary.Tests
             var endSq = MoveParser.ParseSquare(expectedEnd);
             var startSq = MoveParser.ParseSquare(expectedStart);
 
-            Move move;
             var pieceMask = (piece & SquareContents.White) != 0 ? board.WhitePieces : board.BlackPieces;
             
-            var success = MoveParser.TryParseMove(input, board, pieceMask, out move);
+            var success = MoveParser.TryParseMove(input, board, pieceMask, out var move);
 
             Assert.That(success, Is.True);
 
-            Assert.That(move.StartRank, Is.EqualTo(startSq.Rank));
-            Assert.That(move.StartFile, Is.EqualTo(startSq.File));
-            Assert.That(move.EndRank, Is.EqualTo(endSq.Rank));
-            Assert.That(move.EndFile, Is.EqualTo(endSq.File));
+            Assert.That(move.Move.StartRank, Is.EqualTo(startSq.Rank));
+            Assert.That(move.Move.StartFile, Is.EqualTo(startSq.File));
+            Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
+            Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
     }
 }
