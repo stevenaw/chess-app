@@ -7,7 +7,6 @@ namespace ChessLibrary
 {
     public class Game
     {
-        // TODO: ImmutableDictionary<BoardState, int>  ??
         private ImmutableStack<BoardState> History { get; set; } = ImmutableStack<BoardState>.Empty;
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
@@ -145,7 +144,6 @@ namespace ChessLibrary
                 var count = 0;
                 var duplicateCount = 0;
 
-                // TODO: Enumerating the whole stack can be slow
                 foreach (var state in History)
                 {
                     count++;
