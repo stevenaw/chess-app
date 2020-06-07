@@ -105,7 +105,7 @@ namespace ChessLibrary
             // ✔ Detect if pieces in way (unless knight is moving)
             // ✔ Detect if moving onto own piece
             // ✔ Detect standard patterns of movement
-            // ❔ Account for en passant
+            // ✔ Account for en passant
             // ❔ Account for castling
 
             ulong result = 0;
@@ -263,7 +263,7 @@ namespace ChessLibrary
                     if ((state.Pawns & lastMoveEndSquare) != 0
                         && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
                     {
-                        // Probably a better way to do this
+                        // TODO: Probably a better way to do all this
                         var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
                         var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
                         newSquares |= shifted;

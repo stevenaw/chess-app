@@ -71,12 +71,6 @@ namespace ChessLibrary.Models
             return BoardStateMutator.MovePiece(this, from, to);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BoardState Copy()
-        {
-            return BoardStateMutator.Copy(this);
-        }
-
         public static BoardState Empty { get; } = new BoardState();
 
         public static BoardState DefaultPositions { get; } = GetDefaultPositions();

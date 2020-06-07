@@ -4,20 +4,6 @@ namespace ChessLibrary
 {
     internal static class BoardStateMutator
     {
-        internal static BoardState Copy(BoardState state)
-        {
-            return new BoardState(
-                state.WhitePieces,
-                state.BlackPieces,
-                state.Pawns,
-                state.Knights,
-                state.Bishops,
-                state.Rooks,
-                state.Queens,
-                state.Kings
-            );
-        }
-
         internal static BoardState SetPiece(BoardState state, ulong bitSquare, SquareContents contents)
         {
             var bitContents = (ulong)contents;
