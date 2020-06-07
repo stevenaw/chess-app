@@ -43,11 +43,7 @@ namespace ChessLibrary
                 int rank = (i / 8) + 1;
                 char file = (char)('a' + (i % 8));
 
-                map[1UL << i] = new Square()
-                {
-                    Rank = rank,
-                    File = file
-                };
+                map[1UL << i] = new Square(file, rank);
             }
 
             return map;
@@ -64,11 +60,7 @@ namespace ChessLibrary
                     int squareRank = (i / 8) + 1;
                     char squareFile = (char)('a' + (i % 8));
 
-                    result.Add(new Square()
-                    {
-                        Rank = squareRank,
-                        File = squareFile
-                    });
+                    result.Add(new Square(squareFile, squareRank));
                 }
 
                 square >>= 1;

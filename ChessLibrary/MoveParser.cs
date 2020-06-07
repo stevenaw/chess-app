@@ -24,12 +24,10 @@ namespace ChessLibrary
         // TODO: Move this to another class?
         public static Square ParseSquare(string input)
         {
-            var result = new Square();
+            var file = Char.ToLower(input[0]);
+            var rank = input[1] - '0';
 
-            result.File = Char.ToLower(input[0]);
-            result.Rank = input[1] - '0';
-
-            return result;
+            return new Square(file, rank);
         }
 
         // Parses a move, but does not determine validity

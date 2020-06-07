@@ -3,7 +3,7 @@
 namespace ChessLibrary.Models
 {
     [Flags]
-    public enum SquareContents
+    public enum SquareContents : byte
     {
         Empty = 0,
         Pawn = 1,

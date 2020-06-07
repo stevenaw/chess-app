@@ -1,8 +1,14 @@
 ﻿namespace ChessLibrary.Models
 {
-    public struct Square
+    public readonly struct Square
     {
-        public char File { get; set; }
-        public int Rank { get; set; }
+        public readonly char File { get; }
+        public readonly int Rank { get; }
+
+        public Square(char file, int rank)
+        {
+            File = file;
+            Rank = rank;
+        }
     }
 }

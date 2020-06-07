@@ -10,7 +10,7 @@ namespace ChessLibrary.Tests
     public class GameTests
     {
         [Test]
-        public void EnPassantIsAllowedImmediatelyAfterPush()
+        public void EnPassant_IsAllowed_ImmediatelyAfterPush()
         {
             var game = new Game();
             var moveStrings = new[]
@@ -27,6 +27,55 @@ namespace ChessLibrary.Tests
 
             Assert.That(game.GetSquareContents('d', 4), Is.EqualTo(SquareContents.Pawn | SquareContents.White));
             Assert.That(game.GetSquareContents('d', 5), Is.EqualTo(SquareContents.Empty));
+        }
+
+
+        [Test]
+        public void EnPassant_IsDisallowed_WhenNotImmediatelyAfterPush()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d5", // Setup
+                "Na3", "Nb8", // Wait a bit
+                "exd6" // Attempt
+            };
+
+            for (var i = 0; i < moveStrings.Length - 1; i++)
+            {
+                var move = game.ParseMove(moveStrings[i]);
+                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            {
+                var move = game.ParseMove(moveStrings.Last());
+                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                Assert.That(result, Is.EqualTo(ErrorCondition.InvalidMovement));
+            }
+        }
+
+        [Test]
+        public void EnPassant_IsDisallowed_WhenNotPushed()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d6", "Na3", "d5", "exd6"
+            };
+
+            for(var i = 0; i < moveStrings.Length-1; i++)
+            {
+                var move = game.ParseMove(moveStrings[i]);
+                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            {
+                var move = game.ParseMove(moveStrings.Last());
+                var result = game.Move(move.StartFile, move.StartRank, move.EndFile, move.EndRank);
+                Assert.That(result, Is.EqualTo(ErrorCondition.InvalidMovement));
+            }
         }
 
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
