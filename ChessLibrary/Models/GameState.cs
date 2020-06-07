@@ -1,6 +1,7 @@
 ﻿namespace ChessLibrary.Models
 {
-    internal class GameState
+    // TODO: Immutable
+    internal sealed class GameState
     {
         public BoardState BoardState { get; private set; }
         public AttackState AttackState { get; private set; }
@@ -11,12 +12,12 @@
             AttackState = state;
         }
 
-        public static GameState FromState(BoardState boardState, AttackState attackState)
+        public static GameState Initialize(BoardState boardState)
         {
             return new GameState()
             {
                 BoardState = boardState,
-                AttackState = attackState,
+                AttackState = AttackState.None,
                 PrecedingMove = Move.Empty
             };
         }

@@ -1,5 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
+    // TODO: Immutable
     public struct Move
     {
         public char StartFile { get; set; }

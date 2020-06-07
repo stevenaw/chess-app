@@ -34,7 +34,7 @@ namespace ChessLibrary.Tests
             BoardState board = BoardState.Empty
                 .SetPiece(startSquare, SquareContents.White | SquareContents.Queen)
                 .SetPiece(endSquare, SquareContents.Black | SquareContents.King);
-            GameState state = GameState.FromState(board, AttackState.None);
+            GameState state = GameState.Initialize(board);
 
             var squares = MoveGenerator.GenerateStandardMoves(state, board.WhitePieces, 0);
 

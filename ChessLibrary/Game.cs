@@ -22,7 +22,7 @@ namespace ChessLibrary
 
         internal Game(BoardState state, PieceColor turn)
         {
-            GameState = GameState.FromState(state, AttackState.None);
+            GameState = GameState.Initialize(state);
             CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
         }
 
