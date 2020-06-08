@@ -8,15 +8,15 @@ namespace ChessLibrary
         {
             // TODO: Castling stuff. Simplify this
 
-            var startSq = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
-            var endSq = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
+            var startSquare = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
+            var endSquare = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
 
             // Pawn moved in attacking formation, but destination square is empty
-            var isEnPassant = ((startSq & state.BoardState.Pawns) != 0
+            var isEnPassant = ((startSquare & state.BoardState.Pawns) != 0
                                 && move.StartFile != move.EndFile
-                                && (endSq & state.BoardState.AllPieces) == 0);
+                                && (endSquare & state.BoardState.AllPieces) == 0);
 
-            var newBoard = state.BoardState.MovePiece(startSq, endSq);
+            var newBoard = state.BoardState.MovePiece(startSquare, endSquare);
             if (isEnPassant)
             {
                 var opponentPawn = BitTranslator.TranslateToBit(move.EndFile, move.StartRank);
@@ -24,7 +24,7 @@ namespace ChessLibrary
             }
             else if (move.PromotedPiece != SquareContents.Empty)
             {
-                newBoard = newBoard.SetPiece(endSq, move.PromotedPiece);
+                newBoard = newBoard.SetPiece(endSquare, move.PromotedPiece);
             }
 
             return GameState.FromState(newBoard, state.AttackState, move);

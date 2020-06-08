@@ -119,19 +119,19 @@ namespace ChessLibrary
                 History = History.Clear();
 
             var newState = GameStateMutator.ApplyMove(GameState, move);
-            var newBoardState = newState.BoardState;
+            var newBoard = newState.BoardState;
 
-            History = History.Push(newBoardState);
+            History = History.Push(newBoard);
 
 
-            var ownPieces = (endSquare & newBoardState.WhitePieces) != 0
-                ? newBoardState.WhitePieces : newBoardState.BlackPieces;
-            var opponentPieces = newBoardState.AllPieces & ~ownPieces;
+            var ownPieces = (endSquare & newBoard.WhitePieces) != 0
+                ? newBoard.WhitePieces : newBoard.BlackPieces;
+            var opponentPieces = newBoard.AllPieces & ~ownPieces;
 
             var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
             var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
 
-            var opponentKingUnderAttack = (opponentPieces & newBoardState.Kings & ownMovements) != 0;
+            var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
             var opponentCanMove = opponentMovements != 0;
 
             var attackState = AttackState.None;
@@ -147,7 +147,7 @@ namespace ChessLibrary
                 foreach (var state in History)
                 {
                     count++;
-                    if (state.Equals(newBoardState))
+                    if (state.Equals(newBoard))
                         duplicateCount++;
                 }
 
