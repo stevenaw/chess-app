@@ -157,8 +157,7 @@ namespace ChessLibrary
                     attackState = AttackState.DrawByRepetition;
             }
 
-            newState.SetAttackState(attackState);
-
+            newState = newState.SetAttackState(attackState);
             GameState = newState;
             GameHistory.Push(newState);
 

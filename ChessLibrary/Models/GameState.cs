@@ -1,35 +1,31 @@
 ﻿namespace ChessLibrary.Models
 {
-    // TODO: Immutable
     internal sealed class GameState
     {
-        public BoardState BoardState { get; private set; }
-        public AttackState AttackState { get; private set; }
-        public Move PrecedingMove { get; private set; }
+        public BoardState BoardState { get; }
+        public AttackState AttackState { get; }
+        public Move PrecedingMove { get; }
 
-        public void SetAttackState(AttackState state)
+        public GameState(BoardState board, AttackState attackState, Move previousMove)
         {
-            AttackState = state;
+            BoardState = board;
+            AttackState = attackState;
+            PrecedingMove = previousMove;
+        }
+
+        public GameState SetAttackState(AttackState state)
+        {
+            return new GameState(BoardState, state, PrecedingMove);
         }
 
         public static GameState Initialize(BoardState boardState)
         {
-            return new GameState()
-            {
-                BoardState = boardState,
-                AttackState = AttackState.None,
-                PrecedingMove = Move.Empty
-            };
+            return new GameState(boardState, AttackState.None, Move.Empty);
         }
 
         public static GameState FromState(BoardState boardState, AttackState attackState, Move precedingMove)
         {
-            return new GameState()
-            {
-                BoardState = boardState,
-                AttackState = attackState,
-                PrecedingMove = precedingMove
-            };
+            return new GameState(boardState, attackState, precedingMove);
         }
     }
 }
