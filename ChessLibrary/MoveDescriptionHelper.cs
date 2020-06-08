@@ -2,44 +2,32 @@
 
 namespace ChessLibrary
 {
-    public class MoveDescriptionHelper
+    public static class MoveDescriptionHelper
     {
         public static string GetAttackString(AttackState value)
         {
-            switch (value)
+            return value switch
             {
-                case AttackState.Check:
-                    return "+";
-                case AttackState.Checkmate:
-                    return "#";
-                case AttackState.None:
-                    return string.Empty;
-                default:
-                    return string.Empty;
-            }
+                AttackState.Check => "+",
+                AttackState.Checkmate => "#",
+                AttackState.None => string.Empty,
+                _ => string.Empty,
+            };
         }
 
         public static string GetAnnotationString(MoveAnnotation value)
         {
-            switch (value)
+            return value switch
             {
-                case MoveAnnotation.Excellent:
-                    return "!";
-                case MoveAnnotation.Brilliancy:
-                    return "!!";
-                case MoveAnnotation.Mistake:
-                    return "?";
-                case MoveAnnotation.Blunder:
-                    return "??";
-                case MoveAnnotation.Interesting:
-                    return "!?";
-                case MoveAnnotation.Dubious:
-                    return "?!";
-                case MoveAnnotation.Normal:
-                    return string.Empty;
-                default:
-                    return string.Empty;
-            }
+                MoveAnnotation.Excellent => "!",
+                MoveAnnotation.Brilliancy => "!!",
+                MoveAnnotation.Mistake => "?",
+                MoveAnnotation.Blunder => "??",
+                MoveAnnotation.Interesting => "!?",
+                MoveAnnotation.Dubious => "?!",
+                MoveAnnotation.Normal => string.Empty,
+                _ => string.Empty,
+            };
         }
     }
 }
