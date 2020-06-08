@@ -1,10 +1,10 @@
 ﻿namespace ChessLibrary.Models
 {
-    internal sealed class GameState
+    internal readonly struct GameState
     {
-        public BoardState BoardState { get; }
-        public AttackState AttackState { get; }
-        public Move PrecedingMove { get; }
+        public readonly BoardState BoardState { get; }
+        public readonly AttackState AttackState { get; }
+        public readonly Move PrecedingMove { get; }
 
         public GameState(BoardState board, AttackState attackState, Move previousMove)
         {
