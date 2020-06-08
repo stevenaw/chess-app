@@ -22,10 +22,5 @@
         {
             return new GameState(boardState, AttackState.None, Move.Empty);
         }
-
-        public static GameState FromState(BoardState boardState, AttackState attackState, Move precedingMove)
-        {
-            return new GameState(boardState, attackState, precedingMove);
-        }
     }
 }

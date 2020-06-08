@@ -27,7 +27,7 @@ namespace ChessLibrary
                 newBoard = newBoard.SetPiece(endSquare, move.PromotedPiece);
             }
 
-            return GameState.FromState(newBoard, state.AttackState, move);
+            return new GameState(newBoard, state.AttackState, move);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)
