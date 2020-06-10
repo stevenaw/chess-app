@@ -22,7 +22,6 @@ namespace ChessLibrary
             Constants.MoveType.Move
         };
 
-        // TODO: Move this to another class?
         public static Square ParseSquare(string input)
         {
             var file = Char.ToLower(input[0]);
@@ -418,7 +417,7 @@ namespace ChessLibrary
             };
         }
 
-        private struct ParsedMoveState
+        private ref struct ParsedMoveState
         {
             public char StartFile { get; set; }
             public int StartRank { get; set; }

@@ -6,7 +6,7 @@ namespace ChessLibrary
     {
         public static GameState ApplyMove(GameState state, Move move)
         {
-            // TODO: Castling stuff. Simplify this
+            // TODO: Castling
 
             var startSquare = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
             var endSquare = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
