@@ -1,6 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
-    public enum PieceColor : byte
+    public enum PieceColor
     {
         White,
         Black

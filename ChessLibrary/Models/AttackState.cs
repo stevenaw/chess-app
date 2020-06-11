@@ -1,6 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
-    public enum AttackState : byte
+    public enum AttackState
     {
         None = 0,
         Check,      // +

@@ -1,6 +1,6 @@
 ﻿namespace ChessLibrary.Models
 {
-    public enum MoveAnnotation : byte
+    public enum MoveAnnotation
     {
         Normal,
         Excellent,      //  !

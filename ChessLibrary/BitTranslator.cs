@@ -1,6 +1,7 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace ChessLibrary
 {
@@ -69,6 +70,7 @@ namespace ChessLibrary
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Square TranslateToSquare(ulong square)
         {
             return BitSquares[square];
