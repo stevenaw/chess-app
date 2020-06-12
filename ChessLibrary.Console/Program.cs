@@ -1,5 +1,4 @@
-﻿using ChessLibrary.ConsoleApp.Rendering;
-using ChessLibrary.Models;
+﻿using ChessLibrary.Models;
 using System;
 
 namespace ChessLibrary.ConsoleApp
