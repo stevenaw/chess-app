@@ -2,32 +2,33 @@
 
 namespace ChessLibrary.ConsoleApp
 {
-    public class ConsolePaintBrush
+    public readonly struct ConsolePaintBrush
     {
-        public ConsoleColor Foreground { get; set; }
-        public ConsoleColor Background { get; set; }
+        public readonly ConsoleColor Foreground;
+        public readonly ConsoleColor Background;
 
+        public ConsolePaintBrush(ConsoleColor foreground, ConsoleColor background)
+        {
+            Foreground = foreground;
+            Background = background;
+        }
+
+        private static ConsolePaintBrush current = new ConsolePaintBrush(Console.ForegroundColor, Console.BackgroundColor);
         public static ConsolePaintBrush Current
         {
             get
             {
-                return new ConsolePaintBrush()
-                {
-                    Foreground = Console.ForegroundColor,
-                    Background = Console.BackgroundColor
-                };
+                return current;
             }
             set
             {
+                current = value;
+
                 Console.ForegroundColor = value.Foreground;
                 Console.BackgroundColor = value.Background;
             }
         }
 
-        public static ConsolePaintBrush Highlight => new ConsolePaintBrush()
-        {
-            Foreground = ConsoleColor.Black,
-            Background = ConsoleColor.Yellow
-        };
+        public static ConsolePaintBrush Highlight => new ConsolePaintBrush(ConsoleColor.Black, ConsoleColor.Yellow);
     }
 }
