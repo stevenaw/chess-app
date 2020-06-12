@@ -8,6 +8,8 @@ namespace ChessLibrary.ConsoleApp.Rendering
     {
         private static Dictionary<SquareContents, char> PiecesAsLetters => new Dictionary<SquareContents, char>
         {
+            { SquareContents.Empty, ' ' },
+
             { SquareContents.White | SquareContents.King, 'K' },
             { SquareContents.White | SquareContents.Queen, 'Q' },
             { SquareContents.White | SquareContents.Rook, 'R' },
@@ -23,14 +25,14 @@ namespace ChessLibrary.ConsoleApp.Rendering
             { SquareContents.Black | SquareContents.Pawn, 'p' },
         };
 
-        public static void PrintBoard(Game game, List<Square> highlighted)
+        public static void PrintBoard(Game game, IList<Square> highlighted)
         {
             const string rankDivider = "  -----------------";
 
             bool bufferOutput = highlighted.Count == 0;
-            var outputDevice = bufferOutput ? (IOutputMethod)new BufferedOutput() : new UnbufferedOutput();
+            using var outputDevice = bufferOutput ? (IOutputMethod)new BufferedOutput() : new UnbufferedOutput();
 
-            var highlightSquares = new bool[64];
+            Span<bool> highlightSquares = stackalloc bool[64];
             foreach (var sq in highlighted)
                 highlightSquares[BitTranslator.GetSquareIndex(sq.File, sq.Rank)] = true;
 
@@ -45,7 +47,7 @@ namespace ChessLibrary.ConsoleApp.Rendering
                 for (var file = 'a'; file <= 'h'; file++)
                 {
                     var contents = game.GetSquareContents(file, rank);
-                    var representation = GetPieceRepresentation(contents);
+                    var representation = PiecesAsLetters[contents];
 
                     var currentIndex = BitTranslator.GetSquareIndex(file, rank);
 
@@ -83,14 +85,7 @@ namespace ChessLibrary.ConsoleApp.Rendering
 
         public static void PrintBoard(Game game)
         {
-            PrintBoard(game, new List<Square>(0));
-        }
-
-        private static char GetPieceRepresentation(SquareContents contents)
-        {
-            if (contents == 0)
-                return ' ';
-            return PiecesAsLetters[contents];
+            PrintBoard(game, Array.Empty<Square>());
         }
     }
 }

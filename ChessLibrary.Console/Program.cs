@@ -6,10 +6,10 @@ namespace ChessLibrary.ConsoleApp
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var game = new Game();
-            var keepPlaying = true;
+            bool keepPlaying;
             BoardRenderer.PrintBoard(game);
 
             do

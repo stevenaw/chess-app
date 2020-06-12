@@ -1,33 +1,34 @@
 ﻿using System;
-using System.Text;
+using System.IO;
 
 namespace ChessLibrary.ConsoleApp.Rendering
 {
     public class BufferedOutput : IOutputMethod
     {
-        // This could instead just be a char[] or Span<char>
-        // At 2 EOL markers (\r\n) it's 380 in length
-        private StringBuilder Buffer = new StringBuilder(
-            // row = 8 squares + row number. Each has a delimiter (so *2)
-            ((8 + 1) * 2 + Environment.NewLine.Length + 1)
-            // rows to output = 8 squares + delimiter for each
-            * (8 + 1) * 2
-             + Environment.NewLine.Length
-        );
+        private bool disposedValue;
+        private StreamWriter Output { get; } = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
 
-        public void Write(string s)
+        public void Write(string s) => Output.Write(s);
+
+        public void Write(char c) => Output.Write(c);
+
+        public void Flush() => Output.Flush();
+
+        protected virtual void Dispose(bool disposing)
         {
-            Buffer.Append(s);
+            if (!disposedValue)
+            {
+                if (disposing)
+                    Output.Dispose();
+
+                disposedValue = true;
+            }
         }
 
-        public void Write(char c)
+        public void Dispose()
         {
-            Buffer.Append(c);
-        }
-
-        public void Flush()
-        {
-            Console.WriteLine(Buffer.ToString());
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
