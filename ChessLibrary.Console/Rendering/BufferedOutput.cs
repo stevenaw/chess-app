@@ -6,7 +6,7 @@ namespace ChessLibrary.ConsoleApp.Rendering
     public class BufferedOutput : IOutputMethod
     {
         private bool disposedValue;
-        private StreamWriter Output { get; } = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
+        private StreamWriter Output { get; } = new StreamWriter(Console.OpenStandardOutput());
 
         public void Write(string s) => Output.Write(s);
 
