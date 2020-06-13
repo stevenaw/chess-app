@@ -122,7 +122,7 @@ namespace ChessLibrary.Models
             return Equals(this, other);
         }
 
-        private static bool Equals(BoardState a, BoardState b)
+        public static bool Equals(BoardState a, BoardState b)
         {
             return a.Bishops == b.Bishops
                 && a.BlackPieces == b.BlackPieces

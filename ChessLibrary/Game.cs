@@ -7,7 +7,6 @@ namespace ChessLibrary
 {
     public class Game
     {
-        private ImmutableStack<BoardState> History { get; set; } = ImmutableStack<BoardState>.Empty;
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
         private GameState GameState { get; set; }
@@ -110,19 +109,8 @@ namespace ChessLibrary
             // ✔ Detect draw by repetition
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
-            var resetHistory = (
-                    ((BoardState.AllPieces & endSquare) != 0)   // regular capture 
-                    || ((BoardState.Pawns & startSquare) != 0)
-                );
-
-            if (resetHistory)
-                History = History.Clear();
-
-            var newState = GameStateMutator.ApplyMove(GameState, move);
+            var newState = GameStateMutator.ApplyMove(GameState, move, startSquare, endSquare);
             var newBoard = newState.BoardState;
-
-            History = History.Push(newBoard);
-
 
             var ownPieces = (endSquare & newBoard.WhitePieces) != 0
                 ? newBoard.WhitePieces : newBoard.BlackPieces;
@@ -144,10 +132,10 @@ namespace ChessLibrary
                 var count = 0;
                 var duplicateCount = 0;
 
-                foreach (var state in History)
+                foreach (var state in newState.PossibleRepeatedHistory)
                 {
                     count++;
-                    if (state.Equals(newBoard))
+                    if (BoardState.Equals(state, newBoard))
                         duplicateCount++;
                 }
 
@@ -158,9 +146,9 @@ namespace ChessLibrary
             }
 
             newState = newState.SetAttackState(attackState);
+
             GameState = newState;
             GameHistory.Push(newState);
-
             CurrentTurn = opponentPieces;
         }
 

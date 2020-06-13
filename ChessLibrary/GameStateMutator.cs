@@ -4,12 +4,17 @@ namespace ChessLibrary
 {
     internal static class GameStateMutator
     {
-        public static GameState ApplyMove(GameState state, Move move)
+        public static GameState ApplyMove(GameState state, Move move, ulong startSquare, ulong endSquare)
         {
             // TODO: Castling
+            var history = state.PossibleRepeatedHistory;
+            var resetHistory = (
+                    ((state.BoardState.AllPieces & endSquare) != 0)     // regular capture 
+                    || ((state.BoardState.Pawns & startSquare) != 0)    // pawn movement
+                );
 
-            var startSquare = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
-            var endSquare = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
+            if (resetHistory)
+                history = history.Clear();
 
             // Pawn moved in attacking formation, but destination square is empty
             var isEnPassant = ((startSquare & state.BoardState.Pawns) != 0
@@ -27,7 +32,9 @@ namespace ChessLibrary
                 newBoard = newBoard.SetPiece(endSquare, move.PromotedPiece);
             }
 
-            return new GameState(newBoard, state.AttackState, move);
+            history = history.Push(newBoard);
+
+            return new GameState(newBoard, state.AttackState, move, history);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)
@@ -36,7 +43,7 @@ namespace ChessLibrary
             var end = BitTranslator.TranslateToSquare(endSq);
             var move = new Move(start.File, start.Rank, end.File, end.Rank);
 
-            return ApplyMove(state, move);
+            return ApplyMove(state, move, startSq, endSq);
         }
     }
 }

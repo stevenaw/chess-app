@@ -122,13 +122,14 @@ namespace ChessLibrary.Tests
                 "Nc3"
             };
 
-            for (var i = 0; i < moves.Length-1; i++)
+            for (var i = 0; i < moves.Length - 1; i++)
             {
                 game.Move(moves[i]);
-                Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.DrawByRepetition));
+                Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.DrawByRepetition), $"Unexpected repetition at ply {i}");
             }
 
-            game.Move(moves.Last());
+            var lastMove = moves.Last();
+            game.Move(lastMove);
             Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByRepetition));
         }
 
