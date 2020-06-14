@@ -35,47 +35,7 @@ namespace ChessLibrary
 
             history = history.Push(newBoard);
 
-            var newState = new GameState(newBoard, state.AttackState, move, history);
-            var opponentPieces = (endSquare & newBoard.WhitePieces) != 0
-                ? newBoard.BlackPieces : newBoard.WhitePieces;
-
-            return AnalyzeAndApplyState(newState, opponentPieces);
-        }
-
-        private static GameState AnalyzeAndApplyState(GameState newState, ulong opponentPieces)
-        {
-            var newBoard = newState.Board;
-            var ownPieces = newBoard.AllPieces & ~opponentPieces;
-            var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
-            var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
-
-            var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
-            var opponentCanMove = opponentMovements != 0;
-
-            var attackState = AttackState.None;
-            if (opponentKingUnderAttack)
-                attackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
-            else if (!opponentCanMove)
-                attackState = AttackState.Stalemate;
-            else
-            {
-                var count = 0;
-                var duplicateCount = 0;
-
-                foreach (var state in newState.PossibleRepeatedHistory)
-                {
-                    count++;
-                    if (BoardState.Equals(state, newBoard))
-                        duplicateCount++;
-                }
-
-                if (count == Constants.MoveLimits.InactivityLimit)
-                    attackState = AttackState.DrawByInactivity;
-                else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
-                    attackState = AttackState.DrawByRepetition;
-            }
-
-            return newState.SetAttackState(attackState);
+            return new GameState(newBoard, state.AttackState, move, history);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)

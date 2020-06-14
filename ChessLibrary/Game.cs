@@ -99,6 +99,19 @@ namespace ChessLibrary
 
         private void UpdateState(Move move, ulong startSquare, ulong endSquare)
         {
+            var newState = GameStateMutator.ApplyMove(CurrentState, move, startSquare, endSquare);
+            var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
+                ? newState.Board.BlackPieces : newState.Board.WhitePieces;
+
+            newState = AnalyzeAndApplyState(newState, opponentPieces);
+
+            CurrentState = newState;
+            GameHistory.Push(newState);
+            CurrentTurn = opponentPieces;
+        }
+
+        private static GameState AnalyzeAndApplyState(GameState newState, ulong opponentPieces)
+        {
             // All state detections
             // ✔ Account for piece promotions
             // ✔ Detect checks
@@ -107,14 +120,38 @@ namespace ChessLibrary
             // ✔ Detect draw by repetition
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
-            var newState = GameStateMutator.ApplyMove(CurrentState, move, startSquare, endSquare);
+            var newBoard = newState.Board;
+            var ownPieces = newBoard.AllPieces & ~opponentPieces;
+            var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
+            var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
 
-            var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
-                ? newState.Board.BlackPieces : newState.Board.WhitePieces;
+            var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
+            var opponentCanMove = opponentMovements != 0;
 
-            CurrentState = newState;
-            GameHistory.Push(newState);
-            CurrentTurn = opponentPieces;
+            var attackState = AttackState.None;
+            if (opponentKingUnderAttack)
+                attackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
+            else if (!opponentCanMove)
+                attackState = AttackState.Stalemate;
+            else
+            {
+                var count = 0;
+                var duplicateCount = 0;
+
+                foreach (var state in newState.PossibleRepeatedHistory)
+                {
+                    count++;
+                    if (BoardState.Equals(state, newBoard))
+                        duplicateCount++;
+                }
+
+                if (count == Constants.MoveLimits.InactivityLimit)
+                    attackState = AttackState.DrawByInactivity;
+                else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
+                    attackState = AttackState.DrawByRepetition;
+            }
+
+            return newState.SetAttackState(attackState);
         }
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)

@@ -69,8 +69,8 @@ namespace ChessLibrary
             // Try the move and see if it lands in check
             // There's probably a better way to do this using a stateful 'squares attacked by' approach
             // TODO: Do this better
-            var newBoard = state.Board.MovePiece(square, targetMove);
-            var newState = GameState.Initialize(newBoard); // This is fine for here, since we are doing a temp move.
+            var newState = GameStateMutator.ApplyMove(state, square, targetMove);
+            var newBoard = newState.Board;
 
             var ownPieces = (newBoard.WhitePieces & targetMove) != 0 ? newBoard.WhitePieces : newBoard.BlackPieces;
             var opposingPieces = newBoard.AllPieces & ~ownPieces;
