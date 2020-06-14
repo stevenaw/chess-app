@@ -1,18 +1,16 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace ChessLibrary
 {
     public class Game
     {
+        private GameState CurrentState { get; set; }
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
-        private GameState GameState { get; set; }
         private ulong CurrentTurn { get; set; }
-        private BoardState BoardState { get { return GameState.BoardState; } }
-        public AttackState AttackState { get { return GameState.AttackState; } }
+        public AttackState AttackState { get { return CurrentState.AttackState; } }
 
         public Game() : this(BoardState.DefaultPositions, PieceColor.White)
         { }
@@ -22,13 +20,13 @@ namespace ChessLibrary
 
         internal Game(BoardState state, PieceColor turn)
         {
-            GameState = GameState.Initialize(state);
-            CurrentTurn = turn == PieceColor.White ? BoardState.WhitePieces : BoardState.BlackPieces;
+            CurrentState = GameState.Initialize(state);
+            CurrentTurn = turn == PieceColor.White ? CurrentState.Board.WhitePieces : CurrentState.Board.BlackPieces;
         }
 
         public PieceColor GetTurn()
         {
-            return (CurrentTurn & BoardState.WhitePieces) != 0
+            return (CurrentTurn & CurrentState.Board.WhitePieces) != 0
                 ? PieceColor.White
                 : PieceColor.Black;
         }
@@ -41,22 +39,22 @@ namespace ChessLibrary
             {
                 ulong startSquare = BitTranslator.TranslateToBit(file, rank);
 
-                if ((startSquare & BoardState.WhitePieces) != 0)
+                if ((startSquare & CurrentState.Board.WhitePieces) != 0)
                     result |= SquareContents.White;
-                else if ((startSquare & BoardState.BlackPieces) != 0)
+                else if ((startSquare & CurrentState.Board.BlackPieces) != 0)
                     result |= SquareContents.Black;
 
-                if ((startSquare & BoardState.Kings) != 0)
+                if ((startSquare & CurrentState.Board.Kings) != 0)
                     result |= SquareContents.King;
-                else if ((startSquare & BoardState.Queens) != 0)
+                else if ((startSquare & CurrentState.Board.Queens) != 0)
                     result |= SquareContents.Queen;
-                else if ((startSquare & BoardState.Rooks) != 0)
+                else if ((startSquare & CurrentState.Board.Rooks) != 0)
                     result |= SquareContents.Rook;
-                else if ((startSquare & BoardState.Bishops) != 0)
+                else if ((startSquare & CurrentState.Board.Bishops) != 0)
                     result |= SquareContents.Bishop;
-                else if ((startSquare & BoardState.Knights) != 0)
+                else if ((startSquare & CurrentState.Board.Knights) != 0)
                     result |= SquareContents.Knight;
-                else if ((startSquare & BoardState.Pawns) != 0)
+                else if ((startSquare & CurrentState.Board.Pawns) != 0)
                     result |= SquareContents.Pawn;
             }
 
@@ -65,7 +63,7 @@ namespace ChessLibrary
 
         public ErrorCondition Move(string input)
         {
-            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out AnnotatedMove move))
+            if (MoveParser.TryParseMove(input, CurrentState.Board, CurrentTurn, out AnnotatedMove move))
                 return Move(move.Move);
 
             return ErrorCondition.InvalidInput;
@@ -88,7 +86,7 @@ namespace ChessLibrary
             if ((CurrentTurn & endSquare) != 0)
                 return ErrorCondition.CantTakeOwnPiece; // Can't end move on own piece
 
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(GameState, startSquare);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(CurrentState, startSquare);
             if ((endSquare & allMoves) == 0)
                 return ErrorCondition.InvalidMovement; // End square is not a valid move
 
@@ -109,45 +107,12 @@ namespace ChessLibrary
             // ✔ Detect draw by repetition
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
-            var newState = GameStateMutator.ApplyMove(GameState, move, startSquare, endSquare);
-            var newBoard = newState.BoardState;
+            var newState = GameStateMutator.ApplyMove(CurrentState, move, startSquare, endSquare);
 
-            var ownPieces = (endSquare & newBoard.WhitePieces) != 0
-                ? newBoard.WhitePieces : newBoard.BlackPieces;
-            var opponentPieces = newBoard.AllPieces & ~ownPieces;
+            var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
+                ? newState.Board.BlackPieces : newState.Board.WhitePieces;
 
-            var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
-            var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
-
-            var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
-            var opponentCanMove = opponentMovements != 0;
-
-            var attackState = AttackState.None;
-            if (opponentKingUnderAttack)
-                attackState = opponentCanMove ? AttackState.Check : AttackState.Checkmate;
-            else if (!opponentCanMove)
-                attackState = AttackState.Stalemate;
-            else
-            {
-                var count = 0;
-                var duplicateCount = 0;
-
-                foreach (var state in newState.PossibleRepeatedHistory)
-                {
-                    count++;
-                    if (BoardState.Equals(state, newBoard))
-                        duplicateCount++;
-                }
-
-                if (count == Constants.MoveLimits.InactivityLimit)
-                    attackState = AttackState.DrawByInactivity;
-                else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
-                    attackState = AttackState.DrawByRepetition;
-            }
-
-            newState = newState.SetAttackState(attackState);
-
-            GameState = newState;
+            CurrentState = newState;
             GameHistory.Push(newState);
             CurrentTurn = opponentPieces;
         }
@@ -163,14 +128,14 @@ namespace ChessLibrary
                 throw new InvalidOperationException();
 
             var square = BitTranslator.TranslateToBit(file, rank);
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(GameState, square);
+            ulong allMoves = MoveGenerator.GenerateMovesForPiece(CurrentState, square);
 
             return BitTranslator.TranslateToSquares(allMoves);
         }
 
         public AnnotatedMove ParseMove(string input)
         {
-            if (MoveParser.TryParseMove(input, BoardState, CurrentTurn, out AnnotatedMove move))
+            if (MoveParser.TryParseMove(input, CurrentState.Board, CurrentTurn, out AnnotatedMove move))
                 return move;
 
             throw new FormatException($"Could not parse move '{input}' for current board state");

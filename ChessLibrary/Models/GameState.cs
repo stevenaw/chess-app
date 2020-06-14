@@ -5,13 +5,13 @@ namespace ChessLibrary.Models
     internal readonly struct GameState
     {
         public readonly ImmutableStack<BoardState> PossibleRepeatedHistory { get; }
-        public readonly BoardState BoardState { get; }
+        public readonly BoardState Board { get; }
         public readonly AttackState AttackState { get; }
         public readonly Move PrecedingMove { get; }
 
         public GameState(BoardState board, AttackState attackState, Move previousMove, ImmutableStack<BoardState> history)
         {
-            BoardState = board;
+            Board = board;
             AttackState = attackState;
             PrecedingMove = previousMove;
             PossibleRepeatedHistory = history;
@@ -19,7 +19,7 @@ namespace ChessLibrary.Models
 
         public GameState SetAttackState(AttackState state)
         {
-            return new GameState(BoardState, state, PrecedingMove, PossibleRepeatedHistory);
+            return new GameState(Board, state, PrecedingMove, PossibleRepeatedHistory);
         }
 
         public static GameState Initialize(BoardState boardState)

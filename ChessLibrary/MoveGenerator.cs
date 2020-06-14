@@ -25,7 +25,7 @@ namespace ChessLibrary
             //   ✔ Account for can't move king into check
             // ❔ Account for can't castle through check
 
-            var board = state.BoardState;
+            var board = state.Board;
             var isWhite = (square & board.WhitePieces) != 0;
             var opposingPiecesCurrent = isWhite ? board.BlackPieces : board.WhitePieces;
             var opponentMoves = GenerateStandardMoves(state, opposingPiecesCurrent, 0);
@@ -42,7 +42,7 @@ namespace ChessLibrary
             //   ✔ Account for can't move king into check
             // ❔ Account for can't castle through check
 
-            var board = state.BoardState;
+            var board = state.Board;
             var isWhite = (square & board.WhitePieces) != 0;
 
             var ownPiecesCurrent = isWhite ? board.WhitePieces : board.BlackPieces;
@@ -68,9 +68,9 @@ namespace ChessLibrary
         {
             // Try the move and see if it lands in check
             // There's probably a better way to do this using a stateful 'squares attacked by' approach
-
-            var newState = GameStateMutator.ApplyMove(state, square, targetMove);
-            var newBoard = newState.BoardState;
+            // TODO: Do this better
+            var newBoard = state.Board.MovePiece(square, targetMove);
+            var newState = GameState.Initialize(newBoard); // This is fine for here, since we are doing a temp move.
 
             var ownPieces = (newBoard.WhitePieces & targetMove) != 0 ? newBoard.WhitePieces : newBoard.BlackPieces;
             var opposingPieces = newBoard.AllPieces & ~ownPieces;
@@ -87,7 +87,7 @@ namespace ChessLibrary
             for (var i = 0; i < 64; i++)
             {
                 var targetBit = squareMask & (1UL << i);
-                var piece = state.BoardState.AllPieces & targetBit;
+                var piece = state.Board.AllPieces & targetBit;
                 if (piece != 0)
                 {
                     var attackingSquares = GenerateMovesForPiece(state, piece, opponentMoves);
@@ -109,7 +109,7 @@ namespace ChessLibrary
             // ❔ Account for castling
 
             ulong result = 0;
-            var board = state.BoardState;
+            var board = state.Board;
 
             if ((square & board.Queens) != 0)
             {
@@ -147,7 +147,7 @@ namespace ChessLibrary
             for (var i = 0; i < 64; i++)
             {
                 var targetBit = squareMask & (1UL << i);
-                var piece = state.BoardState.AllPieces & targetBit;
+                var piece = state.Board.AllPieces & targetBit;
                 if (piece != 0)
                 {
                     var attackingSquares = GenerateStandardMovesForPiece(state, piece, opponentMoves);
