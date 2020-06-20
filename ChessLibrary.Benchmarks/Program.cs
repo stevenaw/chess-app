@@ -5,9 +5,9 @@ namespace ChessLibrary.Benchmarks
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            BenchmarkRunner.Run<BoardStateEqualsBenchmarks>();
+            BenchmarkRunner.Run<IndexedTupleBenchmarks>();
         }
     }
 }

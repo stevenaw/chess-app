@@ -35,7 +35,7 @@ namespace ChessLibrary
 
             history = history.Push(newBoard);
 
-            return new GameState(newBoard, state.AttackState, move, history);
+            return new GameState(newBoard, move, history, state.AttackState, state.HasKingMoved);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)

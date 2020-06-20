@@ -18,13 +18,6 @@ namespace ChessLibrary
 
         public static ulong GenerateMovesForPiece(GameState state, ulong square)
         {
-            // Detect type of piece
-            // Create bitmask of all moves for that piece
-            // ✔ Account for can't end in check
-            //   ✔ Account for pins
-            //   ✔ Account for can't move king into check
-            // ❔ Account for can't castle through check
-
             var board = state.Board;
             var isWhite = (square & board.WhitePieces) != 0;
             var opposingPiecesCurrent = isWhite ? board.BlackPieces : board.WhitePieces;
@@ -35,13 +28,6 @@ namespace ChessLibrary
 
         public static ulong GenerateMovesForPiece(GameState state, ulong square, ulong opposingMoves)
         {
-            // Detect type of piece
-            // Create bitmask of all moves for that piece
-            // ✔ Account for can't end in check
-            //   ✔ Account for pins
-            //   ✔ Account for can't move king into check
-            // ❔ Account for can't castle through check
-
             var board = state.Board;
             var isWhite = (square & board.WhitePieces) != 0;
 
@@ -107,6 +93,8 @@ namespace ChessLibrary
             // ✔ Detect standard patterns of movement
             // ✔ Account for en passant
             // ❔ Account for castling
+            //   ❔ Account for can't castle through check
+            //   ❔ Account for can't castle while in check
 
             ulong result = 0;
             var board = state.Board;

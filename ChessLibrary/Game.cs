@@ -103,14 +103,14 @@ namespace ChessLibrary
             var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
                 ? newState.Board.BlackPieces : newState.Board.WhitePieces;
 
-            newState = AnalyzeAndApplyState(newState, opponentPieces);
+            newState = AnalyzeAndApplyState(newState, endSquare, opponentPieces);
 
             CurrentState = newState;
             GameHistory.Push(newState);
             CurrentTurn = opponentPieces;
         }
 
-        private static GameState AnalyzeAndApplyState(GameState newState, ulong opponentPieces)
+        private static GameState AnalyzeAndApplyState(GameState newState, ulong endSquare, ulong opponentPieces)
         {
             // All state detections
             // ✔ Account for piece promotions
@@ -151,7 +151,19 @@ namespace ChessLibrary
                     attackState = AttackState.DrawByRepetition;
             }
 
-            return newState.SetAttackState(attackState);
+            var updatedKingMoveStatus = newState.HasKingMoved;
+            if ((newBoard.Kings & endSquare) != 0)
+            {
+                var didBlackKingMove = (newBoard.BlackPieces & newBoard.Kings & endSquare) != 0;
+                var didWhiteKingMove = (newBoard.WhitePieces & newBoard.Kings & endSquare) != 0;
+                updatedKingMoveStatus = new IndexedTuple<bool>(
+                    newState.HasKingMoved.First && didWhiteKingMove,
+                    newState.HasKingMoved.Second && didBlackKingMove
+                );
+            }
+            
+
+            return newState.SetAttackState(attackState, updatedKingMoveStatus);
         }
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)

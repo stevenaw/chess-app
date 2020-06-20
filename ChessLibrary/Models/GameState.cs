@@ -4,27 +4,42 @@ namespace ChessLibrary.Models
 {
     internal readonly struct GameState
     {
-        public readonly ImmutableStack<BoardState> PossibleRepeatedHistory { get; }
         public readonly BoardState Board { get; }
-        public readonly AttackState AttackState { get; }
         public readonly Move PrecedingMove { get; }
+        public readonly ImmutableStack<BoardState> PossibleRepeatedHistory { get; }
 
-        public GameState(BoardState board, AttackState attackState, Move previousMove, ImmutableStack<BoardState> history)
+        public readonly AttackState AttackState { get; }
+        public readonly IndexedTuple<bool> HasKingMoved { get; }
+
+        public GameState(
+            BoardState board,
+            Move previousMove,
+            ImmutableStack<BoardState> history,
+            AttackState attackState,
+            IndexedTuple<bool> hasKingMoved
+        )
         {
             Board = board;
             AttackState = attackState;
             PrecedingMove = previousMove;
             PossibleRepeatedHistory = history;
+            HasKingMoved = hasKingMoved;
         }
 
-        public GameState SetAttackState(AttackState state)
+        public GameState SetAttackState(AttackState state, IndexedTuple<bool> hasKingMoved)
         {
-            return new GameState(Board, state, PrecedingMove, PossibleRepeatedHistory);
+            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, hasKingMoved);
         }
 
         public static GameState Initialize(BoardState boardState)
         {
-            return new GameState(boardState, AttackState.None, Move.Empty, ImmutableStack<BoardState>.Empty);
+            return new GameState(
+                boardState,
+                Move.Empty,
+                ImmutableStack<BoardState>.Empty,
+                AttackState.None,
+                IndexedTuple<bool>.Empty
+            );
         }
     }
 }
