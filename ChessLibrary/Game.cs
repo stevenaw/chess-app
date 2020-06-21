@@ -151,17 +151,10 @@ namespace ChessLibrary
                     attackState = AttackState.DrawByRepetition;
             }
 
-            var updatedKingMoveStatus = newState.HasKingMoved;
-            if ((newBoard.Kings & endSquare) != 0)
-            {
-                var didBlackKingMove = (newBoard.BlackPieces & newBoard.Kings & endSquare) != 0;
-                var didWhiteKingMove = (newBoard.WhitePieces & newBoard.Kings & endSquare) != 0;
-                updatedKingMoveStatus = new IndexedTuple<bool>(
-                    newState.HasKingMoved.First && didWhiteKingMove,
-                    newState.HasKingMoved.Second && didBlackKingMove
-                );
-            }
-            
+            var updatedKingMoveStatus = new IndexedTuple<bool>(
+                newState.HasKingMoved.First || ((newBoard.BlackPieces & newBoard.Kings & endSquare) != 0),
+                newState.HasKingMoved.Second || ((newBoard.WhitePieces & newBoard.Kings & endSquare) != 0)
+            );
 
             return newState.SetAttackState(attackState, updatedKingMoveStatus);
         }
