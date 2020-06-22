@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace ChessLibrary
 {
-    public class Game
+    public sealed class Game
     {
-        private GameState CurrentState { get; set; }
+        internal GameState CurrentState { get; private set; }
         private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
         private ulong CurrentTurn { get; set; }
@@ -152,8 +152,8 @@ namespace ChessLibrary
             }
 
             var updatedKingMoveStatus = new IndexedTuple<bool>(
-                newState.HasKingMoved.First || ((newBoard.BlackPieces & newBoard.Kings & endSquare) != 0),
-                newState.HasKingMoved.Second || ((newBoard.WhitePieces & newBoard.Kings & endSquare) != 0)
+                newState.HasKingMoved.First || ((newBoard.WhitePieces & newBoard.Kings & endSquare) != 0),
+                newState.HasKingMoved.Second || ((newBoard.BlackPieces & newBoard.Kings & endSquare) != 0)
             );
 
             return newState.SetAttackState(attackState, updatedKingMoveStatus);

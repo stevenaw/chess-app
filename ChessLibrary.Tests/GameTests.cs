@@ -78,6 +78,39 @@ namespace ChessLibrary.Tests
             }
         }
 
+        [Test]
+        public void Move_UpdatesKingMovementTracker()
+        {
+            var moves = new[]
+            {
+                "d4", "d5",
+                "Kd2", "Kd7",
+                "a3", "a6"
+            };
+            var expectedState = new[]
+            {
+                (false, false),
+                (false, false),
+                (true, false),
+                (true, true),
+                (true, true),
+                (true, true)
+            };
+
+            var game = new Game();
+            for (var i = 0; i < moves.Length; i++)
+            {
+                var move = moves[i];
+                var state = expectedState[i];
+
+                var result = game.Move(move);
+                var hasKingMoved = game.CurrentState.HasKingMoved;
+
+                Assert.That(state.Item1, Is.EqualTo(hasKingMoved.First));
+                Assert.That(state.Item2, Is.EqualTo(hasKingMoved.Second));
+            }
+        }
+
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
         [TestCase("a1=Q", "a2", "a1", PieceColor.Black, SquareContents.Black | SquareContents.Queen)]
         public void TryParseMove_ParsesPromotion(string input, string expectedStart, string expectedEnd, PieceColor color, SquareContents piece)
