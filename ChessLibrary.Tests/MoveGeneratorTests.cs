@@ -1,5 +1,6 @@
 using ChessLibrary.Models;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ChessLibrary.Tests
@@ -102,6 +103,35 @@ namespace ChessLibrary.Tests
             var validMoves = game.GetValidMoves(square.File, square.Rank).ToArray();
 
             Assert.That(validMoves, Does.Not.Contain(expected[0]));
+        }
+
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6", "e1", "g1")]
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,a3", "e8", "g8")]
+        [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7", "e1", "c1")]
+        [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,a3", "e8", "c8")]
+        public void GeneratesExpectedSquares_AllowsCastling_WhenWhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
+        {
+            var king = MoveParser.ParseSquare(kingSquare);
+            var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
+            IEnumerable<Square> validMoves;
+
+            var game = new Game();
+            var moves = input.Split(",");
+
+            foreach (var move in moves.SkipLast(2))
+            {
+                game.Move(move);
+
+                validMoves = game.GetValidMoves(king.File, king.Rank);
+                Assert.That(validMoves, Does.Not.Contain(expectedResult), $"Unexpected castling square after move {move}");
+            }
+
+
+            foreach (var move in moves.TakeLast(2))
+                game.Move(move);
+
+            validMoves = game.GetValidMoves(king.File, king.Rank);
+            Assert.That(validMoves, Does.Contain(expectedResult));
         }
     }
 }

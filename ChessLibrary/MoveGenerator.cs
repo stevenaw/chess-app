@@ -16,6 +16,18 @@ namespace ChessLibrary
         public const ulong PawnStartRowWhite = 0x000000000000FF00;
         public const ulong PawnStartRowBlack = 0x00FF000000000000;
 
+        private const ulong CastlingQueenside = 0x1F0000000000001F;
+        private const ulong CastlingKingside = 0xF0000000000000F0;
+        private const ulong StartingKings = 0x1000000000000010;
+        private const ulong StartingRooks = (Rank1 | Rank8) & (FileA | FileH);
+        private const ulong StartingKingsAndRooks = StartingKings | StartingRooks;
+
+        private static ulong[] HomeRows = new ulong[]
+        {
+            Rank1,
+            Rank8
+        };
+
         public static ulong GenerateMovesForPiece(GameState state, ulong square)
         {
             var board = state.Board;
@@ -122,7 +134,9 @@ namespace ChessLibrary
             else if ((square & board.Kings) != 0)
             {
                 var moves = GetKingMovements(square) & ~opponentMoves;
-                result |= moves;
+                var castlingOptions = GenerateCastlingOptions(state, square);
+
+                result |= (moves | castlingOptions);
             }
 
             return result;
@@ -189,6 +203,44 @@ namespace ChessLibrary
             newSquares |= (input << 8);
 
             return newSquares;
+        }
+
+        private static ulong GenerateCastlingOptions(GameState state, ulong input)
+        {
+            // TODO: Test this like crazy
+            if (state.AttackState != AttackState.None)
+                return 0;
+            else if ((input & state.PiecesOnStartSquares & StartingKings) == 0)
+                return 0;
+
+            // 'input' is king and has not moved from space on home row
+            var isBlack = input > (1 << 8);
+            var homeRow = HomeRows[Convert.ToInt32(isBlack)];
+            var kingsAndRooksOnHomeRow = homeRow & state.PiecesOnStartSquares & StartingKingsAndRooks;
+            var opponentAttacks = state.SquaresAttackedBy.Get(Convert.ToInt32(!isBlack));
+
+            ulong result = input;
+            if (
+                // nothing in between king + rook, neither has moved
+                (state.Board.AllPieces & homeRow & CastlingQueenside) == (kingsAndRooksOnHomeRow & CastlingQueenside)
+                // and in between spaces are not under attack
+                && ((opponentAttacks & homeRow & CastlingQueenside & (~kingsAndRooksOnHomeRow)) == 0)
+            )
+            {
+                result |= (result >> 2);
+            }
+
+            if (
+                // nothing in between king + rook, neither has moved
+                (state.Board.AllPieces & homeRow & CastlingKingside) == (kingsAndRooksOnHomeRow & CastlingKingside)
+                // and in between spaces are not under attack
+                && ((opponentAttacks & homeRow & CastlingKingside & (~kingsAndRooksOnHomeRow)) == 0)
+            )
+            {
+                result |= (result << 2);
+            }
+
+            return result & ~input;
         }
 
         internal static ulong GetKnightMovements(ulong input)
