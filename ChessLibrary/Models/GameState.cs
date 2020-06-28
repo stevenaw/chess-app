@@ -9,26 +9,29 @@ namespace ChessLibrary.Models
         public readonly ImmutableStack<BoardState> PossibleRepeatedHistory { get; }
 
         public readonly AttackState AttackState { get; }
-        public readonly IndexedTuple<bool> HasKingMoved { get; }
+        public readonly ulong PiecesOnStartSquares { get; }
+        public readonly IndexedTuple<ulong> SquaresAttackedBy { get; }
 
         public GameState(
             BoardState board,
             Move previousMove,
             ImmutableStack<BoardState> history,
             AttackState attackState,
-            IndexedTuple<bool> hasKingMoved
+            ulong piecesOnStartSquares,
+            IndexedTuple<ulong> squaresAttackedBy
         )
         {
             Board = board;
             AttackState = attackState;
             PrecedingMove = previousMove;
             PossibleRepeatedHistory = history;
-            HasKingMoved = hasKingMoved;
+            PiecesOnStartSquares = piecesOnStartSquares;
+            SquaresAttackedBy = squaresAttackedBy;
         }
 
-        public GameState SetAttackState(AttackState state, IndexedTuple<bool> hasKingMoved)
+        public GameState SetAttackState(AttackState state, ulong piecesOnStartSquares, IndexedTuple<ulong> squaresAttackedBy)
         {
-            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, hasKingMoved);
+            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, piecesOnStartSquares, squaresAttackedBy);
         }
 
         public static GameState Initialize(BoardState boardState)
@@ -38,7 +41,8 @@ namespace ChessLibrary.Models
                 Move.Empty,
                 ImmutableStack<BoardState>.Empty,
                 AttackState.None,
-                IndexedTuple<bool>.Empty
+                boardState.AllPieces,
+                IndexedTuple<ulong>.Empty
             );
         }
     }

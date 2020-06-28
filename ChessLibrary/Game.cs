@@ -71,7 +71,7 @@ namespace ChessLibrary
 
         public ErrorCondition Move(AnnotatedMove move) => Move(move.Move);
 
-        public ErrorCondition Move(Move move)
+        private ErrorCondition Move(Move move)
         {
             if (!BitTranslator.IsValidSquare(move.StartFile, move.StartRank))
                 return ErrorCondition.InvalidSquare;
@@ -103,14 +103,14 @@ namespace ChessLibrary
             var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
                 ? newState.Board.BlackPieces : newState.Board.WhitePieces;
 
-            newState = AnalyzeAndApplyState(newState, endSquare, opponentPieces);
+            newState = AnalyzeAndApplyState(newState, startSquare, endSquare, opponentPieces);
 
             CurrentState = newState;
             GameHistory.Push(newState);
             CurrentTurn = opponentPieces;
         }
 
-        private static GameState AnalyzeAndApplyState(GameState newState, ulong endSquare, ulong opponentPieces)
+        private static GameState AnalyzeAndApplyState(GameState newState, ulong startSquare, ulong endSquare, ulong opponentPieces)
         {
             // All state detections
             // ✔ Account for piece promotions
@@ -121,8 +121,14 @@ namespace ChessLibrary
             // ✔ Detect draw by inactivity (50 moves without a capture)
 
             var newBoard = newState.Board;
-            var ownPieces = newBoard.AllPieces & ~opponentPieces;
-            var ownMovements = MoveGenerator.GenerateStandardMoves(newState, ownPieces, 0);
+            var didBlackMove = ((endSquare & newBoard.BlackPieces) != 0) ? 1 : 0;
+
+            // TODO: Differentiate between attacks + movements for pawns
+            var whiteMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.WhitePieces, 0);
+            var blackMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.BlackPieces, 0);
+            var squaresAttackedBy = new IndexedTuple<ulong>(whiteMoves, blackMoves);
+
+            var ownMovements = squaresAttackedBy.Get(didBlackMove);
             var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
 
             var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
@@ -148,15 +154,16 @@ namespace ChessLibrary
                 if (count == Constants.MoveLimits.InactivityLimit)
                     attackState = AttackState.DrawByInactivity;
                 else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
+                {
+                    // TODO: Check for ability to castle (in case a king or rook moved and then moved back)
+                    // Check bitfield of pieces still on original squares for this
                     attackState = AttackState.DrawByRepetition;
+                }
             }
 
-            var updatedKingMoveStatus = new IndexedTuple<bool>(
-                newState.HasKingMoved.First || ((newBoard.WhitePieces & newBoard.Kings & endSquare) != 0),
-                newState.HasKingMoved.Second || ((newBoard.BlackPieces & newBoard.Kings & endSquare) != 0)
-            );
+            var newPiecesStillOnStartSquare = newState.PiecesOnStartSquares & ~(startSquare | endSquare);
 
-            return newState.SetAttackState(attackState, updatedKingMoveStatus);
+            return newState.SetAttackState(attackState, newPiecesStillOnStartSquare, squaresAttackedBy);
         }
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)

@@ -6,9 +6,6 @@
         public readonly MoveAnnotation Annotation { get; }
         public readonly AttackState AttackState { get; }
 
-
-        public AnnotatedMove(Move move) : this(move, MoveAnnotation.Normal, AttackState.None) { }
-
         public AnnotatedMove(Move move, MoveAnnotation annotation, AttackState attackState)
         {
             Move = move;
@@ -16,7 +13,7 @@
             AttackState = attackState;
         }
 
-        public static AnnotatedMove Empty { get; } = new AnnotatedMove(Move.Empty);
+        public static AnnotatedMove Empty { get; } = new AnnotatedMove(Move.Empty, MoveAnnotation.Normal, AttackState.None);
 
         public static bool Equals(AnnotatedMove a, AnnotatedMove b)
         {

@@ -28,6 +28,9 @@ namespace ChessLibrary.Models
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Get(PieceColor colour) => GetWithPointerArithmetic((int)colour);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Get(int idx) => GetWithPointerArithmetic(idx);
+
         private unsafe T GetWithPointerArithmetic(int idx)
         {
             var first = Unsafe.AsPointer(ref _first);

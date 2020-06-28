@@ -81,34 +81,20 @@ namespace ChessLibrary.Tests
         [Test]
         public void Move_UpdatesKingMovementTracker()
         {
-            var moves = new[]
-            {
-                "d4", "d5",
-                "Kd2", "Kd7",
-                "a3", "a6"
-            };
-            var expectedState = new[]
-            {
-                (false, false),
-                (false, false),
-                (true, false),
-                (true, true),
-                (true, true),
-                (true, true)
-            };
+            var board = BoardState.DefaultPositions;
+            var game = new Game(board);
+            var expectedStartSquares = board.AllPieces;
 
-            var game = new Game();
-            for (var i = 0; i < moves.Length; i++)
-            {
-                var move = moves[i];
-                var state = expectedState[i];
+            game.Move("Na3");
+            expectedStartSquares -= 2; // Move piece at idx = 2 (1^idx-1 = 2)
+            Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
 
-                var result = game.Move(move);
-                var hasKingMoved = game.CurrentState.HasKingMoved;
+            game.Move("a6");
+            expectedStartSquares = game.CurrentState.PiecesOnStartSquares;
 
-                Assert.That(state.Item1, Is.EqualTo(hasKingMoved.First));
-                Assert.That(state.Item2, Is.EqualTo(hasKingMoved.Second));
-            }
+            game.Move("Rb1");
+            expectedStartSquares -= 1; // Move piece at idx = 1 to a square already flipped (1^idx-1 = 1)
+            Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
         }
 
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]
