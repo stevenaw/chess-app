@@ -79,7 +79,7 @@ namespace ChessLibrary.Tests
         }
 
         [Test]
-        public void Move_UpdatesKingMovementTracker()
+        public void Move_UpdatesCastlingMovementTracker()
         {
             var board = BoardState.DefaultPositions;
             var game = new Game(board);
@@ -89,11 +89,16 @@ namespace ChessLibrary.Tests
             expectedStartSquares -= 2; // Move piece at idx = 2 (1^idx-1 = 2)
             Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
 
-            game.Move("a6");
+            game.Move("Na6");
             expectedStartSquares = game.CurrentState.PiecesOnStartSquares;
 
             game.Move("Rb1");
             expectedStartSquares -= 1; // Move piece at idx = 1 to a square already flipped (1^idx-1 = 1)
+            Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
+
+            //Ensure they don't flip back on when moving to original square
+            game.Move("Nb8");
+            game.Move("Ra1");
             Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
         }
 
