@@ -1,4 +1,6 @@
 ﻿using ChessLibrary.Models;
+using System;
+using System.Reflection;
 
 namespace ChessLibrary
 {
@@ -6,7 +8,6 @@ namespace ChessLibrary
     {
         public static GameState ApplyMove(GameState state, Move move, ulong startSquare, ulong endSquare)
         {
-            // TODO: Castling
             var history = state.PossibleRepeatedHistory;
             var resetHistory = (
                     ((state.Board.AllPieces & endSquare) != 0)     // regular capture 
@@ -23,6 +24,9 @@ namespace ChessLibrary
             var isEnPassant = ((startSquare & state.Board.Pawns) != 0
                                 && move.StartFile != move.EndFile
                                 && (endSquare & state.Board.AllPieces) == 0);
+            var isCastling = (startSquare & state.Board.Kings) != 0
+                                && Math.Abs(move.EndFile - move.StartFile) == 2;
+
             if (isEnPassant)
             {
                 var opponentPawn = BitTranslator.TranslateToBit(move.EndFile, move.StartRank);
@@ -31,6 +35,17 @@ namespace ChessLibrary
             else if (move.PromotedPiece != SquareContents.Empty)
             {
                 newBoard = newBoard.SetPiece(endSquare, move.PromotedPiece);
+            }
+            else if (isCastling)
+            {
+                var rookDestinationRelativeKing = Math.Sign(move.StartFile - move.EndFile);
+                var rookDestinationFile = (char)(move.EndFile + rookDestinationRelativeKing);
+                var rookDestinationBit = BitTranslator.TranslateToBit(rookDestinationFile, move.EndRank);
+
+                var rookOriginFile = rookDestinationRelativeKing > 0 ? 'a' : 'h';
+                var rookOriginBit = BitTranslator.TranslateToBit(rookOriginFile, move.EndRank);
+
+                newBoard = BoardStateMutator.MovePiece(newBoard, rookOriginBit, rookDestinationBit);
             }
 
             history = history.Push(newBoard);

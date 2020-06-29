@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace ChessLibrary.Tests
 {
+    //TODO: Promotion tests
     [TestFixture]
     public class GameTests
     {
@@ -100,6 +101,26 @@ namespace ChessLibrary.Tests
             game.Move("Nb8");
             game.Move("Ra1");
             Assert.That(game.CurrentState.PiecesOnStartSquares, Is.EqualTo(expectedStartSquares));
+        }
+
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,O-O", "g1", "f1", SquareContents.White)]
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,a3,O-O", "g8", "f8", SquareContents.Black)]
+        [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,O-O-O", "c1", "d1", SquareContents.White)]
+        [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,h3,O-O-O", "c8", "d8", SquareContents.Black)]
+        public void Move_UpdatesPiecesWhenCastling(string input, string kingSquare, string rookSquare, SquareContents color)
+        {
+            var king = MoveParser.ParseSquare(kingSquare);
+            var rook = MoveParser.ParseSquare(rookSquare);
+
+            var game = new Game();
+            foreach (var move in input.Split(','))
+                game.Move(move);
+
+            var expectedKing = game.GetSquareContents(king.File, king.Rank);
+            var expectedRook = game.GetSquareContents(rook.File, rook.Rank);
+
+            Assert.That(expectedKing, Is.EqualTo(SquareContents.King | color));
+            Assert.That(expectedRook, Is.EqualTo(SquareContents.Rook | color));
         }
 
         [TestCase("a8=Q", "a7", "a8", PieceColor.White, SquareContents.White | SquareContents.Queen)]

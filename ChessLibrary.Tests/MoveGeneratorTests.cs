@@ -116,7 +116,7 @@ namespace ChessLibrary.Tests
             IEnumerable<Square> validMoves;
 
             var game = new Game();
-            var moves = input.Split(",");
+            var moves = input.Split(',');
 
             foreach (var move in moves.SkipLast(2))
             {
@@ -125,7 +125,6 @@ namespace ChessLibrary.Tests
                 validMoves = game.GetValidMoves(king.File, king.Rank);
                 Assert.That(validMoves, Does.Not.Contain(expectedResult), $"Unexpected castling square after move {move}");
             }
-
 
             foreach (var move in moves.TakeLast(2))
                 game.Move(move);
