@@ -1,5 +1,8 @@
-﻿namespace ChessLibrary.Models
+﻿using System.Diagnostics;
+
+namespace ChessLibrary.Models
 {
+    [DebuggerDisplay("{File}{Rank}")]
     public readonly struct Square
     {
         public readonly char File { get; }

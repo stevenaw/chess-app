@@ -104,9 +104,9 @@ namespace ChessLibrary
             // ✔ Detect if moving onto own piece
             // ✔ Detect standard patterns of movement
             // ✔ Account for en passant
-            // ❔ Account for castling
-            //   ❔ Account for can't castle through check
-            //   ❔ Account for can't castle while in check
+            // ✔ Account for castling
+            //   ✔ Account for can't castle through check
+            //   ✔ Account for can't castle while in check
 
             ulong result = 0;
             var board = state.Board;
@@ -316,13 +316,13 @@ namespace ChessLibrary
 
         private static ulong FillDiagonals(ulong input, BoardState state)
         {
-            ulong descendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileA | Rank1)
-                | TraverseUntilCant(state, input, ShiftLeft, 8 + 1, FileH | Rank8);
+            var upRight = TraverseUntilCant(state, input, ShiftLeft, 8 + 1, FileH | Rank8);
+            var upLeft = TraverseUntilCant(state, input, ShiftLeft, 8 - 1, FileA | Rank8);
 
-            ulong ascendingDiagonal = TraverseUntilCant(state, input, ShiftRight, 8 + 1, FileH | Rank1)
-                | TraverseUntilCant(state, input, ShiftLeft, 8 - 1, FileA | Rank8);
+            var downRight = TraverseUntilCant(state, input, ShiftRight, 8 - 1, FileH | Rank1);
+            var downLeft = TraverseUntilCant(state, input, ShiftRight, 8 + 1, FileA | Rank1);
 
-            return ascendingDiagonal | descendingDiagonal;
+            return downRight | downLeft | upRight | upLeft;
         }
 
         private static ulong FillVerticalAndHorizontal(ulong input, BoardState state)
@@ -346,17 +346,16 @@ namespace ChessLibrary
         )
         {
             ulong result = 0;
-            int walkSize = stepSize;
             var stopCondition = border | state.AllPieces;
 
             if ((input & border) != 0)
                 return result;
 
+            var targetBit = input;
             while ((result & stopCondition) == 0)
             {
-                var possibleMove = shift(input, walkSize);
-                result |= possibleMove;
-                walkSize += stepSize;
+                targetBit = shift(targetBit, stepSize);
+                result |= targetBit;
             }
 
             return result;

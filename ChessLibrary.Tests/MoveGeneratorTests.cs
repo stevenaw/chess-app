@@ -1,4 +1,5 @@
 using ChessLibrary.Models;
+using ChessLibrary.Serialization;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,7 +110,7 @@ namespace ChessLibrary.Tests
         [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,a3", "e8", "g8")]
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7", "e1", "c1")]
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,a3", "e8", "c8")]
-        public void GeneratesExpectedSquares_AllowsCastling_WhenWhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
+        public void GeneratesExpectedSquares_AllowsCastling_WhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
@@ -131,6 +132,43 @@ namespace ChessLibrary.Tests
 
             validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Contain(expectedResult));
+        }
+
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,f4,Qh4", "e1", "g1")]
+        public void GeneratesExpectedSquares_DisallowsCastling_WhenUnderAttack(string input, string kingSquare, string expectedCastlingSquare)
+        {
+            var king = MoveParser.ParseSquare(kingSquare);
+            var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
+            IEnumerable<Square> validMoves;
+
+            var game = new Game();
+            var moves = input.Split(',');
+
+            foreach (var move in moves.SkipLast(1))
+                game.Move(move);
+
+            game.Move(moves.Last());
+
+            Assert.That(game.AttackState, Is.EqualTo(AttackState.Check));
+
+            validMoves = game.GetValidMoves(king.File, king.Rank);
+            Assert.That(validMoves, Does.Not.Contain(expectedResult));
+        }
+
+        [TestCase("8/8/8/8/7B/8/8/K1k5", "h4", "e1")]
+        public void GetValidMoves_DetectsWhenOnEdge(string position, string targetSq, string expectedSq)
+        {
+            var fen = new FenSerializer();
+            var board = fen.Deserialize(position);
+
+            var target = MoveParser.ParseSquare(targetSq);
+            var targetMask = BitTranslator.TranslateToBit(target.File, target.Rank);
+
+            var validMovesMask = MoveGenerator.GetBishopMovements(targetMask, board);
+            var validMoves = BitTranslator.TranslateToSquares(validMovesMask);
+
+            var expected = MoveParser.ParseSquare(expectedSq);
+            Assert.That(validMoves, Does.Contain(expected));
         }
     }
 }
