@@ -22,7 +22,7 @@ namespace ChessLibrary
         private const ulong StartingRooks = (Rank1 | Rank8) & (FileA | FileH);
         private const ulong StartingKingsAndRooks = StartingKings | StartingRooks;
 
-        private static ulong[] HomeRows = new ulong[]
+        private static readonly ulong[] HomeRows = new ulong[]
         {
             Rank1,
             Rank8

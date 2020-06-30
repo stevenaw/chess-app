@@ -23,7 +23,9 @@ namespace ChessLibrary.Tests
                 var data = new[]
                 {
                     ("O-O", "e1", "g1"),
+                    ("0-0", "e1", "g1"),
                     ("O-O-O", "e1", "c1"),
+                    ("0-0-0", "e1", "c1"),
                     ("Kd1", "e1", "d1"),
                     ("a4", "a2", "a4")
                 };
@@ -60,7 +62,9 @@ namespace ChessLibrary.Tests
                 var data = new[]
                 {
                     ("O-O", "e1", "g1"),
+                    ("0-0", "e1", "g1"),
                     ("O-O-O", "e1", "c1"),
+                    ("0-0-0", "e1", "c1"),
                     ("Kd1", "e1", "d1"),
                     ("a4", "a2", "a4")
                 };
@@ -188,12 +192,16 @@ namespace ChessLibrary.Tests
 
 
         [TestCase("O-O", PieceColor.White, "e1", "g1")]
+        [TestCase("0-0", PieceColor.White, "e1", "g1")]
         [TestCase("O-O-O", PieceColor.White, "e1", "c1")]
+        [TestCase("0-0-0", PieceColor.White, "e1", "c1")]
         [TestCase("Kd1", PieceColor.White, "e1", "d1")]
         [TestCase("Nc3", PieceColor.White, "b1", "c3")]
 
         [TestCase("O-O", PieceColor.Black, "e8", "g8")]
+        [TestCase("0-0", PieceColor.Black, "e8", "g8")]
         [TestCase("O-O-O", PieceColor.Black, "e8", "c8")]
+        [TestCase("0-0-0", PieceColor.Black, "e8", "c8")]
         [TestCase("Kd8", PieceColor.Black, "e8", "d8")]
         [TestCase("Nh6", PieceColor.Black, "g8", "h6")]
         public void TryParseMove_GeneratesProperSquare(string input, PieceColor color, string expectedStart, string expectedEnd)

@@ -330,8 +330,10 @@ namespace ChessLibrary
 
         private static bool TryHandleCastling(ReadOnlySpan<char> moveNotation, bool isWhiteMove, out Move result)
         {
-            var castleKingside = moveNotation.Equals("O-O".AsSpan(), StringComparison.OrdinalIgnoreCase);
-            var castleQueenside = moveNotation.Equals("O-O-O".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var castleKingside = moveNotation.Equals("O-O".AsSpan(), StringComparison.OrdinalIgnoreCase)
+                || moveNotation.Equals("0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var castleQueenside = moveNotation.Equals("O-O-O".AsSpan(), StringComparison.OrdinalIgnoreCase)
+                || moveNotation.Equals("0-0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
             if (castleKingside || castleQueenside)
             {
