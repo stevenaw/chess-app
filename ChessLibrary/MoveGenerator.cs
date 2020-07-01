@@ -345,18 +345,15 @@ namespace ChessLibrary
             ulong border
         )
         {
-            ulong result = 0;
+            if ((input & border) != 0)
+                return 0;
+
+            var result = 0UL;
+            var walkSize = 0;
             var stopCondition = border | state.AllPieces;
 
-            if ((input & border) != 0)
-                return result;
-
-            var targetBit = input;
             while ((result & stopCondition) == 0)
-            {
-                targetBit = shift(targetBit, stepSize);
-                result |= targetBit;
-            }
+                result |= shift(input, walkSize += stepSize);
 
             return result;
         }
