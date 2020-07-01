@@ -134,7 +134,7 @@ namespace ChessLibrary.Tests
             Assert.That(validMoves, Does.Contain(expectedResult));
         }
 
-        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,f4,Qh4", "e1", "g1")]
+        [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4", "e1", "g1", Description = "Under attack")]
         public void GeneratesExpectedSquares_DisallowsCastling_WhenUnderAttack(string input, string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
@@ -150,6 +150,27 @@ namespace ChessLibrary.Tests
             game.Move(moves.Last());
 
             Assert.That(game.AttackState, Is.EqualTo(AttackState.Check));
+
+            validMoves = game.GetValidMoves(king.File, king.Rank);
+            Assert.That(validMoves, Does.Not.Contain(expectedResult));
+        }
+
+        [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxf4", "e1", "g1", Description = "Passing through attack")]
+        [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxh2", "e1", "g1", Description = "Ending in attack")]
+        public void GeneratesExpectedSquares_DisallowsCastling_WhenPassThroughAttack(string input, string kingSquare, string expectedCastlingSquare)
+        {
+            var king = MoveParser.ParseSquare(kingSquare);
+            var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
+            IEnumerable<Square> validMoves;
+
+            var game = new Game();
+            var moves = input.Split(',');
+
+            foreach (var move in moves.SkipLast(1))
+                game.Move(move);
+
+            game.Move(moves.Last());
+            Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.Check));
 
             validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Not.Contain(expectedResult));
