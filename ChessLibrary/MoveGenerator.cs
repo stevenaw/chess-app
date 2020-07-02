@@ -207,7 +207,6 @@ namespace ChessLibrary
 
         private static ulong GenerateCastlingOptions(GameState state, ulong input)
         {
-            // TODO: Test this like crazy
             if (state.AttackState != AttackState.None)
                 return 0;
             else if ((input & state.PiecesOnStartSquares & StartingKings) == 0)

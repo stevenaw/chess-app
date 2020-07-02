@@ -109,6 +109,7 @@ namespace ChessLibrary.Tests
         [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6", "e1", "g1")]
         [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,a3", "e8", "g8")]
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7", "e1", "c1")]
+        [TestCase("d4,c5,Be3,Qa5,Qd2,Na6,Na3,Qxa2", "e1", "c1", Description = "a1+b1 under attack, but others are clear")]
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,a3", "e8", "c8")]
         public void GeneratesExpectedSquares_AllowsCastling_WhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
         {
@@ -134,7 +135,8 @@ namespace ChessLibrary.Tests
             Assert.That(validMoves, Does.Contain(expectedResult));
         }
 
-        [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4", "e1", "g1", Description = "Under attack")]
+        [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4", "e1", "g1", Description = "Under attack - kingside")]
+        [TestCase("d4,c5,Be3,Nh6,Na3,Na6,Qd3,Qa5", "e1", "c1", Description = "Under attack - queenside")]
         public void GeneratesExpectedSquares_DisallowsCastling_WhenUnderAttack(string input, string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
