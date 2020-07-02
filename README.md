@@ -17,7 +17,7 @@ A list of commands is as follows:
 The 'move' command will move a piece based on the provided notation. Standard algebraic notation is supported.
 Entering a move following standard algebraic notation without specifying the move command will still be treated as a move.
 
-Ex: `move Nc3`
+Ex: `move Nc3` or `Qxh4`
 
 #### hint {square}
 

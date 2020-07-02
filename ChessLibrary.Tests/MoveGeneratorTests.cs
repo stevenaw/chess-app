@@ -139,7 +139,6 @@ namespace ChessLibrary.Tests
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
-            IEnumerable<Square> validMoves;
 
             var game = new Game();
             var moves = input.Split(',');
@@ -148,20 +147,20 @@ namespace ChessLibrary.Tests
                 game.Move(move);
 
             game.Move(moves.Last());
-
             Assert.That(game.AttackState, Is.EqualTo(AttackState.Check));
 
-            validMoves = game.GetValidMoves(king.File, king.Rank);
+            var validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Not.Contain(expectedResult));
         }
 
         [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxf4", "e1", "g1", Description = "Passing through attack")]
         [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxh2", "e1", "g1", Description = "Ending in attack")]
-        public void GeneratesExpectedSquares_DisallowsCastling_WhenPassThroughAttack(string input, string kingSquare, string expectedCastlingSquare)
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,Rg1,Na6,Rh1,Nb8", "e1", "g1", Description = "Rook moved already")]
+        [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,Kf1,Na6,Ke1,Nb8", "e1", "g1", Description = "King moved already")]
+        public void GeneratesExpectedSquares_DisallowsCastling_WhenInvalidState(string input, string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
-            IEnumerable<Square> validMoves;
 
             var game = new Game();
             var moves = input.Split(',');
@@ -172,7 +171,7 @@ namespace ChessLibrary.Tests
             game.Move(moves.Last());
             Assert.That(game.AttackState, Is.Not.EqualTo(AttackState.Check));
 
-            validMoves = game.GetValidMoves(king.File, king.Rank);
+            var validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Not.Contain(expectedResult));
         }
 
