@@ -179,6 +179,43 @@ namespace ChessLibrary.Tests
         }
 
         [Test]
+        public void Move_DetectsDrawByRepetition_ConsidersCastlingAbility()
+        {
+            var game = new Game();
+            var movesToSetup = new[]
+            {
+                "e4", "e5",
+                "Bc4", "Bc5",
+                "Nh3", "Nh6"
+            };
+
+            foreach(var move in movesToSetup)
+                game.Move(move);
+
+            var boardStateToDuplicate = game.CurrentState.Board;
+
+            game.Move("Rg1");
+            game.Move("Rg8");
+            game.Move("Rh1");
+            game.Move("Rh8");
+
+            var movesToReplicate = new[]
+            {
+                "Ng1", "Ng8",
+                "Nh3", "Nh6",
+                "Ng1", "Ng8",
+                "Nh3", "Nh6"
+            };
+
+            foreach (var move in movesToReplicate)
+                game.Move(move);
+
+            var repetitionCount = game.CurrentState.PossibleRepeatedHistory.Count(o => BoardState.Equals(o, boardStateToDuplicate));
+            Assert.That(repetitionCount, Is.EqualTo(3));
+            Assert.That(game.AttackState, Is.EqualTo(AttackState.None));
+        }
+
+        [Test]
         public void Move_DetectsDrawByInactivity()
         {
             var game = new Game();

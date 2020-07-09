@@ -16,8 +16,7 @@ namespace ChessLibrary.Tests
 
             foreach(var moveString in moveStrings)
             {
-                var move = game.ParseMove(moveString);
-                var result = game.Move(move);
+                var result = game.Move(moveString);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None), "Failed for move: " + moveString);
             }
 
@@ -26,21 +25,21 @@ namespace ChessLibrary.Tests
             Assert.That(actualContents, Is.EqualTo(expectedContents));
         }
 
-        [Test]
-        public void Queen_CanMoveFromEdge()
+        [TestCase("8/8/8/7Q/8/8/8/K1k5", "h5", "d1", Description = "Queen")]
+        [TestCase("8/8/8/8/7B/8/8/K1k5", "h4", "e1", Description = "Bishop")]
+        public void GetValidMoves_DetectsWhenOnEdge(string position, string targetSq, string expectedSq)
         {
-            var startSquare = MoveParser.ParseSquare("h5");
-            var endSquare = MoveParser.ParseSquare("e8");
-            var endBit = BitTranslator.TranslateToBit(endSquare.File, endSquare.Rank);
+            var fen = new FenSerializer();
+            var board = fen.Deserialize(position);
 
-            BoardState board = BoardState.Empty
-                .SetPiece(startSquare, SquareContents.White | SquareContents.Queen)
-                .SetPiece(endSquare, SquareContents.Black | SquareContents.King);
-            GameState state = GameState.Initialize(board);
+            var target = MoveParser.ParseSquare(targetSq);
+            var targetMask = BitTranslator.TranslateToBit(target.File, target.Rank);
 
-            var squares = MoveGenerator.GenerateStandardMoves(state, board.WhitePieces, 0);
+            var validMovesMask = MoveGenerator.GetBishopMovements(targetMask, board);
+            var validMoves = BitTranslator.TranslateToSquares(validMovesMask);
 
-            Assert.That(squares & endBit, Is.Not.EqualTo(0));
+            var expected = MoveParser.ParseSquare(expectedSq);
+            Assert.That(validMoves, Does.Contain(expected));
         }
 
         [TestCase("h5", SquareContents.White | SquareContents.King, 5)]
@@ -111,7 +110,7 @@ namespace ChessLibrary.Tests
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7", "e1", "c1")]
         [TestCase("d4,c5,Be3,Qa5,Qd2,Na6,Na3,Qxa2", "e1", "c1", Description = "a1+b1 under attack, but others are clear")]
         [TestCase("d4,d5,Be3,Be6,Na3,Na6,Qd2,Qd7,a3", "e8", "c8")]
-        public void GeneratesExpectedSquares_AllowsCastling_WhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
+        public void King_AllowsCastling_WhenSpacesOpen(string input,string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
@@ -137,7 +136,7 @@ namespace ChessLibrary.Tests
 
         [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4", "e1", "g1", Description = "Under attack - kingside")]
         [TestCase("d4,c5,Be3,Nh6,Na3,Na6,Qd3,Qa5", "e1", "c1", Description = "Under attack - queenside")]
-        public void GeneratesExpectedSquares_DisallowsCastling_WhenUnderAttack(string input, string kingSquare, string expectedCastlingSquare)
+        public void King_DisallowsCastling_WhenUnderAttack(string input, string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
@@ -157,9 +156,10 @@ namespace ChessLibrary.Tests
 
         [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxf4", "e1", "g1", Description = "Passing through attack")]
         [TestCase("e4,e5,Bd3,Bd6,Ne2,Nh6,f4,Qh4,g3,Qxh2", "e1", "g1", Description = "Ending in attack")]
+        [TestCase("g4,e5,g3,Bd3,gxh2,Nh3,Nh6", "e1", "g1", Description = "Ending in attack (from pawn)")]
         [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,Rg1,Na6,Rh1,Nb8", "e1", "g1", Description = "Rook moved already")]
         [TestCase("e4,e5,Bd3,Bd6,Nh3,Nh6,Kf1,Na6,Ke1,Nb8", "e1", "g1", Description = "King moved already")]
-        public void GeneratesExpectedSquares_DisallowsCastling_WhenInvalidState(string input, string kingSquare, string expectedCastlingSquare)
+        public void King_DisallowsCastling_WhenInvalidState(string input, string kingSquare, string expectedCastlingSquare)
         {
             var king = MoveParser.ParseSquare(kingSquare);
             var expectedResult = MoveParser.ParseSquare(expectedCastlingSquare);
@@ -175,22 +175,6 @@ namespace ChessLibrary.Tests
 
             var validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Not.Contain(expectedResult));
-        }
-
-        [TestCase("8/8/8/8/7B/8/8/K1k5", "h4", "e1")]
-        public void GetValidMoves_DetectsWhenOnEdge(string position, string targetSq, string expectedSq)
-        {
-            var fen = new FenSerializer();
-            var board = fen.Deserialize(position);
-
-            var target = MoveParser.ParseSquare(targetSq);
-            var targetMask = BitTranslator.TranslateToBit(target.File, target.Rank);
-
-            var validMovesMask = MoveGenerator.GetBishopMovements(targetMask, board);
-            var validMoves = BitTranslator.TranslateToSquares(validMovesMask);
-
-            var expected = MoveParser.ParseSquare(expectedSq);
-            Assert.That(validMoves, Does.Contain(expected));
         }
     }
 }
