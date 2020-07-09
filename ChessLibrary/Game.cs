@@ -123,9 +123,10 @@ namespace ChessLibrary
             var newBoard = newState.Board;
             var didBlackMove = ((endSquare & newBoard.BlackPieces) != 0) ? 1 : 0;
 
-            // TODO: Differentiate between attacks + movements for pawns
             var whiteMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.WhitePieces, 0);
             var blackMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.BlackPieces, 0);
+
+            // TODO: 'Squares attacked by pawns' here will only show if square is CURRENTLY occupied, rather than prospective attacks
             var squaresAttackedBy = new IndexedTuple<ulong>(whiteMoves, blackMoves);
 
             var ownMovements = squaresAttackedBy.Get(didBlackMove);

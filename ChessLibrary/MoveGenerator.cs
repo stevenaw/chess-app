@@ -65,8 +65,7 @@ namespace ChessLibrary
         private static bool WillMovePlaceKingUnderAttack(GameState state, ulong square, ulong targetMove)
         {
             // Try the move and see if it lands in check
-            // There's probably a better way to do this using a stateful 'squares attacked by' approach
-            // TODO: Do this better
+            // TODO: Use a stateful 'squares attacked by' approach to do this better
             var newState = GameStateMutator.ApplyMove(state, square, targetMove);
             var newBoard = newState.Board;
 
@@ -302,7 +301,7 @@ namespace ChessLibrary
                     if ((state.Pawns & lastMoveEndSquare) != 0
                         && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
                     {
-                        // TODO: Probably a better way to do all this
+                        // TODO: Probably a better way to do all this using bit twiddling
                         var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
                         var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
                         newSquares |= shifted;

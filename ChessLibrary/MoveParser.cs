@@ -100,7 +100,6 @@ namespace ChessLibrary
             var promotion = GetPromotion(moveDescriptors, isWhiteMove);
             var lastRankForColor = isWhiteMove ? Constants.Board.NumberOfRows : 1;
 
-            // TODO: Move promotion validation + tests to Game.Move() ??
             if (promotion != 0)
             {
                 if (

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace ChessLibrary.Tests
 {
-    internal static class DebuggingHelpers
+    public static class DebuggingHelpers
     {
         public static string RenderBitboard(ulong mask)
         {

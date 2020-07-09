@@ -21,8 +21,7 @@ namespace ChessLibrary.Tests
 
             foreach (var moveString in moveStrings)
             {
-                var move = game.ParseMove(moveString);
-                var result = game.Move(move);
+                var result = game.Move(moveString);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
@@ -44,8 +43,7 @@ namespace ChessLibrary.Tests
 
             for (var i = 0; i < moveStrings.Length - 1; i++)
             {
-                var move = game.ParseMove(moveStrings[i]);
-                var result = game.Move(move);
+                var result = game.Move(moveStrings[i]);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
@@ -67,8 +65,7 @@ namespace ChessLibrary.Tests
 
             for(var i = 0; i < moveStrings.Length-1; i++)
             {
-                var move = game.ParseMove(moveStrings[i]);
-                var result = game.Move(move);
+                var result = game.Move(moveStrings[i]);
                 Assert.That(result, Is.EqualTo(ErrorCondition.None));
             }
 
@@ -143,13 +140,15 @@ namespace ChessLibrary.Tests
         [TestCase("k7/8/8/2b5/8/8/p7/Kb6", "Bd4", ExpectedResult = AttackState.Checkmate)]
         [TestCase("k7/8/8/2b5/8/8/pR6/Kb6", "Bd4", ExpectedResult = AttackState.Stalemate)]
         [TestCase("k7/8/8/2b5/8/8/pB6/Kb6", "Bd4", ExpectedResult = AttackState.None)]
+        [TestCase("4k3/8/8/8/8/4p3/8/4K3", "e2", ExpectedResult = AttackState.None)]
         public AttackState Move_DetectsAttackState(string position, string move)
         {
             var fen = new FenSerializer();
             var board = fen.Deserialize(position);
             var game = new Game(board, PieceColor.Black);
 
-            game.Move(move);
+            var error = game.Move(move);
+            Assert.That(error, Is.EqualTo(ErrorCondition.None));
 
             return game.AttackState;
         }
