@@ -47,9 +47,13 @@ namespace ChessLibrary
                 newBoard = BoardStateMutator.MovePiece(newBoard, rookOriginBit, rookDestinationBit);
             }
 
-            history = history.Push(newBoard);
 
-            return new GameState(newBoard, move, history, state.AttackState, state.PiecesOnStartSquares, state.SquaresAttackedBy);
+            var newPiecesStillOnStartSquare = state.PiecesOnStartSquares & ~(startSquare | endSquare);
+            var castlingPiecesUnmoved = newPiecesStillOnStartSquare & MoveGenerator.StartingKingsAndRooks;
+
+            history = history.Push((newBoard, castlingPiecesUnmoved));
+
+            return new GameState(newBoard, move, history, state.AttackState, newPiecesStillOnStartSquare, state.SquaresAttackedBy);
         }
 
         public static GameState ApplyMove(GameState state, ulong startSq, ulong endSq)

@@ -16,11 +16,11 @@ namespace ChessLibrary
         public const ulong PawnStartRowWhite = 0x000000000000FF00;
         public const ulong PawnStartRowBlack = 0x00FF000000000000;
 
-        private const ulong CastlingQueenside = 0x1F0000000000001F;
-        private const ulong CastlingKingside = 0xF0000000000000F0;
-        private const ulong StartingKings = 0x1000000000000010;
-        private const ulong StartingRooks = (Rank1 | Rank8) & (FileA | FileH);
-        private const ulong StartingKingsAndRooks = StartingKings | StartingRooks;
+        public const ulong CastlingQueenside = 0x1F0000000000001F;
+        public const ulong CastlingKingside = 0xF0000000000000F0;
+        public const ulong StartingKings = 0x1000000000000010;
+        public const ulong StartingRooks = (Rank1 | Rank8) & (FileA | FileH);
+        public const ulong StartingKingsAndRooks = StartingKings | StartingRooks;
 
         private static readonly ulong[] HomeRows = new ulong[]
         {

@@ -103,14 +103,14 @@ namespace ChessLibrary
             var opponentPieces = (endSquare & newState.Board.WhitePieces) != 0
                 ? newState.Board.BlackPieces : newState.Board.WhitePieces;
 
-            newState = AnalyzeAndApplyState(newState, startSquare, endSquare, opponentPieces);
+            newState = AnalyzeAndApplyState(newState, endSquare, opponentPieces);
 
             CurrentState = newState;
             GameHistory.Push(newState);
             CurrentTurn = opponentPieces;
         }
 
-        private static GameState AnalyzeAndApplyState(GameState newState, ulong startSquare, ulong endSquare, ulong opponentPieces)
+        private static GameState AnalyzeAndApplyState(GameState newState, ulong endSquare, ulong opponentPieces)
         {
             // All state detections
             // ✔ Account for piece promotions
@@ -143,27 +143,22 @@ namespace ChessLibrary
             {
                 var count = 0;
                 var duplicateCount = 0;
+                var newStateUnmovedCastlingPieces = (newState.PiecesOnStartSquares & MoveGenerator.StartingKingsAndRooks);
 
                 foreach (var state in newState.PossibleRepeatedHistory)
                 {
                     count++;
-                    if (BoardState.Equals(state, newBoard))
+                    if (BoardState.Equals(state.Item1, newBoard) && state.Item2 == newStateUnmovedCastlingPieces)
                         duplicateCount++;
                 }
 
                 if (count == Constants.MoveLimits.InactivityLimit)
                     attackState = AttackState.DrawByInactivity;
                 else if (duplicateCount >= Constants.MoveLimits.RepetitionLimit)
-                {
-                    // TODO: Check for ability to castle (in case a king or rook moved and then moved back)
-                    // Check bitfield of pieces still on original squares for this
                     attackState = AttackState.DrawByRepetition;
-                }
             }
 
-            var newPiecesStillOnStartSquare = newState.PiecesOnStartSquares & ~(startSquare | endSquare);
-
-            return newState.SetAttackState(attackState, newPiecesStillOnStartSquare, squaresAttackedBy);
+            return newState.SetAttackState(attackState, squaresAttackedBy);
         }
 
         internal ErrorCondition Move(char startFile, int startRank, char endFile, int endRank)

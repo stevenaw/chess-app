@@ -6,7 +6,8 @@ namespace ChessLibrary.Models
     {
         public readonly BoardState Board { get; }
         public readonly Move PrecedingMove { get; }
-        public readonly ImmutableStack<BoardState> PossibleRepeatedHistory { get; }
+        // TODO: Change this from a tuple to something else?
+        public readonly ImmutableStack<(BoardState, ulong)> PossibleRepeatedHistory { get; }
 
         public readonly AttackState AttackState { get; }
         public readonly ulong PiecesOnStartSquares { get; }
@@ -15,7 +16,7 @@ namespace ChessLibrary.Models
         public GameState(
             BoardState board,
             Move previousMove,
-            ImmutableStack<BoardState> history,
+            ImmutableStack<(BoardState, ulong)> history,
             AttackState attackState,
             ulong piecesOnStartSquares,
             IndexedTuple<ulong> squaresAttackedBy
@@ -29,9 +30,9 @@ namespace ChessLibrary.Models
             SquaresAttackedBy = squaresAttackedBy;
         }
 
-        public GameState SetAttackState(AttackState state, ulong piecesOnStartSquares, IndexedTuple<ulong> squaresAttackedBy)
+        public GameState SetAttackState(AttackState state, IndexedTuple<ulong> squaresAttackedBy)
         {
-            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, piecesOnStartSquares, squaresAttackedBy);
+            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, PiecesOnStartSquares, squaresAttackedBy);
         }
 
         public static GameState Initialize(BoardState boardState)
@@ -39,7 +40,7 @@ namespace ChessLibrary.Models
             return new GameState(
                 boardState,
                 Move.Empty,
-                ImmutableStack<BoardState>.Empty,
+                ImmutableStack<(BoardState, ulong)>.Empty,
                 AttackState.None,
                 boardState.AllPieces,
                 IndexedTuple<ulong>.Empty

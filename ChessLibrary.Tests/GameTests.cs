@@ -203,14 +203,12 @@ namespace ChessLibrary.Tests
             {
                 "Ng1", "Ng8",
                 "Nh3", "Nh6",
-                "Ng1", "Ng8",
-                "Nh3", "Nh6"
             };
 
             foreach (var move in movesToReplicate)
                 game.Move(move);
 
-            var repetitionCount = game.CurrentState.PossibleRepeatedHistory.Count(o => BoardState.Equals(o, boardStateToDuplicate));
+            var repetitionCount = game.CurrentState.PossibleRepeatedHistory.Count(o => BoardState.Equals(o.Item1, boardStateToDuplicate));
             Assert.That(repetitionCount, Is.EqualTo(3));
             Assert.That(game.AttackState, Is.EqualTo(AttackState.None));
         }
