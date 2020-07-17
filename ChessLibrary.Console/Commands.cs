@@ -2,7 +2,7 @@
 
 namespace ChessLibrary.ConsoleApp
 {
-    public static class Commands
+    internal static class Commands
     {
         public const string Move = "move";
         public const string Help = "help";

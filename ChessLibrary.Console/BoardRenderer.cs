@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ChessLibrary.ConsoleApp
 {
-    public static class BoardRenderer
+    internal static class BoardRenderer
     {
         private static Dictionary<SquareContents, char> PiecesAsLetters => new Dictionary<SquareContents, char>
         {

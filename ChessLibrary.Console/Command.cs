@@ -1,6 +1,6 @@
 ﻿namespace ChessLibrary.ConsoleApp
 {
-    internal readonly struct Command
+    internal readonly ref struct Command
     {
         public readonly string TotalInput { get; }
         public readonly string CommandName { get; }
