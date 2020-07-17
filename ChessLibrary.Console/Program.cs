@@ -37,7 +37,7 @@ namespace ChessLibrary.ConsoleApp
         private static Command GetCommand(PieceColor turn)
         {
             Console.Write($"Enter command ({turn}'s turn): ");
-            var input = Console.ReadLine().Trim();
+            var input = (Console.ReadLine() ?? string.Empty).Trim();
 
             var endOfCommandName = input.IndexOf(' ');
             var commandName = endOfCommandName == -1 ? input : input.Substring(0, endOfCommandName).ToLower();
@@ -73,7 +73,7 @@ namespace ChessLibrary.ConsoleApp
                 case Commands.Exit:
                     {
                         Console.Write("Are you sure (Y\\N) ?: ");
-                        return Console.ReadLine().ToLower() != "y";
+                        return (Console.ReadLine() ?? string.Empty).ToLower() != "y";
                     }
 
                 case Commands.Help:
