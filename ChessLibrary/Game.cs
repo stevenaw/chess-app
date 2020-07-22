@@ -7,7 +7,6 @@ namespace ChessLibrary
     public sealed class Game
     {
         internal GameState CurrentState { get; private set; }
-        private Stack<GameState> GameHistory { get; } = new Stack<GameState>();
 
         private ulong CurrentTurn { get; set; }
         public AttackState AttackState { get { return CurrentState.AttackState; } }
@@ -106,7 +105,6 @@ namespace ChessLibrary
             newState = AnalyzeAndApplyState(newState, endSquare, opponentPieces);
 
             CurrentState = newState;
-            GameHistory.Push(newState);
             CurrentTurn = opponentPieces;
         }
 
