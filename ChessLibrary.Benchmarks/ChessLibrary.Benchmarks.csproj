@@ -18,4 +18,8 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChessLibrary\ChessLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

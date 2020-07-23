@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 
 namespace ChessLibrary.Benchmarks
 {
@@ -7,7 +6,7 @@ namespace ChessLibrary.Benchmarks
     {
         static void Main()
         {
-            BenchmarkRunner.Run<IndexedTupleBenchmarks>();
+            BenchmarkRunner.Run<ParsingBenchmarks_Castling>();
         }
     }
 }

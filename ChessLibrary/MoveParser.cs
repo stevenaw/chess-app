@@ -329,15 +329,23 @@ namespace ChessLibrary
 
         private static bool TryHandleCastling(ReadOnlySpan<char> moveNotation, bool isWhiteMove, out Move result)
         {
-            var castleKingside = moveNotation.Equals("O-O".AsSpan(), StringComparison.OrdinalIgnoreCase)
-                || moveNotation.Equals("0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
-            var castleQueenside = moveNotation.Equals("O-O-O".AsSpan(), StringComparison.OrdinalIgnoreCase)
-                || moveNotation.Equals("0-0-0".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            var potentialCastling = moveNotation.Length == 3 || moveNotation.Length == 5;
 
-            if (castleKingside || castleQueenside)
+            potentialCastling = potentialCastling
+                    && moveNotation[2] == moveNotation[0]
+                    && moveNotation[1] == '-'
+                    && (moveNotation[0] == '0' || moveNotation[0] == 'O');
+
+            if (potentialCastling && moveNotation.Length == 5)
+            {
+                potentialCastling = moveNotation[4] == moveNotation[0]
+                    && moveNotation[3] == '-';
+            }
+
+            if (potentialCastling)
             {
                 var startFile = 'e';
-                var endFile = castleKingside ? 'g' : 'c';
+                var endFile = moveNotation.Length == 3 ? 'g' : 'c';
 
                 if (isWhiteMove)
                     result = new Move(startFile, 1, endFile, 1);
