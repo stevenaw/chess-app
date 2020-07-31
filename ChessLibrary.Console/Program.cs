@@ -95,6 +95,17 @@ namespace ChessLibrary.ConsoleApp
                         return game.AttackState != AttackState.Checkmate;
                     }
 
+                case Commands.Undo:
+                    {
+                        var success = game.Undo();
+                        if (!success)
+                            Console.WriteLine("Can't undo from this state");
+
+                        BoardRenderer.PrintBoard(game);
+
+                        return true;
+                    }
+
                 default:
                     {
                         // By default, treat no command as a move

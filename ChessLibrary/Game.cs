@@ -1,12 +1,14 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChessLibrary
 {
     public sealed class Game
     {
         internal GameState CurrentState { get; private set; }
+        private Stack<GameState> History { get; set; } = new Stack<GameState>();
 
         private ulong CurrentTurn { get; set; }
         public AttackState AttackState { get { return CurrentState.AttackState; } }
@@ -21,6 +23,7 @@ namespace ChessLibrary
         {
             CurrentState = GameState.Initialize(state);
             CurrentTurn = turn == PieceColor.White ? CurrentState.Board.WhitePieces : CurrentState.Board.BlackPieces;
+            History.Push(CurrentState);
         }
 
         public PieceColor GetTurn()
@@ -96,6 +99,19 @@ namespace ChessLibrary
             return ErrorCondition.None;
         }
 
+        // TODO: Tests
+        public bool Undo()
+        {
+            if (History.Count <= 1)
+                return false;
+
+            History.Pop();
+            CurrentState = History.Peek();
+            CurrentTurn = (History.Count % 2 == 1) ? CurrentState.Board.WhitePieces : CurrentState.Board.BlackPieces;
+
+            return true;
+        }
+
         private void UpdateState(Move move, ulong startSquare, ulong endSquare)
         {
             var newState = GameStateMutator.ApplyMove(CurrentState, move, startSquare, endSquare);
@@ -106,6 +122,8 @@ namespace ChessLibrary
 
             CurrentState = newState;
             CurrentTurn = opponentPieces;
+
+            History.Push(newState);
         }
 
         private static GameState AnalyzeAndApplyState(GameState newState, ulong endSquare, ulong opponentPieces)
