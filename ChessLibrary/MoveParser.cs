@@ -45,7 +45,7 @@ namespace ChessLibrary
             //
             // - Now that the move string is built, splice to only used tokens and convert to readonlyspan<char>
 
-            var buffer = new char[8];
+            Span<char> buffer = stackalloc char[8];
             var lastIdx = buffer.Length - 1;
 
             if (move.PromotedPiece != SquareContents.Empty)
@@ -78,9 +78,8 @@ namespace ChessLibrary
                 buffer[lastIdx--] = PiecesAsLetters[movedPiece];
             }
 
-            var segment = new ArraySegment<char>(buffer);
-            var mutableResult = segment.Slice(lastIdx + 1);
-            return (ReadOnlySpan<char>)mutableResult;
+            var segment = buffer.Slice(lastIdx + 1);
+            return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(segment), segment.Length);
         }
 
         public static Square ParseSquare(string input)
