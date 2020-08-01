@@ -71,6 +71,31 @@ namespace ChessLibrary.Models
             return BoardStateMutator.MovePiece(this, from, to);
         }
 
+        public SquareContents GetPiece(ulong bit)
+        {
+            var result = (SquareContents)0;
+
+            if ((bit & WhitePieces) != 0)
+                result |= SquareContents.White;
+            else if ((bit & BlackPieces) != 0)
+                result |= SquareContents.Black;
+
+            if ((bit & Kings) != 0)
+                result |= SquareContents.King;
+            else if ((bit & Queens) != 0)
+                result |= SquareContents.Queen;
+            else if ((bit & Rooks) != 0)
+                result |= SquareContents.Rook;
+            else if ((bit & Bishops) != 0)
+                result |= SquareContents.Bishop;
+            else if ((bit & Knights) != 0)
+                result |= SquareContents.Knight;
+            else if ((bit & Pawns) != 0)
+                result |= SquareContents.Pawn;
+
+            return result;
+        }
+
         public static BoardState Empty { get; } = new BoardState();
 
         public static BoardState DefaultPositions { get; } = GetDefaultPositions();

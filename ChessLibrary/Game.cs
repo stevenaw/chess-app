@@ -1,7 +1,6 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChessLibrary
 {
@@ -39,25 +38,8 @@ namespace ChessLibrary
 
             if (BitTranslator.IsValidSquare(file, rank))
             {
-                ulong startSquare = BitTranslator.TranslateToBit(file, rank);
-
-                if ((startSquare & CurrentState.Board.WhitePieces) != 0)
-                    result |= SquareContents.White;
-                else if ((startSquare & CurrentState.Board.BlackPieces) != 0)
-                    result |= SquareContents.Black;
-
-                if ((startSquare & CurrentState.Board.Kings) != 0)
-                    result |= SquareContents.King;
-                else if ((startSquare & CurrentState.Board.Queens) != 0)
-                    result |= SquareContents.Queen;
-                else if ((startSquare & CurrentState.Board.Rooks) != 0)
-                    result |= SquareContents.Rook;
-                else if ((startSquare & CurrentState.Board.Bishops) != 0)
-                    result |= SquareContents.Bishop;
-                else if ((startSquare & CurrentState.Board.Knights) != 0)
-                    result |= SquareContents.Knight;
-                else if ((startSquare & CurrentState.Board.Pawns) != 0)
-                    result |= SquareContents.Pawn;
+                ulong bit = BitTranslator.TranslateToBit(file, rank);
+                result = CurrentState.Board.GetPiece(bit);
             }
 
             return result;

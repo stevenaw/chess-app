@@ -322,5 +322,28 @@ namespace ChessLibrary.Tests
             Assert.That(move.Move.EndRank, Is.EqualTo(endSq.Rank));
             Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
+
+        [TestCase(FenSerializer.DefaultValue, "e2,e4", ExpectedResult = "e4")]
+        [TestCase(FenSerializer.DefaultValue, "b1,c3", ExpectedResult = "Nc3")]
+        [TestCase("8/8/8/4p3/3P4/8/8/K6k", "d4,e5", ExpectedResult = "dxe5")]
+        [TestCase("8/8/8/4p3/8/3N4/8/K6k", "d3,e5", ExpectedResult = "Nxe5")]
+        [TestCase("8/P7/8/8/8/8/8/K6k", "a7,a8,Q", ExpectedResult = "a8=Q")]
+        public string ToMoveString_SuccessCases(string fen, string moveStr)
+        {
+            var serializer = new FenSerializer();
+            var board = serializer.Deserialize(fen);
+
+            var squares = moveStr.Split(',');
+            var start = MoveParser.ParseSquare(squares[0]);
+            var end = MoveParser.ParseSquare(squares[1]);
+            var promotedPiece = squares.Length == 3 ? FenSerializer.FromNotation(squares[2][0]) : SquareContents.Empty;
+
+            var move = new Move(start.File, start.Rank, end.File, end.Rank, promotedPiece);
+
+            var result = MoveParser.ToMoveString(move, board);
+            var resultStr = result.ToString();
+
+            return resultStr;
+        }
     }
 }

@@ -3,10 +3,12 @@ using System;
 
 namespace ChessLibrary.Serialization
 {
-    internal class FenSerializer
+    internal readonly struct FenSerializer
     {
         private const int MaximumLength = 71;
         private const char FenDelimeter = '/';
+
+        public const string DefaultValue = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
         public string Serialize(BoardState board)
         {
@@ -114,7 +116,7 @@ namespace ChessLibrary.Serialization
                 return board;
         }
 
-        private static SquareContents FromNotation(char symbol)
+        internal static SquareContents FromNotation(char symbol)
         {
             var colour = Char.IsUpper(symbol) ? SquareContents.White : SquareContents.Black;
 

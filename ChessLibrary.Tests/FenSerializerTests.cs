@@ -1,7 +1,6 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
 using NUnit.Framework;
-using System;
 
 namespace ChessLibrary.Tests
 {
@@ -40,172 +39,57 @@ namespace ChessLibrary.Tests
             // Act
             actual = ser.Deserialize(FenString);
 
-            Assert.AreEqual(expected.AllPieces, actual.AllPieces);
-            Assert.AreEqual(expected.WhitePieces, actual.WhitePieces);
-            Assert.AreEqual(expected.BlackPieces, actual.BlackPieces);
+            Assert.That(expected.AllPieces, Is.EqualTo(actual.AllPieces));
+            Assert.That(expected.WhitePieces, Is.EqualTo(actual.WhitePieces));
+            Assert.That(expected.BlackPieces, Is.EqualTo(actual.BlackPieces));
         }
 
         [Test]
         public void Deserialize_ShouldThrowException_WhenEmpty()
         {
-            const string FenString = "";
-
             var serializer = new FenSerializer();
-            var exception = Assert.Throws<ArgumentNullException>(() => serializer.Deserialize(FenString));
+
+            Assert.That(() => serializer.Deserialize(string.Empty), Throws.ArgumentNullException);
         }
 
         [Test]
         public void Deserialize_ShouldThrowException_WhenTooLong()
         {
-            var FenString = new string('0', 80);
+            var fenString = new string('0', 80);
 
             var serializer = new FenSerializer();
-            var exception = Assert.Throws<ArgumentException>(() => serializer.Deserialize(FenString));
+            Assert.That(() => serializer.Deserialize(fenString), Throws.ArgumentException);
         }
 
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenTooFewRows()
+        [TestCase("8/8/8/8/8/8/q7", "Not enough rows specified!")]
+        [TestCase("8/8/8/8/8/8/q7/8/8", "Too many rows!")]
+        [TestCase("8/8/8/8/8/8/q7/8/", "Too many rows!")]
+        [TestCase("8/8/8/8/8/8/q7/", "Not enough columns specified!")]
+        [TestCase("8/8/8/8/8/8/bbbbbbb/8", "Unanticipated new row, columns to fill!")]
+        [TestCase("8/8/8/8/8/8/7/8", "Unanticipated new row, columns to fill!")]
+        [TestCase("8/8/8/8/8/8/9/8", "Blank spot exceeds column count!")]
+        [TestCase("8/8/8/8/8/8/bbbbbbbbb/8", "Too many pieces specified in row!")]
+        [TestCase("8/8/8/8/8/8/bb0bbbbb/8", "Can not have a 0 in a FEN diagram!")]
+        [TestCase("8/8/8/8/8/8/bb11bbbb/8", "Can not specify two consecutive blank spots!")]
+        [TestCase("8/8/8/8/8/8/bb1cbbbb/8", "Unsupported piece notation: c")]
+        public void Deserialize_ShouldThrowException_WhenInvalid(string fenString, string expectedMessage)
         {
-            const string FenString = "8/8/8/8/8/8/q7";
-            const string ExpectedMessagee = "Not enough rows specified!";
-
             var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
 
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenTooManyRows()
-        {
-            const string FenString = "8/8/8/8/8/8/q7/8/8";
-            const string ExpectedMessagee = "Too many rows!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenEndsInDelimeterAndTooManyRows()
-        {
-            const string FenString = "8/8/8/8/8/8/q7/8/";
-            const string ExpectedMessagee = "Too many rows!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenEndsInDelimeterAndTooFewRows()
-        {
-            const string FenString = "8/8/8/8/8/8/q7/";
-            const string ExpectedMessagee = "Not enough columns specified!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenNotEnoughFilledSquares()
-        {
-            const string FenString = "8/8/8/8/8/8/bbbbbbb/8";
-            const string ExpectedMessagee = "Unanticipated new row, columns to fill!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenNotEnoughEmptySquares()
-        {
-            const string FenString = "8/8/8/8/8/8/7/8";
-            const string ExpectedMessagee = "Unanticipated new row, columns to fill!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenTooManyEmptySquares()
-        {
-            const string FenString = "8/8/8/8/8/8/9/8";
-            const string ExpectedMessagee = "Blank spot exceeds column count!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenTooManyFilledSquares()
-        {
-            const string FenString = "8/8/8/8/8/8/bbbbbbbbb/8";
-            const string ExpectedMessagee = "Too many pieces specified in row!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenInvalidEmptyToken()
-        {
-            const string FenString = "8/8/8/8/8/8/bb0bbbbb/8";
-            const string ExpectedMessagee = "Can not have a 0 in a FEN diagram!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenConsecutiveEmptyToken()
-        {
-            const string FenString = "8/8/8/8/8/8/bb11bbbb/8";
-            const string ExpectedMessagee = "Can not specify two consecutive blank spots!";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
-        }
-
-        [Test]
-        public void Deserialize_ShouldThrowException_WhenInvalidFilledSquare()
-        {
-            const string FenString = "8/8/8/8/8/8/bb1cbbbb/8";
-            const string ExpectedMessagee = "Unsupported piece notation: c";
-
-            var serializer = new FenSerializer();
-            var exception = Assert.Throws<InvalidOperationException>(() => serializer.Deserialize(FenString));
-
-            Assert.AreEqual(ExpectedMessagee, exception.Message);
+            Assert.That(() => serializer.Deserialize(fenString), Throws.InvalidOperationException.With.Message.EqualTo(expectedMessage));
         }
 
         [Test]
         public void Serialize_ShouldSerializeCorrectPosition()
         {
-            const string expectedValue = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-
+            var defaultFen = FenSerializer.DefaultValue;
             var board = BoardState.DefaultPositions;
+
             var serializer = new FenSerializer();
 
             var actualValue = serializer.Serialize(board);
 
-            Assert.AreEqual(expectedValue, actualValue);
+            Assert.AreEqual(defaultFen, actualValue);
         }
     }
 }

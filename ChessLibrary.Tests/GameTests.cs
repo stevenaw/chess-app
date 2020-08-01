@@ -131,6 +131,22 @@ namespace ChessLibrary.Tests
             return game.AttackState;
         }
 
+        [TestCase("8/P7/8/8/8/8/8/K6k", "a8=Q", ExpectedResult = AttackState.Check)]
+        [TestCase("8/P7/8/8/8/8/7p/K5Bk", "a8=Q", ExpectedResult = AttackState.Check, Description = "Can capture to escape mate")]
+        [TestCase("8/P7/8/8/8/8/7p/K5nk", "a8=Q", ExpectedResult = AttackState.Check, Description = "Can block to escape mate")]
+        [TestCase("8/P7/8/8/8/8/7p/K5bk", "a8=Q", ExpectedResult = AttackState.Checkmate, Description = "Can't escape mate")]
+        public AttackState Move_DetectsAttackState_ForPromotion(string position, string move)
+        {
+            var fen = new FenSerializer();
+            var board = fen.Deserialize(position);
+            var game = new Game(board, PieceColor.White);
+
+            var error = game.Move(move);
+            Assert.That(error, Is.EqualTo(ErrorCondition.None));
+
+            return game.AttackState;
+        }
+
         [Test]
         public void Move_DetectsDrawByRepetition()
         {

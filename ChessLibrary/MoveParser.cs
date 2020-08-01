@@ -1,7 +1,9 @@
 ﻿using ChessLibrary.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ChessLibrary
 {
@@ -21,6 +23,65 @@ namespace ChessLibrary
             Constants.MoveType.Capture,
             Constants.MoveType.Move
         };
+
+        private static Dictionary<SquareContents, char> PiecesAsLetters => new Dictionary<SquareContents, char>
+        {
+            { SquareContents.King, 'K' },
+            { SquareContents.Queen, 'Q' },
+            { SquareContents.Rook, 'R' },
+            { SquareContents.Bishop, 'B' },
+            { SquareContents.Knight, 'N' },
+            { SquareContents.Pawn, 'P' }
+        };
+
+        public static ReadOnlySpan<char> ToMoveString(Move move, BoardState board)
+        {
+            // Algo: Move from end, adding tokens in order
+            // - Check if move is promotion, add tokens if so
+            // - Add end square
+            // - Check if move is capture, output 'x' if so
+            // - Then check if multiple pieces of same type can move to end square, then output first rank or file of moved piece
+            // - Then output piece notation if piece is not a pawn
+            //
+            // - Now that the move string is built, splice to only used tokens and convert to readonlyspan<char>
+
+            var buffer = new char[8];
+            var lastIdx = buffer.Length - 1;
+
+            if (move.PromotedPiece != SquareContents.Empty)
+            {
+                var pieceType = move.PromotedPiece & ~SquareContents.Colours;
+
+                buffer[lastIdx--] = PiecesAsLetters[pieceType];
+                buffer[lastIdx--] = '=';
+            }
+
+            buffer[lastIdx--] = (char)(move.EndRank + '0');
+            buffer[lastIdx--] = move.EndFile;
+
+            var endSquareBit = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
+            var endSquareOccupied = (endSquareBit & board.AllPieces) != 0;
+            if (endSquareOccupied)
+                buffer[lastIdx--] = 'x';
+
+            var startSquareBit = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
+            var movedPiece = board.GetPiece(startSquareBit) & ~SquareContents.Colours;
+
+            if (movedPiece == SquareContents.Pawn)
+            {
+                if (endSquareOccupied)
+                    buffer[lastIdx--] = move.StartFile;
+            }
+            else
+            {
+                // TODO: Check if multiple pieces of same type could move to end square, disambiguate, then output piece notation, then convert for output 
+                buffer[lastIdx--] = PiecesAsLetters[movedPiece];
+            }
+
+            var segment = new ArraySegment<char>(buffer);
+            var mutableResult = segment.Slice(lastIdx + 1);
+            return (ReadOnlySpan<char>)mutableResult;
+        }
 
         public static Square ParseSquare(string input)
         {
