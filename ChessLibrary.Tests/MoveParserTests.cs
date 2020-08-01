@@ -323,12 +323,25 @@ namespace ChessLibrary.Tests
             Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
-        // TODO: Tests for disambiguation, castling, en passant
-        [TestCase(FenSerializer.DefaultValue, "e2,e4", ExpectedResult = "e4")]
-        [TestCase(FenSerializer.DefaultValue, "b1,c3", ExpectedResult = "Nc3")]
-        [TestCase("8/8/8/4p3/3P4/8/8/K6k", "d4,e5", ExpectedResult = "dxe5")]
-        [TestCase("8/8/8/4p3/8/3N4/8/K6k", "d3,e5", ExpectedResult = "Nxe5")]
-        [TestCase("8/P7/8/8/8/8/8/K6k", "a7,a8,Q", ExpectedResult = "a8=Q")]
+        [TestCase(FenSerializer.DefaultValue, "e2,e3", ExpectedResult = "e3", Description = "Pawn moves 1")]
+        [TestCase(FenSerializer.DefaultValue, "e2,e4", ExpectedResult = "e4", Description = "Pawn moves 2")]
+        [TestCase("8/8/8/4p3/3P4/8/8/K6k", "d4,e5", ExpectedResult = "dxe5", Description = "Regular pawn capture")]
+        [TestCase("8/8/8/3Pp3/8/8/8/K6k", "d5,e6", ExpectedResult = "dxe6", Description = "En Passant")]
+        [TestCase("8/P7/8/8/8/8/8/K6k", "a7,a8,Q", ExpectedResult = "a8=Q", Description = "Pawn promotion")]
+        [TestCase("1n6/P7/8/8/8/8/8/K6k", "a7,b8,Q", ExpectedResult = "axb8=Q", Description = "Pawn promotion via capture")]
+
+        [TestCase(FenSerializer.DefaultValue, "b1,c3", ExpectedResult = "Nc3", Description = "Knight move regular")]
+        [TestCase("8/8/8/4p3/8/3N4/8/K6k", "d3,e5", ExpectedResult = "Nxe5", Description = "Knight move capture")]
+        [TestCase("3N1N2/8/8/8/8/8/8/K6k", "d8,e6", ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
+        [TestCase("N7/8/N7/8/8/8/8/K6k", "a8,c7", ExpectedResult = "N8c7", Description = "Knight move disambiguate rank")]
+        [TestCase("3N1N2/8/8/8/8/8/8/K6k", "d8,e6", ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
+        [TestCase("N3N3/8/N7/8/8/8/8/K6k", "a8,c7", ExpectedResult = "Na8c7", Description = "Knight move disambiguate rank and file")]
+
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,d2", ExpectedResult = "Kd2", Description = "King move regular")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,g1", ExpectedResult = "0-0", Description = "Castle kingside white")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,c1", ExpectedResult = "0-0-0", Description = "Castle queenside white")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e8,g8", ExpectedResult = "0-0", Description = "Castle kingside black")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e8,c8", ExpectedResult = "0-0-0", Description = "Castle queenside black")]
         public string ToMoveString_SuccessCases(string fen, string moveStr)
         {
             var serializer = new FenSerializer();

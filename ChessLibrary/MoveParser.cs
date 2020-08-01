@@ -53,10 +53,10 @@ namespace ChessLibrary
             if (movedPiece == SquareContents.King)
             {
                 // Check for castling
-                var squareDiff = startSquareBit / endSquareBit;
+                var squareDiff = (decimal)startSquareBit / endSquareBit;
                 if (squareDiff == 4) // King has moved 2 squares horizontally towards queenside
                     return "0-0-0";
-                else if (squareDiff == 0.25) // King has moved 2 squares horizontally towards kingside
+                else if (squareDiff == 0.25M) // King has moved 2 squares horizontally towards kingside
                     return "0-0";
             }
 
