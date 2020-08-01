@@ -107,38 +107,53 @@ namespace ChessLibrary
             //   ✔ Account for can't castle through check
             //   ✔ Account for can't castle while in check
 
-            ulong result = 0;
             var board = state.Board;
+            var normalMovement = GenerateStandardMovesForPiece(board, square);
 
-            if ((square & board.Queens) != 0)
+            if ((square & board.Pawns) != 0)
             {
-                result |= GetQueenMovements(square, board);
-            }
-            else if ((square & board.Rooks) != 0)
-            {
-                result |= GetRookMovements(square, board);
-            }
-            else if ((square & board.Bishops) != 0)
-            {
-                result |= GetBishopMovements(square, board);
-            }
-            else if ((square & board.Pawns) != 0)
-            {
-                result |= GetPawnMovements(square, board, state.PrecedingMove);
-            }
-            else if ((square & board.Knights) != 0)
-            {
-                result |= GetKnightMovements(square);
+                var enPassant = GetEnPassantSquares(square, board, state.PrecedingMove);
+                return (normalMovement | enPassant);
             }
             else if ((square & board.Kings) != 0)
             {
-                var moves = GetKingMovements(square) & ~opponentMoves;
+                var moves = normalMovement & ~opponentMoves;
                 var castlingOptions = GenerateCastlingOptions(state, square);
 
-                result |= (moves | castlingOptions);
+                return (moves | castlingOptions);
             }
 
-            return result;
+            return normalMovement;
+        }
+
+        internal static ulong GenerateStandardMovesForPiece(BoardState board, ulong square)
+        {
+            if ((square & board.Queens) != 0)
+            {
+                return GetQueenMovements(square, board);
+            }
+            else if ((square & board.Rooks) != 0)
+            {
+                return GetRookMovements(square, board);
+            }
+            else if ((square & board.Bishops) != 0)
+            {
+                return GetBishopMovements(square, board);
+            }
+            else if ((square & board.Pawns) != 0)
+            {
+                return GetPawnMovements(square, board);
+            }
+            else if ((square & board.Knights) != 0)
+            {
+                return GetKnightMovements(square);
+            }
+            else if ((square & board.Kings) != 0)
+            {
+                return GetKingMovements(square);
+            }
+
+            return 0;
         }
 
         public static ulong GenerateStandardMoves(GameState state, ulong squareMask, ulong opponentMoves)
@@ -258,7 +273,7 @@ namespace ChessLibrary
             return newSquares;
         }
 
-        private static ulong GetPawnMovements(ulong input, BoardState state, Move previousMove)
+        private static ulong GetPawnMovements(ulong input, BoardState state)
         {
             ulong newSquares = 0;
             var isWhite = (input & state.WhitePieces) != 0;
@@ -287,7 +302,11 @@ namespace ChessLibrary
                 newSquares |= (attackSquares & state.AllPieces);
             }
 
-            // Check for en passant
+            return newSquares;
+        }
+
+        private static ulong GetEnPassantSquares(ulong input, BoardState state, Move previousMove)
+        {
             if (!Move.Equals(previousMove, Move.Empty))
             {
                 var squareForGeneration = BitTranslator.TranslateToSquare(input);
@@ -302,14 +321,15 @@ namespace ChessLibrary
                         && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
                     {
                         // TODO: Probably a better way to do all this using bit twiddling
+                        var isWhite = (input & state.WhitePieces) != 0;
                         var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
                         var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
-                        newSquares |= shifted;
+                        return shifted;
                     }
                 }
             }
 
-            return newSquares;
+            return 0;
         }
 
         private static ulong FillDiagonals(ulong input, BoardState state)

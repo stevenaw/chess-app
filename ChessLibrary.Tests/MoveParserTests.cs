@@ -323,6 +323,7 @@ namespace ChessLibrary.Tests
             Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
+        // TODO: Tests for disambiguation, castling, en passant
         [TestCase(FenSerializer.DefaultValue, "e2,e4", ExpectedResult = "e4")]
         [TestCase(FenSerializer.DefaultValue, "b1,c3", ExpectedResult = "Nc3")]
         [TestCase("8/8/8/4p3/3P4/8/8/K6k", "d4,e5", ExpectedResult = "dxe5")]

@@ -71,7 +71,7 @@ namespace ChessLibrary.Models
             return BoardStateMutator.MovePiece(this, from, to);
         }
 
-        public SquareContents GetPiece(ulong bit)
+        public SquareContents GetSquareContents(ulong bit)
         {
             var result = (SquareContents)0;
 

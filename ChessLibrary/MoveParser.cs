@@ -45,9 +45,23 @@ namespace ChessLibrary
             //
             // - Now that the move string is built, splice to only used tokens and convert to readonlyspan<char>
 
+
+            var startSquareBit = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
+            var endSquareBit = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
+            var movedPiece = board.GetSquareContents(startSquareBit) & ~SquareContents.Colours;
+
+            if (movedPiece == SquareContents.King)
+            {
+                // Check for castling
+                var squareDiff = startSquareBit / endSquareBit;
+                if (squareDiff == 4) // King has moved 2 squares horizontally towards queenside
+                    return "0-0-0";
+                else if (squareDiff == 0.25) // King has moved 2 squares horizontally towards kingside
+                    return "0-0";
+            }
+
             Span<char> buffer = stackalloc char[8];
             var lastIdx = buffer.Length - 1;
-
             if (move.PromotedPiece != SquareContents.Empty)
             {
                 var pieceType = move.PromotedPiece & ~SquareContents.Colours;
@@ -59,22 +73,69 @@ namespace ChessLibrary
             buffer[lastIdx--] = (char)(move.EndRank + '0');
             buffer[lastIdx--] = move.EndFile;
 
-            var endSquareBit = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
-            var endSquareOccupied = (endSquareBit & board.AllPieces) != 0;
-            if (endSquareOccupied)
-                buffer[lastIdx--] = 'x';
+            var isCapture = (endSquareBit & board.AllPieces) != 0;
+            if (!isCapture && movedPiece == SquareContents.Pawn)
+            {
+                // Capture pattern for pawn is diagonal movement
+                // Explicitly checking will account for capture by en passant where end square is empty
+                var diff = Math.Max(startSquareBit, endSquareBit) / Math.Min(startSquareBit, endSquareBit);
+                isCapture = diff == 1 << 7 || diff == 1 << 9; 
+            }
 
-            var startSquareBit = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
-            var movedPiece = board.GetPiece(startSquareBit) & ~SquareContents.Colours;
+            if (isCapture)
+                buffer[lastIdx--] = 'x';
 
             if (movedPiece == SquareContents.Pawn)
             {
-                if (endSquareOccupied)
+                if (isCapture)
                     buffer[lastIdx--] = move.StartFile;
             }
             else
             {
-                // TODO: Check if multiple pieces of same type could move to end square, disambiguate, then output piece notation, then convert for output 
+                if (movedPiece != SquareContents.King)
+                {
+                    // Check for disambiguation
+                    var colorMask = (startSquareBit & board.WhitePieces) != 0 ? board.WhitePieces : board.BlackPieces;
+                    var pieceMask = 0UL;
+
+                    if (movedPiece == SquareContents.Knight)
+                        pieceMask = board.Knights;
+                    else if (movedPiece == SquareContents.Bishop)
+                        pieceMask = board.Bishops;
+                    else if (movedPiece == SquareContents.Rook)
+                        pieceMask = board.Rooks;
+                    else if (movedPiece == SquareContents.Queen)
+                        pieceMask = board.Queens;
+
+                    pieceMask = pieceMask & colorMask & ~startSquareBit;
+
+                    var otherPossibleStartSquares = new List<Square>();
+                    for (var i = 0; i < 64; i++)
+                    {
+                        var mask = pieceMask & (1UL << i);
+                        if (mask != 0)
+                        {
+                            var moves = MoveGenerator.GenerateStandardMovesForPiece(board, mask);
+                            if ((moves & endSquareBit) != 0)
+                                otherPossibleStartSquares.Add(BitTranslator.TranslateToSquare(mask));
+                        }
+                    }
+
+                    // There may be multiple possible start squares to disambiguate from
+                    var disambiguateByRank = false;
+                    var disambiguateByFile = false;
+                    foreach(var otherSquare in otherPossibleStartSquares)
+                    {
+                        disambiguateByRank = disambiguateByRank || (otherSquare.File == move.StartFile);
+                        disambiguateByFile = disambiguateByFile || (otherSquare.Rank == move.StartRank);
+                    }
+
+                    if (disambiguateByRank)
+                        buffer[lastIdx--] = (char)(move.StartRank + '0');
+                    if (disambiguateByFile)
+                        buffer[lastIdx--] = move.StartFile;
+                }
+
                 buffer[lastIdx--] = PiecesAsLetters[movedPiece];
             }
 

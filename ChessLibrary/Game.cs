@@ -39,7 +39,7 @@ namespace ChessLibrary
             if (BitTranslator.IsValidSquare(file, rank))
             {
                 ulong bit = BitTranslator.TranslateToBit(file, rank);
-                result = CurrentState.Board.GetPiece(bit);
+                result = CurrentState.Board.GetSquareContents(bit);
             }
 
             return result;
