@@ -176,5 +176,65 @@ namespace ChessLibrary.Tests
             var validMoves = game.GetValidMoves(king.File, king.Rank);
             Assert.That(validMoves, Does.Not.Contain(expectedResult));
         }
+
+        [Test]
+        public void EnPassant_IsAllowed_ImmediatelyAfterPush()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d5"
+            };
+
+            foreach (var moveString in moveStrings)
+            {
+                var result = game.Move(moveString);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            var validMoves = game.GetValidMoves('e', 5);
+            Assert.That(validMoves, Does.Contain(new Square('d', 6)));
+        }
+
+
+        [Test]
+        public void EnPassant_IsDisallowed_WhenNotImmediatelyAfterPush()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d5", // Setup
+                "Na3", "Nb8", // Wait a bit
+            };
+
+            for (var i = 0; i < moveStrings.Length; i++)
+            {
+                var result = game.Move(moveStrings[i]);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            var validMoves = game.GetValidMoves('e', 5);
+            Assert.That(validMoves, Does.Not.Contain(new Square('d', 6)));
+        }
+
+        [Test]
+        public void EnPassant_IsDisallowed_WhenNotPushed()
+        {
+            var game = new Game();
+            var moveStrings = new[]
+            {
+                "e4", "Na6", "e5", "d6", "Na3", "d5", "exd6"
+            };
+
+            for (var i = 0; i < moveStrings.Length - 1; i++)
+            {
+                var result = game.Move(moveStrings[i]);
+                Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            }
+
+            var validMoves = game.GetValidMoves('e', 5);
+            Assert.That(validMoves, Does.Not.Contain(new Square('d', 6)));
+        }
+
     }
 }
