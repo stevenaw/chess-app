@@ -99,7 +99,6 @@ namespace ChessLibrary
             return ErrorCondition.None;
         }
 
-        // TODO: Tests
         public bool Undo()
         {
             if (History.Count <= 1)

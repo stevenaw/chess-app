@@ -276,5 +276,70 @@ namespace ChessLibrary.Tests
 
             Assert.That(game.AttackState, Is.EqualTo(AttackState.DrawByInactivity));
         }
+
+        [Test]
+        public void Undo_FailsOnInitialState()
+        {
+            var game= new Game();
+            var didUndo = game.Undo();
+
+            Assert.That(didUndo, Is.False);
+        }
+
+        [Test]
+        public void Undo_WillRevertUntilInitialState()
+        {
+            var game = new Game();
+            var moves = new[] { "e4", "e5", "d4", "d6" };
+
+            for (var i = 0; i < moves.Length; i++)
+                game.Move(moves[i]);
+
+            for (var i = 0; i < moves.Length; i++)
+            {
+                var didUndo = game.Undo();
+                Assume.That(didUndo, Is.True);
+            }
+
+            var canUndo = game.Undo();
+            Assert.That(canUndo, Is.False);
+        }
+
+        [Test]
+        public void Undo_WillSetExpectedNextTurn()
+        {
+            var game = new Game();
+            var moves = new[] { "e4", "e5", "d4", "d6", "Na3" };
+            var nextTurn = new[] { PieceColor.White, PieceColor.Black, PieceColor.White, PieceColor.Black, PieceColor.White };
+
+            for (var i = 0; i < moves.Length; i++)
+                game.Move(moves[i]);
+
+            for (var i = 0; i < moves.Length; i++)
+            {
+                var didUndo = game.Undo();
+                Assume.That(didUndo, Is.True);
+
+                var currentTurn = game.GetTurn();
+                Assert.That(currentTurn, Is.EqualTo(nextTurn[i]));
+            }
+        }
+
+        [Test]
+        public void Undo_WillRestoreCapturedPiece()
+        {
+            var game = new Game();
+            var moves = new[] { "Nc3", "d5", "Nxd5" };
+
+            for (var i = 0; i < moves.Length; i++)
+                game.Move(moves[i]);
+
+            var targetSquare = game.GetSquareContents('d', 5);
+            Assume.That(targetSquare, Is.EqualTo(SquareContents.White | SquareContents.Knight));
+
+            game.Undo();
+            targetSquare = game.GetSquareContents('d', 5);
+            Assert.That(targetSquare, Is.EqualTo(SquareContents.Black | SquareContents.Pawn));
+        }
     }
 }

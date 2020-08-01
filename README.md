@@ -19,6 +19,12 @@ Entering a move following standard algebraic notation without specifying the mov
 
 Ex: `move Nc3` or `Qxh4`
 
+#### undo
+
+The 'undo' command will undo the previous move .
+
+Ex: `undo`
+
 #### hint {square}
 
 The 'hint' command will highlight a list of possible moves for the piece on the given square.
