@@ -323,26 +323,32 @@ namespace ChessLibrary.Tests
             Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
-        [TestCase(FenSerializer.DefaultValue, "e2,e3", ExpectedResult = "e3", Description = "Pawn moves 1")]
-        [TestCase(FenSerializer.DefaultValue, "e2,e4", ExpectedResult = "e4", Description = "Pawn moves 2")]
-        [TestCase("8/8/8/4p3/3P4/8/8/K6k", "d4,e5", ExpectedResult = "dxe5", Description = "Regular pawn capture")]
-        [TestCase("8/8/8/3Pp3/8/8/8/K6k", "d5,e6", ExpectedResult = "dxe6", Description = "En Passant")]
-        [TestCase("8/P7/8/8/8/8/8/K6k", "a7,a8,Q", ExpectedResult = "a8=Q", Description = "Pawn promotion")]
-        [TestCase("1n6/P7/8/8/8/8/8/K6k", "a7,b8,Q", ExpectedResult = "axb8=Q", Description = "Pawn promotion via capture")]
+        [TestCase(FenSerializer.DefaultValue,   "e2,e3", '\0', AttackState.None, ExpectedResult = "e3", Description = "Pawn moves 1")]
+        [TestCase(FenSerializer.DefaultValue,   "e2,e4", '\0', AttackState.None, ExpectedResult = "e4", Description = "Pawn moves 2")]
+        [TestCase("8/8/8/4p3/3P4/8/8/K6k",      "d4,e5", '\0', AttackState.None, ExpectedResult = "dxe5", Description = "Regular pawn capture")]
+        [TestCase("8/8/8/3Pp3/8/8/8/K6k",       "d5,e6", '\0', AttackState.None, ExpectedResult = "dxe6", Description = "En Passant")]
+        [TestCase("8/P7/8/8/8/8/8/K6k",         "a7,a8", 'Q', AttackState.None, ExpectedResult = "a8=Q", Description = "Pawn promotion")]
+        [TestCase("1n6/P7/8/8/8/8/8/K6k",       "a7,b8", 'Q', AttackState.None, ExpectedResult = "axb8=Q", Description = "Pawn promotion via capture")]
+        [TestCase("1n5k/P7/8/8/8/8/8/K7",       "a7,b8", 'R', AttackState.Check, ExpectedResult = "axb8=R+", Description = "Pawn promotion via capture with check")]
 
-        [TestCase(FenSerializer.DefaultValue, "b1,c3", ExpectedResult = "Nc3", Description = "Knight move regular")]
-        [TestCase("8/8/8/4p3/8/3N4/8/K6k", "d3,e5", ExpectedResult = "Nxe5", Description = "Knight move capture")]
-        [TestCase("3N1N2/8/8/8/8/8/8/K6k", "d8,e6", ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
-        [TestCase("N7/8/N7/8/8/8/8/K6k", "a8,c7", ExpectedResult = "N8c7", Description = "Knight move disambiguate rank")]
-        [TestCase("3N1N2/8/8/8/8/8/8/K6k", "d8,e6", ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
-        [TestCase("N3N3/8/N7/8/8/8/8/K6k", "a8,c7", ExpectedResult = "Na8c7", Description = "Knight move disambiguate rank and file")]
+        [TestCase(FenSerializer.DefaultValue,   "b1,c3", '\0', AttackState.None, ExpectedResult = "Nc3", Description = "Knight move regular")]
+        [TestCase("8/8/8/4p3/8/3N4/8/K6k",      "d3,e5", '\0', AttackState.None, ExpectedResult = "Nxe5", Description = "Knight move capture")]
+        [TestCase("3N1N2/8/8/8/8/8/8/K6k",      "d8,e6", '\0', AttackState.None, ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
+        [TestCase("N7/8/N7/8/8/8/8/K6k",        "a8,c7", '\0', AttackState.None, ExpectedResult = "N8c7", Description = "Knight move disambiguate rank")]
+        [TestCase("3N1N2/8/8/8/8/8/8/K6k",      "d8,e6", '\0', AttackState.None, ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
+        [TestCase("N3N3/8/N7/8/8/8/8/K6k",      "a8,c7", '\0', AttackState.None, ExpectedResult = "Na8c7", Description = "Knight move disambiguate rank and file")]
+        [TestCase("N3N3/8/N7/8/4k3/8/8/K7",      "a8,c7", '\0', AttackState.Check, ExpectedResult = "Na8c7+", Description = "Knight move disambiguate rank and file with check")]
 
-        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,d2", ExpectedResult = "Kd2", Description = "King move regular")]
-        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,g1", ExpectedResult = "0-0", Description = "Castle kingside white")]
-        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e1,c1", ExpectedResult = "0-0-0", Description = "Castle queenside white")]
-        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e8,g8", ExpectedResult = "0-0", Description = "Castle kingside black")]
-        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R", "e8,c8", ExpectedResult = "0-0-0", Description = "Castle queenside black")]
-        public string ToMoveString_SuccessCases(string fen, string moveStr)
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e1,d2", '\0', AttackState.None, ExpectedResult = "Kd2", Description = "King move regular")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e1,g1", '\0', AttackState.None, ExpectedResult = "0-0", Description = "Castle kingside white")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e1,c1", '\0', AttackState.None, ExpectedResult = "0-0-0", Description = "Castle queenside white")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e8,g8", '\0', AttackState.None, ExpectedResult = "0-0", Description = "Castle kingside black")]
+        [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e8,c8", '\0', AttackState.None, ExpectedResult = "0-0-0", Description = "Castle queenside black")]
+        [TestCase("r4k1r/8/8/8/8/8/8/R3K2R",    "e1,g1", '\0', AttackState.Check, ExpectedResult = "0-0+", Description = "Castle kingside with check")]
+        [TestCase("r2k3r/8/8/8/8/8/8/R3K2R",    "e1,c1", '\0', AttackState.Check, ExpectedResult = "0-0-0+", Description = "Castle queenside with check")]
+        [TestCase("r4k1r/8/8/8/8/8/8/R3K2R",    "e1,g1", '\0', AttackState.Checkmate, ExpectedResult = "0-0#", Description = "Castle kingside with check")]
+        [TestCase("r2k3r/8/8/8/8/8/8/R3K2R",    "e1,c1", '\0', AttackState.Checkmate, ExpectedResult = "0-0-0#", Description = "Castle queenside with checkmate")]
+        public string ToMoveString_SuccessCases(string fen, string moveStr, char promotedPieceToken, AttackState attackState)
         {
             var serializer = new FenSerializer();
             var board = serializer.Deserialize(fen);
@@ -350,11 +356,11 @@ namespace ChessLibrary.Tests
             var squares = moveStr.Split(',');
             var start = MoveParser.ParseSquare(squares[0]);
             var end = MoveParser.ParseSquare(squares[1]);
-            var promotedPiece = squares.Length == 3 ? FenSerializer.FromNotation(squares[2][0]) : SquareContents.Empty;
+            var promotedPiece = promotedPieceToken != 0 ? FenSerializer.FromNotation(promotedPieceToken) : SquareContents.Empty;
 
             var move = new Move(start.File, start.Rank, end.File, end.Rank, promotedPiece);
 
-            var result = MoveParser.ToMoveString(move, board);
+            var result = MoveParser.ToMoveString(move, board, attackState);
             var resultStr = result.ToString();
 
             return resultStr;

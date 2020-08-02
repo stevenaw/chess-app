@@ -34,7 +34,7 @@ namespace ChessLibrary
             { SquareContents.Pawn, 'P' }
         };
 
-        public static ReadOnlySpan<char> ToMoveString(Move move, BoardState board)
+        public static ReadOnlySpan<char> ToMoveString(Move move, BoardState board, AttackState attackState)
         {
             // Algo: Move from end, adding tokens in order
             // - Check if move is promotion, add tokens if so
@@ -50,18 +50,41 @@ namespace ChessLibrary
             var endSquareBit = BitTranslator.TranslateToBit(move.EndFile, move.EndRank);
             var movedPiece = board.GetSquareContents(startSquareBit) & ~SquareContents.Colours;
 
+            Span<char> buffer = stackalloc char[8];
+            var lastIdx = buffer.Length - 1;
+
+
+            if (attackState != AttackState.None)
+            {
+                // Check if move ended in attack
+                var notation = GetAttackStateMoveNotation(attackState);
+                if (notation != 0)
+                    buffer[lastIdx--] = notation;
+            }
+
             if (movedPiece == SquareContents.King)
             {
                 // Check for castling
                 var squareDiff = (decimal)startSquareBit / endSquareBit;
+                var castleNotation = "";
+
                 if (squareDiff == 4) // King has moved 2 squares horizontally towards queenside
-                    return "0-0-0";
+                    castleNotation = "0-0-0";
                 else if (squareDiff == 0.25M) // King has moved 2 squares horizontally towards kingside
-                    return "0-0";
+                    castleNotation = "0-0";
+
+                if (!string.IsNullOrEmpty(castleNotation))
+                {
+                    var copyIdx = lastIdx - castleNotation.Length + 1;
+                    var notationBuffer = buffer.Slice(copyIdx, castleNotation.Length);
+                    castleNotation.AsSpan().CopyTo(notationBuffer);
+                    lastIdx -= castleNotation.Length;
+
+                    var copyLocation = buffer.Slice(lastIdx + 1);
+                    return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(copyLocation), copyLocation.Length);
+                }
             }
 
-            Span<char> buffer = stackalloc char[8];
-            var lastIdx = buffer.Length - 1;
             if (move.PromotedPiece != SquareContents.Empty)
             {
                 var pieceType = move.PromotedPiece & ~SquareContents.Colours;
@@ -521,6 +544,16 @@ namespace ChessLibrary
             }
 
             return AttackState.None;
+        }
+
+        private static char GetAttackStateMoveNotation(AttackState state)
+        {
+            return state switch
+            {
+                AttackState.Check => '+',
+                AttackState.Checkmate => '#',
+                _ => '\0',
+            };
         }
 
         private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)
