@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChessLibrary.Serialization
 {
@@ -22,18 +23,18 @@ namespace ChessLibrary.Serialization
 
         
 
-        public void Serialize(Game game, PGNMetadata metadata, TextWriter writer)
+        public async Task Serialize(Game game, PGNMetadata metadata, TextWriter writer)
         {
             var date = $"{metadata.DateTime.Year}.{metadata.DateTime.Month.ToString("00")}.{metadata.DateTime.Day.ToString("00")}";
             // TODO: Async I/O
-            writer.WriteLine($"[{WellKnownTags.Event} \"{metadata.Event}\"]");
-            writer.WriteLine($"[{WellKnownTags.Site} \"{metadata.Site}\"]");
-            writer.WriteLine($"[{WellKnownTags.Date} \"{date}\"]");
-            writer.WriteLine($"[{WellKnownTags.Round} \"{metadata.Round}\"]");
-            writer.WriteLine($"[{WellKnownTags.White} \"{metadata.White}\"]");
-            writer.WriteLine($"[{WellKnownTags.Black} \"{metadata.Black}\"]");
-            writer.WriteLine($"[{WellKnownTags.Result} \"{metadata.Result}\"]");
-            writer.WriteLine();
+            await writer.WriteLineAsync($"[{WellKnownTags.Event} \"{metadata.Event}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Site} \"{metadata.Site}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Date} \"{date}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Round} \"{metadata.Round}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.White} \"{metadata.White}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Black} \"{metadata.Black}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Result} \"{metadata.Result}\"]");
+            await writer.WriteLineAsync();
 
             // TODO: Better way to reverse
             var history = game.History.ToArray().Reverse().ToArray();
@@ -57,26 +58,26 @@ namespace ChessLibrary.Serialization
                 var lengthToWrite = ply.Length + moveNumber.Length;
                 if (linePos + lengthToWrite + 1 > LineLength)
                 {
-                    writer.WriteLine();
+                    await writer.WriteLineAsync();
                     linePos = 0;
                 }
                 else if (i != 0)
                 {
-                    writer.Write(' ');
+                    await writer.WriteAsync(' ');
                     linePos++;
                 }
 
-                writer.Write(moveNumber);
-                writer.Write(ply);
+                await writer.WriteAsync(moveNumber);
+                await writer.WriteAsync(ply);
                 linePos += lengthToWrite;
             }
 
             if (linePos + metadata.Result.Length + 1 > LineLength)
-                writer.WriteLine();
+                await writer.WriteLineAsync();
             else
-                writer.Write(' ');
+                await writer.WriteAsync(' ');
 
-            writer.WriteLine(metadata.Result);
+            await writer.WriteLineAsync(metadata.Result);
         }
     }
 }

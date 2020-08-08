@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ChessLibrary.Tests
 {
@@ -14,7 +15,7 @@ namespace ChessLibrary.Tests
     {
         [TestCaseSource(nameof(NoAnnotations))]
         [Test]
-        public void SerializeNoAnnotations((string scenario, string[] moves, PGNMetadata metadata) args)
+        public async Task SerializeNoAnnotations((string scenario, string[] moves, PGNMetadata metadata) args)
         {
             (string scenario, string[] moves, PGNMetadata metadata) = args;
             var game = new Game();
@@ -32,22 +33,22 @@ namespace ChessLibrary.Tests
             var result = string.Empty;
             using (var writer = new StringWriter())
             {
-                serializer.Serialize(game, metadata, writer);
+                await serializer.Serialize(game, metadata, writer);
                 result = writer.ToString();
             }
 
-            var expectedResult = GetEmbeddedPGN(scenario);
+            var expectedResult = await GetEmbeddedPGN(scenario);
 
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
-        private static string GetEmbeddedPGN(string scenario)
+        private static async Task<string> GetEmbeddedPGN(string scenario)
         {
             var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
             using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
             {
                 using (var sr = new StreamReader(s))
-                    return sr.ReadToEnd();
+                    return await sr.ReadToEndAsync();
             }
         }
 

@@ -338,6 +338,7 @@ namespace ChessLibrary.Tests
         [TestCase("3N1N2/8/8/8/8/8/8/K6k",      "d8,e6", '\0', AttackState.None, ExpectedResult = "Nde6", Description = "Knight move disambiguate file")]
         [TestCase("N3N3/8/N7/8/8/8/8/K6k",      "a8,c7", '\0', AttackState.None, ExpectedResult = "Na8c7", Description = "Knight move disambiguate rank and file")]
         [TestCase("N3N3/8/N7/8/4k3/8/8/K7",      "a8,c7", '\0', AttackState.Check, ExpectedResult = "Na8c7+", Description = "Knight move disambiguate rank and file with check")]
+        [TestCase("rnbq1rk1/2p1bppp/p2p1n2/1p2p3/3PP3/1BP2N1P/PP3PP1/RNBQR1K1", "b8,d7", '\0', AttackState.None, ExpectedResult = "Nbd7", Description = "FischerSpasskyPly19")]
 
         [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e1,d2", '\0', AttackState.None, ExpectedResult = "Kd2", Description = "King move regular")]
         [TestCase("r3k2r/8/8/8/8/8/8/R3K2R",    "e1,g1", '\0', AttackState.None, ExpectedResult = "0-0", Description = "Castle kingside white")]
