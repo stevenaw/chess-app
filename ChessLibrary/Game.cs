@@ -7,7 +7,7 @@ namespace ChessLibrary
     public sealed class Game
     {
         internal GameState CurrentState { get; private set; }
-        private Stack<GameState> History { get; set; } = new Stack<GameState>();
+        internal Stack<GameState> History { get; set; } = new Stack<GameState>();
 
         private ulong CurrentTurn { get; set; }
         public AttackState AttackState { get { return CurrentState.AttackState; } }

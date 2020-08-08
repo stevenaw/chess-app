@@ -34,7 +34,7 @@ namespace ChessLibrary
             { SquareContents.Pawn, 'P' }
         };
 
-        public static ReadOnlySpan<char> ToMoveString(Move move, BoardState board, AttackState attackState)
+        public static string ToMoveString(Move move, BoardState board, AttackState attackState)
         {
             // Algo: Move from end, adding tokens in order
             // - Check if move is promotion, add tokens if so
@@ -81,7 +81,8 @@ namespace ChessLibrary
                     lastIdx -= castleNotation.Length;
 
                     var copyLocation = buffer.Slice(lastIdx + 1);
-                    return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(copyLocation), copyLocation.Length);
+                    return copyLocation.ToString();
+                    //return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(copyLocation), copyLocation.Length);
                 }
             }
 
@@ -163,7 +164,8 @@ namespace ChessLibrary
             }
 
             var segment = buffer.Slice(lastIdx + 1);
-            return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(segment), segment.Length);
+            return segment.ToString();
+            //return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(segment), segment.Length);
         }
 
         public static Square ParseSquare(string input)
