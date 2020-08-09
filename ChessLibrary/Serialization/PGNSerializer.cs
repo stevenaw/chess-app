@@ -8,7 +8,7 @@ namespace ChessLibrary.Serialization
 {
     class PGNSerializer
     {
-        private const int LineLength = 80;
+        private const int LineLength = 64;
 
         public static class WellKnownTags
         {

@@ -154,6 +154,10 @@ namespace ChessLibrary
                         disambiguateByFile = disambiguateByFile || (otherSquare.Rank == move.StartRank);
                     }
 
+                    // Need to disambiguate, but both rank + file are different. Default to by file.
+                    if (!disambiguateByFile && !disambiguateByRank && otherPossibleStartSquares.Count > 0)
+                        disambiguateByFile = true;
+
                     if (disambiguateByRank)
                         buffer[lastIdx--] = (char)(move.StartRank + '0');
                     if (disambiguateByFile)
