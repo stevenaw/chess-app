@@ -15,7 +15,7 @@ namespace ChessLibrary.Tests
     {
         [TestCaseSource(nameof(NoAnnotations))]
         [Test]
-        public async Task SerializeNoAnnotations((string scenario, string[] moves, PGNMetadata metadata) args)
+        public async Task SerializeNoAnnotations_IgnoreLineEndings((string scenario, string[] moves, PGNMetadata metadata) args)
         {
             (string scenario, string[] moves, PGNMetadata metadata) = args;
             var game = new Game();

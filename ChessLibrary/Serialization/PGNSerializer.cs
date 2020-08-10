@@ -44,7 +44,7 @@ namespace ChessLibrary.Serialization
             {
                 var move = history[i + 1].PrecedingMove;
                 var board = history[i].Board;
-                var result = history[i].AttackState;
+                var result = history[i + 1].AttackState;
 
                 var moveStr = MoveParser.ToMoveString(move, board, result);
                 if (moveStr.StartsWith('0'))
@@ -82,7 +82,7 @@ namespace ChessLibrary.Serialization
             else
                 await writer.WriteAsync(' ');
 
-            await writer.WriteLineAsync(metadata.Result);
+            await writer.WriteAsync(metadata.Result);
         }
     }
 }
