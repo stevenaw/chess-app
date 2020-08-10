@@ -39,7 +39,8 @@ namespace ChessLibrary.Tests
 
             var expectedResult = await GetEmbeddedPGN(scenario);
 
-            Assert.That(result, Is.EqualTo(expectedResult));
+            // TODO: Account for line endings
+            Assert.That(result.Replace(Environment.NewLine, " "), Is.EqualTo(expectedResult.Replace(Environment.NewLine, " ")));
         }
 
         private static async Task<string> GetEmbeddedPGN(string scenario)

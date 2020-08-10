@@ -39,23 +39,28 @@ namespace ChessLibrary.Serialization
             // TODO: Better way to reverse
             var history = game.History.ToArray().Reverse().ToArray();
 
-            var moves = new (Move move, BoardState board, AttackState attack)[history.Length - 1];
+            var moves = new string[history.Length - 1];
             for (var i = 0; i < history.Length-1; i++)
-                moves[i] = (history[i + 1].PrecedingMove, history[i].Board, history[i].AttackState);
+            {
+                var move = history[i + 1].PrecedingMove;
+                var board = history[i].Board;
+                var result = history[i].AttackState;
+
+                var moveStr = MoveParser.ToMoveString(move, board, result);
+                if (moveStr.StartsWith('0'))
+                    moveStr = moveStr.Replace('0', 'O');
+
+                moves[i] = moveStr;
+            }
 
             var linePos = 0;
             for (var i = 0; i < moves.Length; i ++)
             {
-                var ply = MoveParser.ToMoveString(moves[i].move, moves[i].board, moves[i].attack);
-                if (ply.StartsWith('0'))
-                    ply = ply.Replace('0', 'O');
-
                 var moveNumber = string.Empty;
-
                 if (i % 2 == 0)
                     moveNumber = ((i/2) + 1).ToString() + ". ";
 
-                var lengthToWrite = ply.Length + moveNumber.Length;
+                var lengthToWrite = moves[i].Length + moveNumber.Length;
                 if (linePos + lengthToWrite + 1 > LineLength)
                 {
                     await writer.WriteLineAsync();
@@ -68,7 +73,7 @@ namespace ChessLibrary.Serialization
                 }
 
                 await writer.WriteAsync(moveNumber);
-                await writer.WriteAsync(ply);
+                await writer.WriteAsync(moves[i]);
                 linePos += lengthToWrite;
             }
 
