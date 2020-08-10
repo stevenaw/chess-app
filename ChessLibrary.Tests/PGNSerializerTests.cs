@@ -29,11 +29,13 @@ namespace ChessLibrary.Tests
             if (string.IsNullOrEmpty(metadata.Result))
                 metadata.Result = GetResult(game);
 
+            metadata.Moves = GetMoves(game);
+
             var serializer = new PGNSerializer();
             var result = string.Empty;
             using (var writer = new StringWriter())
             {
-                await serializer.Serialize(game, metadata, writer);
+                await serializer.Serialize(metadata, writer);
                 result = writer.ToString();
             }
 
@@ -53,6 +55,28 @@ namespace ChessLibrary.Tests
             }
         }
 
+        // TODO: Convert for game <-> pgn models
+        private static string[] GetMoves(Game game)
+        {
+            // TODO: Better way to reverse
+            var history = game.History.ToArray().Reverse().ToArray();
+
+            var moves = new string[history.Length - 1];
+            for (var i = 0; i < history.Length - 1; i++)
+            {
+                var move = history[i + 1].PrecedingMove;
+                var board = history[i].Board;
+                var result = history[i + 1].AttackState;
+
+                var moveStr = MoveParser.ToMoveString(move, board, result);
+                if (moveStr.StartsWith('0'))
+                    moveStr = moveStr.Replace('0', 'O');
+
+                moves[i] = moveStr;
+            }
+
+            return moves;
+        }
         private static string GetResult(Game game)
         {
             switch (game.AttackState)

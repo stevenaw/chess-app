@@ -1,7 +1,5 @@
 ﻿using ChessLibrary.Models;
-using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.Serialization
@@ -21,9 +19,7 @@ namespace ChessLibrary.Serialization
             public const string Result = "Result";
         }
 
-        
-
-        public async Task Serialize(Game game, PGNMetadata metadata, TextWriter writer)
+        public async Task Serialize(PGNMetadata metadata, TextWriter writer)
         {
             var date = $"{metadata.DateTime.Year}.{metadata.DateTime.Month.ToString("00")}.{metadata.DateTime.Day.ToString("00")}";
             // TODO: Async I/O
@@ -36,31 +32,15 @@ namespace ChessLibrary.Serialization
             await writer.WriteLineAsync($"[{WellKnownTags.Result} \"{metadata.Result}\"]");
             await writer.WriteLineAsync();
 
-            // TODO: Better way to reverse
-            var history = game.History.ToArray().Reverse().ToArray();
-
-            var moves = new string[history.Length - 1];
-            for (var i = 0; i < history.Length-1; i++)
-            {
-                var move = history[i + 1].PrecedingMove;
-                var board = history[i].Board;
-                var result = history[i + 1].AttackState;
-
-                var moveStr = MoveParser.ToMoveString(move, board, result);
-                if (moveStr.StartsWith('0'))
-                    moveStr = moveStr.Replace('0', 'O');
-
-                moves[i] = moveStr;
-            }
-
             var linePos = 0;
-            for (var i = 0; i < moves.Length; i ++)
+            for (var i = 0; i < metadata.Moves.Length; i++)
             {
                 var moveNumber = string.Empty;
                 if (i % 2 == 0)
-                    moveNumber = ((i/2) + 1).ToString() + ". ";
+                    moveNumber = ((i / 2) + 1).ToString() + ". ";
 
-                var lengthToWrite = moves[i].Length + moveNumber.Length;
+                var move = metadata.Moves[i];
+                var lengthToWrite = move.Length + moveNumber.Length;
                 if (linePos + lengthToWrite + 1 > LineLength)
                 {
                     await writer.WriteLineAsync();
@@ -73,7 +53,7 @@ namespace ChessLibrary.Serialization
                 }
 
                 await writer.WriteAsync(moveNumber);
-                await writer.WriteAsync(moves[i]);
+                await writer.WriteAsync(move);
                 linePos += lengthToWrite;
             }
 

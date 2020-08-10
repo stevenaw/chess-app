@@ -11,5 +11,6 @@ namespace ChessLibrary.Models
         public string White { get; set; }
         public string Black { get; set; }
         public string Result { get; set; }
+        public string[] Moves {get;set;}
     }
 }
