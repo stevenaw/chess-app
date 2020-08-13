@@ -21,11 +21,10 @@ namespace ChessLibrary.Serialization
 
         public async Task Serialize(PGNMetadata metadata, TextWriter writer)
         {
-            var date = $"{metadata.DateTime.Year}.{metadata.DateTime.Month.ToString("00")}.{metadata.DateTime.Day.ToString("00")}";
             // TODO: Async I/O
             await writer.WriteLineAsync($"[{WellKnownTags.Event} \"{metadata.Event}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.Site} \"{metadata.Site}\"]");
-            await writer.WriteLineAsync($"[{WellKnownTags.Date} \"{date}\"]");
+            await writer.WriteLineAsync($"[{WellKnownTags.Date} \"{metadata.Date}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.Round} \"{metadata.Round}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.White} \"{metadata.White}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.Black} \"{metadata.Black}\"]");
