@@ -17,13 +17,13 @@ namespace ChessLibrary.Tests
         [TestCaseSource(nameof(NoAnnotations))]
         public async Task SerializeNoAnnotations_IgnoreLineEndings((string scenario, PGNMetadata metadata) args)
         {
-            (string scenario, PGNMetadata metadata) = args;
+            (string scenario, PGNMetadata pgn) = args;
 
             var serializer = new PGNSerializer();
             var result = string.Empty;
             using (var writer = new StringWriter())
             {
-                await serializer.Serialize(metadata, writer);
+                await serializer.Serialize(pgn, writer);
                 result = writer.ToString();
             }
 
@@ -31,6 +31,30 @@ namespace ChessLibrary.Tests
 
             // TODO: Account for line endings
             Assert.That(result.Replace(Environment.NewLine, " "), Is.EqualTo(expectedResult.Replace(Environment.NewLine, " ")));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(ParseTagScenarios))]
+        public async Task Deerialize_ParsesMainTags((string scenario, PGNMetadata metadata) args)
+        {
+            (string scenario, PGNMetadata expected) = args;
+
+            var fileContents = await GetEmbeddedPGN(scenario);
+            var serializer = new PGNSerializer();
+            PGNMetadata actual;
+
+            using (var reader = new StringReader(fileContents))
+            {
+                actual = await serializer.Deserialize(reader);
+            }
+
+            Assert.That(actual.White, Is.EqualTo(expected.White));
+            Assert.That(actual.Black, Is.EqualTo(expected.Black));
+            Assert.That(actual.Date, Is.EqualTo(expected.Date));
+            Assert.That(actual.Result, Is.EqualTo(expected.Result));
+            Assert.That(actual.Event, Is.EqualTo(expected.Event));
+            Assert.That(actual.Round, Is.EqualTo(expected.Round));
+            Assert.That(actual.Site, Is.EqualTo(expected.Site));
         }
 
         private static async Task<string> GetEmbeddedPGN(string scenario)
@@ -42,6 +66,26 @@ namespace ChessLibrary.Tests
 
             using var sr = new StreamReader(s);
             return await sr.ReadToEndAsync();
+        }
+
+        private static IEnumerable<(string scenario, PGNMetadata metadata)> ParseTagScenarios
+        {
+            get
+            {
+                var scenario = "Fischer_Spassky_1992_Game29";
+                var metadata = new PGNMetadata()
+                {
+                    Event = "F/S Return Match",
+                    Site = "Belgrade, Serbia JUG",
+                    Date = "1992.11.04",
+                    Round = "29",
+                    White = "Fischer, Robert J.",
+                    Black = "Spassky, Boris V.",
+                    Result = "1/2-1/2"
+                };
+
+                yield return (scenario, metadata);
+            }
         }
 
         private static IEnumerable<(string scenario, PGNMetadata metadata)> NoAnnotations
