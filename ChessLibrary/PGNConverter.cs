@@ -1,5 +1,6 @@
 ﻿using ChessLibrary.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ChessLibrary
@@ -27,12 +28,12 @@ namespace ChessLibrary
             return game;
         }
 
-        private static string[] GetMoves(Game game)
+        private static List<string> GetMoves(Game game)
         {
             // TODO: Better way to reverse
             var history = game.History.ToArray().Reverse().ToArray();
 
-            var moves = new string[history.Length - 1];
+            var moves = new List<string>(history.Length - 1);
             for (var i = 0; i < history.Length - 1; i++)
             {
                 var move = history[i + 1].PrecedingMove;
@@ -48,6 +49,7 @@ namespace ChessLibrary
 
             return moves;
         }
+
         private static string GetResult(Game game)
         {
             switch (game.AttackState)

@@ -34,8 +34,8 @@ namespace ChessLibrary.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(ParseTagScenarios))]
-        public async Task Deerialize_ParsesMainTags((string scenario, PGNMetadata metadata) args)
+        [TestCaseSource(nameof(ParsingScenarios))]
+        public async Task Deserialize_ParsesMainTags((string scenario, PGNMetadata metadata) args)
         {
             (string scenario, PGNMetadata expected) = args;
 
@@ -57,6 +57,23 @@ namespace ChessLibrary.Tests
             Assert.That(actual.Site, Is.EqualTo(expected.Site));
         }
 
+        [TestCaseSource(nameof(ParsingScenarios))]
+        public async Task Deserialize_ParsesMoves((string scenario, PGNMetadata metadata) args)
+        {
+            (string scenario, PGNMetadata expected) = args;
+
+            var fileContents = await GetEmbeddedPGN(scenario);
+            var serializer = new PGNSerializer();
+            PGNMetadata actual;
+
+            using (var reader = new StringReader(fileContents))
+            {
+                actual = await serializer.Deserialize(reader);
+            }
+
+            Assert.That(actual.Moves, Is.EqualTo(expected.Moves));
+        }
+
         private static async Task<string> GetEmbeddedPGN(string scenario)
         {
             var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
@@ -68,7 +85,7 @@ namespace ChessLibrary.Tests
             return await sr.ReadToEndAsync();
         }
 
-        private static IEnumerable<(string scenario, PGNMetadata metadata)> ParseTagScenarios
+        private static IEnumerable<(string scenario, PGNMetadata metadata)> ParsingScenarios
         {
             get
             {
@@ -81,7 +98,14 @@ namespace ChessLibrary.Tests
                     Round = "29",
                     White = "Fischer, Robert J.",
                     Black = "Spassky, Boris V.",
-                    Result = "1/2-1/2"
+                    Result = "1/2-1/2",
+                    Moves = @"e4,e5,Nf3,Nc6,Bb5,a6,Ba4,Nf6,O-O,Be7,Re1,b5,Bb3,d6,c3
+                    ,O-O,h3,Nb8,d4,Nbd7,c4,c6,cxb5,axb5,Nc3,Bb7,Bg5,b4
+                    ,Nb1,h6,Bh4,c5,dxe5,Nxe4,Bxe7,Qxe7,exd6,Qf6,Nbd2,Nxd6
+                    ,Nc4,Nxc4,Bxc4,Nb6,Ne5,Rae8,Bxf7+,Rxf7,Nxf7,Rxe1+,Qxe1
+                    ,Kxf7,Qe3,Qg5,Qxg5,hxg5,b3,Ke6,a3,Kd6,axb4,cxb4,Ra5,Nd5
+                    ,f3,Bc8,Kf2,Bf5,Ra7,g6,Ra6+,Kc5,Ke1,Nf4,g3,Nxh3,Kd2
+                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToList()
                 };
 
                 yield return (scenario, metadata);
@@ -108,7 +132,7 @@ namespace ChessLibrary.Tests
                     ,Nc4,Nxc4,Bxc4,Nb6,Ne5,Rae8,Bxf7+,Rxf7,Nxf7,Rxe1+,Qxe1
                     ,Kxf7,Qe3,Qg5,Qxg5,hxg5,b3,Ke6,a3,Kd6,axb4,cxb4,Ra5,Nd5
                     ,f3,Bc8,Kf2,Bf5,Ra7,g6,Ra6+,Kc5,Ke1,Nf4,g3,Nxh3,Kd2
-                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToArray()
+                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToList()
                 };
 
                 yield return (scenario, metadata);

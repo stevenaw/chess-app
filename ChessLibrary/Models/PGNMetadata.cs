@@ -1,4 +1,6 @@
-﻿namespace ChessLibrary.Models
+﻿using System.Collections.Generic;
+
+namespace ChessLibrary.Models
 {
     // TODO: Immutable?
     public struct PGNMetadata
@@ -10,6 +12,6 @@
         public string White { get; set; }
         public string Black { get; set; }
         public string Result { get; set; }
-        public string[] Moves { get; set; }
+        public List<string> Moves { get; set; }
     }
 }

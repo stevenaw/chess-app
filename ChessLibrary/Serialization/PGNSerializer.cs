@@ -1,6 +1,8 @@
 ﻿using ChessLibrary.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.Serialization
@@ -33,7 +35,7 @@ namespace ChessLibrary.Serialization
             await writer.WriteLineAsync();
 
             var linePos = 0;
-            for (var i = 0; i < pgn.Moves.Length; i++)
+            for (var i = 0; i < pgn.Moves.Count; i++)
             {
                 var moveNumber = string.Empty;
                 if (i % 2 == 0)
@@ -70,9 +72,10 @@ namespace ChessLibrary.Serialization
             var pgn = new PGNMetadata();
 
             string? currentLine = await reader.ReadLineAsync();
-            while (!string.IsNullOrEmpty(currentLine) && currentLine.StartsWith('['))
+            while (!string.IsNullOrEmpty(currentLine))
             {
-                // Parse tag
+                // Parse tags
+                // VERY very rudimentary. A proper parser would account for leading/trailing whitespan on tags, tags spanning multiple lines, multiple tags on a line
                 if (TryParseTag(currentLine, out var tag))
                 {
                     switch(tag.tagName)
@@ -104,13 +107,56 @@ namespace ChessLibrary.Serialization
                 currentLine = await reader.ReadLineAsync();
             }
 
+            // Consume blank lines before moveset
+            while (currentLine?.Length == 0)
+                currentLine = await reader.ReadLineAsync();
+
+            // Parse moveset
+            var moves = new List<string>();
+            while (!string.IsNullOrEmpty(currentLine))
+            {
+                var movesOnLine = ParseLineToMoves(currentLine);
+                moves.AddRange(movesOnLine);
+
+                currentLine = await reader.ReadLineAsync();
+            }
+            pgn.Moves = moves;
+
             return pgn;
+        }
+
+        private static List<string> ParseLineToMoves(string line)
+        {
+            var moves = new List<string>();
+
+            var lineSpan = line.AsSpan().Trim();
+            while(lineSpan.Length > 0)
+            {
+                var endOfToken = lineSpan.IndexOf(' ');
+                if (endOfToken == -1)
+                    endOfToken = lineSpan.Length;
+
+                var token = lineSpan.Slice(0, endOfToken);
+
+                // TODO: Ignore comments
+                if (!Char.IsDigit(token[0]) || token[0] == '0')
+                {
+                    // TODO: Simple verification of if algebraic notation string
+                    moves.Add(token.ToString());
+                }
+
+                var nextTokenStart = Math.Min(endOfToken + 1, lineSpan.Length);
+                lineSpan = lineSpan.Slice(nextTokenStart);
+            }
+
+
+            return moves;
         }
 
         private static bool TryParseTag(string line, out (string tagName, string tagValue) result)
         {
             // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1
-            if (string.IsNullOrEmpty(line) || line.Length < 6 || line[0] != '[' || line[line.Length-1] != ']')
+            if (string.IsNullOrEmpty(line) || line.Length < 6 || line[0] != '[' || line[line.Length - 1] != ']')
             {
                 result = (string.Empty, string.Empty);
                 return false;
