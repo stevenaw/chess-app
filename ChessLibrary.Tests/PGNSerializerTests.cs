@@ -29,8 +29,7 @@ namespace ChessLibrary.Tests
 
             var expectedResult = await GetEmbeddedPGN(scenario);
 
-            // TODO: Account for line endings
-            Assert.That(result.Replace(Environment.NewLine, " "), Is.EqualTo(expectedResult.Replace(Environment.NewLine, " ")));
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -74,21 +73,11 @@ namespace ChessLibrary.Tests
             Assert.That(actual.Moves, Is.EqualTo(expected.Moves));
         }
 
-        private static async Task<string> GetEmbeddedPGN(string scenario)
-        {
-            var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
-            using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            if (s == null)
-                return string.Empty;
-
-            using var sr = new StreamReader(s);
-            return await sr.ReadToEndAsync();
-        }
-
         private static IEnumerable<(string scenario, PGNMetadata metadata)> ParsingScenarios
         {
             get
             {
+                // Basic game
                 var scenario = "Fischer_Spassky_1992_Game29";
                 var metadata = new PGNMetadata()
                 {
@@ -96,9 +85,9 @@ namespace ChessLibrary.Tests
                     Site = "Belgrade, Serbia JUG",
                     Date = "1992.11.04",
                     Round = "29",
+                    Result = "1/2-1/2",
                     White = "Fischer, Robert J.",
                     Black = "Spassky, Boris V.",
-                    Result = "1/2-1/2",
                     Moves = @"e4,e5,Nf3,Nc6,Bb5,a6,Ba4,Nf6,O-O,Be7,Re1,b5,Bb3,d6,c3
                     ,O-O,h3,Nb8,d4,Nbd7,c4,c6,cxb5,axb5,Nc3,Bb7,Bg5,b4
                     ,Nb1,h6,Bh4,c5,dxe5,Nxe4,Bxe7,Qxe7,exd6,Qf6,Nbd2,Nxd6
@@ -106,6 +95,29 @@ namespace ChessLibrary.Tests
                     ,Kxf7,Qe3,Qg5,Qxg5,hxg5,b3,Ke6,a3,Kd6,axb4,cxb4,Ra5,Nd5
                     ,f3,Bc8,Kf2,Bf5,Ra7,g6,Ra6+,Kc5,Ke1,Nf4,g3,Nxh3,Kd2
                     ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToList()
+                };
+
+                yield return (scenario, metadata);
+
+                // Multi-line annotations
+                scenario = "Fischer_Byrne_1956";
+                metadata = new PGNMetadata()
+                {
+                    Event = "Third Rosenwald Trophy",
+                    Site = "New York, NY USA",
+                    Date = "1956.10.17",
+                    Round = "8",
+                    Result = "0-1",
+                    White = "Donald Byrne",
+                    Black = "Robert James Fischer",
+                    Moves = @"Nf3,Nf6,c4,g6,Nc3,Bg7,d4,O-O,Bf4,d5,Qb3
+                            ,dxc4,Qxc4,c6,e4,Nbd7,Rd1,Nb6,Qc5,Bg4,Bg5,Na4,Qa3,Nxc3,bxc3,Nxe4
+                            ,Bxe7,Qb6,Bc4,Nxc3,Bc5,Rfe8+,Kf1,Be6,Bxb6,Bxc4+
+                            ,Kg1,Ne2+,Kf1,Nxd4+,Kg1,Ne2+,Kf1,Nc3+,Kg1,axb6,Qb4
+                            ,Ra4,Qxb6,Nxd1,h3,Rxa2,Kh2,Nxf2,Re1,Rxe1
+                            ,Qd8+,Bf8,Nxe1,Bd5,Nf3,Ne4,Qb8,b5,h4,h5,Ne5,Kg7,Kg1,Bc5+,Kf1
+                            ,Ng3+,Ke1,Bb4+,Kd1,Bb3+,Kc1,Ne2+,Kb1,Nc3+
+                            ,Kc1,Rc2#".Split(',').Select(o => o.Trim()).ToList()
                 };
 
                 yield return (scenario, metadata);
@@ -138,5 +150,17 @@ namespace ChessLibrary.Tests
                 yield return (scenario, metadata);
             }
         }
+
+        private static async Task<string> GetEmbeddedPGN(string scenario)
+        {
+            var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
+            using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+            if (s == null)
+                return string.Empty;
+
+            using var sr = new StreamReader(s);
+            return await sr.ReadToEndAsync();
+        }
+
     }
 }

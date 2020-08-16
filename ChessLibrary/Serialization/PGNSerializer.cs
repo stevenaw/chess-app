@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.Serialization
 {
     class PGNSerializer
     {
-        private const int LineLength = 64;
+        // 64 chars per line (2 for line ending)
+        private const int LineLength = 62;
 
         public static class WellKnownTags
         {
@@ -111,11 +111,12 @@ namespace ChessLibrary.Serialization
             while (currentLine?.Length == 0)
                 currentLine = await reader.ReadLineAsync();
 
-            // Parse moveset
+            // Parse movetext
             var moves = new List<string>();
+            bool insideComment = false;
             while (!string.IsNullOrEmpty(currentLine))
             {
-                var movesOnLine = ParseLineToMoves(currentLine);
+                var movesOnLine = ParseLineToMoves(currentLine, ref insideComment);
                 moves.AddRange(movesOnLine);
 
                 currentLine = await reader.ReadLineAsync();
@@ -125,11 +126,24 @@ namespace ChessLibrary.Serialization
             return pgn;
         }
 
-        private static List<string> ParseLineToMoves(string line)
+        private static List<string> ParseLineToMoves(string line, ref bool insideComment)
         {
             var moves = new List<string>();
 
             var lineSpan = line.AsSpan().Trim();
+
+            if (insideComment == true)
+            {
+                var endOfComment = lineSpan.IndexOf('}');
+                if (endOfComment == -1)
+                    return moves;
+
+                var nextTokenStart = Math.Min(endOfComment + 2, lineSpan.Length);
+                lineSpan = lineSpan.Slice(nextTokenStart);
+                insideComment = false;
+            }
+
+
             while(lineSpan.Length > 0)
             {
                 var endOfToken = lineSpan.IndexOf(' ');
@@ -137,16 +151,35 @@ namespace ChessLibrary.Serialization
                     endOfToken = lineSpan.Length;
 
                 var token = lineSpan.Slice(0, endOfToken);
+                var nextTokenStart = Math.Min(endOfToken + 1, lineSpan.Length);
 
-                // TODO: Ignore comments
-                if (!Char.IsDigit(token[0]) || token[0] == '0')
+                lineSpan = lineSpan.Slice(nextTokenStart);
+
+                // TODO: Ignore ';' comments
+                if (token[0] == '{')
+                {
+                    if (token[token.Length - 1] == '}')
+                        continue;
+                    else
+                    {
+                        var endOfComment = lineSpan.IndexOf('}');
+                        if (endOfComment != -1)
+                        {
+                            nextTokenStart = Math.Min(endOfComment + 2, lineSpan.Length);
+                            lineSpan = lineSpan.Slice(nextTokenStart);
+                        }
+                        else
+                        {
+                            lineSpan = lineSpan.Slice(lineSpan.Length);
+                            insideComment = true;
+                        }
+                    }
+                }
+                else if (Char.IsLetter(token[0]))
                 {
                     // TODO: Simple verification of if algebraic notation string
                     moves.Add(token.ToString());
                 }
-
-                var nextTokenStart = Math.Min(endOfToken + 1, lineSpan.Length);
-                lineSpan = lineSpan.Slice(nextTokenStart);
             }
 
 
