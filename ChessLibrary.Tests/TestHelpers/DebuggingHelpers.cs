@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ChessLibrary.Tests
+namespace ChessLibrary.Tests.TestHelpers
 {
     public static class DebuggingHelpers
     {

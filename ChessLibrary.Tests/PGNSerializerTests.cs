@@ -1,11 +1,10 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
+using ChessLibrary.Tests.TestHelpers;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.Tests
@@ -27,7 +26,7 @@ namespace ChessLibrary.Tests
                 result = writer.ToString();
             }
 
-            var expectedResult = await GetEmbeddedPGN(scenario);
+            var expectedResult = await ResourceHelpers.GetEmbeddedPGN(scenario);
 
             Assert.That(result, Is.EqualTo(expectedResult));
         }
@@ -38,7 +37,7 @@ namespace ChessLibrary.Tests
         {
             (string scenario, PGNMetadata expected) = args;
 
-            var fileContents = await GetEmbeddedPGN(scenario);
+            var fileContents = await ResourceHelpers.GetEmbeddedPGN(scenario);
             var serializer = new PGNSerializer();
             PGNMetadata actual;
 
@@ -61,7 +60,7 @@ namespace ChessLibrary.Tests
         {
             (string scenario, PGNMetadata expected) = args;
 
-            var fileContents = await GetEmbeddedPGN(scenario);
+            var fileContents = await ResourceHelpers.GetEmbeddedPGN(scenario);
             var serializer = new PGNSerializer();
             PGNMetadata actual;
 
@@ -150,17 +149,5 @@ namespace ChessLibrary.Tests
                 yield return (scenario, metadata);
             }
         }
-
-        private static async Task<string> GetEmbeddedPGN(string scenario)
-        {
-            var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
-            using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            if (s == null)
-                return string.Empty;
-
-            using var sr = new StreamReader(s);
-            return await sr.ReadToEndAsync();
-        }
-
     }
 }
