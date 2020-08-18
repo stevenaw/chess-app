@@ -155,8 +155,11 @@ namespace ChessLibrary.Serialization
 
                 lineSpan = lineSpan.Slice(nextTokenStart);
 
-                // TODO: Ignore ';' comments
-                if (token[0] == '{')
+                if (token[0] == ';')
+                {
+                    break;
+                }
+                else if (token[0] == '{')
                 {
                     if (token[token.Length - 1] == '}')
                         continue;
@@ -177,6 +180,7 @@ namespace ChessLibrary.Serialization
                 }
                 else if (Char.IsLetter(token[0]))
                 {
+                    // TODO: Detect if there's no space between ply count token + move token (ex: 4.Na5)
                     // TODO: Simple verification of if algebraic notation string
                     moves.Add(token.ToString());
                 }

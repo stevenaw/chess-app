@@ -120,6 +120,22 @@ namespace ChessLibrary.Tests
                 };
 
                 yield return (scenario, metadata);
+
+                // Full-line annotation
+                scenario = "Fischer_Altusky_1954";
+                metadata = new PGNMetadata()
+                {
+                    Event = "Offhand Game",
+                    Site = "New York, NY USA",
+                    Date = "1954.12.??",
+                    Round = "?",
+                    Result = "0-1",
+                    White = "Jacob Altusky",
+                    Black = "Robert James Fischer",
+                    Moves = @"e4,e5,Nf3,Nc6,Bb5,a6,Ba4,d6,d4,b5,Bb3,Bg4,Bxf7+,Kxf7,Ng5+,Qxg5".Split(',').Select(o => o.Trim()).ToList()
+                };
+
+                yield return (scenario, metadata);
             }
         }
 

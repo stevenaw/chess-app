@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Fischer_Altusky_1954.pgn" />
     <None Remove="Data\Fischer_Byrne_1956.pgn" />
     <None Remove="Data\Fischer_Spassky_1992_Game29.pgn" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\Fischer_Altusky_1954.pgn" />
     <EmbeddedResource Include="Data\Fischer_Byrne_1956.pgn" />
     <EmbeddedResource Include="Data\Fischer_Spassky_1992_Game29.pgn" />
   </ItemGroup>
