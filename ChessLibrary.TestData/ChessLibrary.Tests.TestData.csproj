@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Games\Fischer_Altusky_1954.pgn" />
+    <None Remove="Games\Fischer_Byrne_1956.pgn" />
+    <None Remove="Games\Fischer_Spassky_1992_Game29.pgn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Games\Fischer_Altusky_1954.pgn" />
+    <EmbeddedResource Include="Games\Fischer_Byrne_1956.pgn" />
+    <EmbeddedResource Include="Games\Fischer_Spassky_1992_Game29.pgn" />
+  </ItemGroup>
+
+</Project>

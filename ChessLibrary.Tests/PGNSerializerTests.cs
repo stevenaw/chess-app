@@ -1,5 +1,6 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
+using ChessLibrary.Tests.TestData;
 using ChessLibrary.Tests.TestHelpers;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace ChessLibrary.Tests
             get
             {
                 // Basic game
-                var scenario = "Fischer_Spassky_1992_Game29";
+                var scenario = Scenarios.Fischer_Spassky_1992_Game29;
                 var metadata = new PGNMetadata()
                 {
                     Event = "F/S Return Match",
@@ -99,7 +100,7 @@ namespace ChessLibrary.Tests
                 yield return (scenario, metadata);
 
                 // Multi-line annotations
-                scenario = "Fischer_Byrne_1956";
+                scenario = Scenarios.Fischer_Byrne_1956;
                 metadata = new PGNMetadata()
                 {
                     Event = "Third Rosenwald Trophy",
@@ -122,7 +123,7 @@ namespace ChessLibrary.Tests
                 yield return (scenario, metadata);
 
                 // Full-line annotation
-                scenario = "Fischer_Altusky_1954";
+                scenario = Scenarios.Fischer_Altusky_1954;
                 metadata = new PGNMetadata()
                 {
                     Event = "Offhand Game",
@@ -143,7 +144,7 @@ namespace ChessLibrary.Tests
         {
             get
             {
-                var scenario = "Fischer_Spassky_1992_Game29";
+                var scenario = Scenarios.Fischer_Spassky_1992_Game29;
                 var metadata = new PGNMetadata()
                 {
                     Event = "F/S Return Match",

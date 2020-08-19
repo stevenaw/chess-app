@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.ConsoleApp", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Tests", "ChessLibrary.Tests\ChessLibrary.Tests.csproj", "{B74FA5BF-3C9C-4AEE-97F7-8EE004ABD9E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessLibrary.Benchmarks", "ChessLibrary.Benchmarks\ChessLibrary.Benchmarks.csproj", "{E692886F-6F64-4478-A14F-247506CB0A87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Benchmarks", "ChessLibrary.Benchmarks\ChessLibrary.Benchmarks.csproj", "{E692886F-6F64-4478-A14F-247506CB0A87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessLibrary.Tests.TestData", "ChessLibrary.TestData\ChessLibrary.Tests.TestData.csproj", "{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E692886F-6F64-4478-A14F-247506CB0A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E692886F-6F64-4478-A14F-247506CB0A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E692886F-6F64-4478-A14F-247506CB0A87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

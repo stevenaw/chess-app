@@ -7,18 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\Fischer_Altusky_1954.pgn" />
-    <None Remove="Data\Fischer_Byrne_1956.pgn" />
-    <None Remove="Data\Fischer_Spassky_1992_Game29.pgn" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Data\Fischer_Altusky_1954.pgn" />
-    <EmbeddedResource Include="Data\Fischer_Byrne_1956.pgn" />
-    <EmbeddedResource Include="Data\Fischer_Spassky_1992_Game29.pgn" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
       <PrivateAssets>all</PrivateAssets>
@@ -28,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ChessLibrary.TestData\ChessLibrary.Tests.TestData.csproj" />
     <ProjectReference Include="..\ChessLibrary\ChessLibrary.csproj" />
   </ItemGroup>
 

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace ChessLibrary.Tests.TestHelpers
 {
-    internal static class ResourceHelpers
+    public static class ResourceHelpers
     {
         public static async Task<string> GetEmbeddedPGN(string scenario)
         {
-            var resourceName = $"ChessLibrary.Tests.Data.{scenario}.pgn";
+            var resourceName = $"ChessLibrary.Tests.TestData.Games.{scenario}.pgn";
             using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
             if (s == null)
                 return string.Empty;
