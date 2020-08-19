@@ -178,12 +178,20 @@ namespace ChessLibrary.Serialization
                         }
                     }
                 }
-                else if (Char.IsLetter(token[0]))
+                else
                 {
-                    // TODO: Detect if there's no space between ply count token + move token (ex: 4.Na5)
-                    // TODO: Simple verification of if algebraic notation string
-                    moves.Add(token.ToString());
+                    if (Char.IsDigit(token[0]))
+                    {
+                        // Trim a move number if there's no space delim between it and move
+                        while (token.Length > 1 && !Char.IsLetter(token[0]))
+                            token = token.Slice(1);
+                    }
+
+                    if (Char.IsLetter(token[0]))
+                        moves.Add(token.ToString());
                 }
+                
+                
             }
 
 

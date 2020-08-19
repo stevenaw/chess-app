@@ -307,6 +307,7 @@ namespace ChessLibrary
 
         private static ulong GetEnPassantSquares(ulong input, BoardState state, Move previousMove)
         {
+            // TODO: Instead of this whole thing, consider just storing the en passant square in game state. There will only be 1 per ply.
             if (!Move.Equals(previousMove, Move.Empty))
             {
                 var squareForGeneration = BitTranslator.TranslateToSquare(input);
