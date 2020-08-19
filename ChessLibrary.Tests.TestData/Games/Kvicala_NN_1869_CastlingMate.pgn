@@ -1,0 +1,17 @@
+﻿[Event "Prague"]
+[Site "Prague AUH"]
+[Date "1869.04.16"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Antonin Kvicala"]
+[Black "NN"]
+[ECO "B20"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "35"]
+
+1.e4 c5 2.Bc4 Nc6 3.Nf3 e6 4.Nc3 a6 5.d4 b5 6.d5 bxc4 7.dxc6
+d6 8.e5 d5 9.Bg5 f6 10.exf6 Nxf6 11.Ne5 h6 12.c7 Qxc7 13.Bxf6
+gxf6 14.Qh5+ Ke7 15.Qf7+ Kd6 16.Qxf6 Bg7 17.Ne4+ dxe4
+18.O-O-O# 1-0

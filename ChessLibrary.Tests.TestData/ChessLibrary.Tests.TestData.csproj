@@ -9,12 +9,20 @@
     <None Remove="Games\Fischer_Altusky_1954.pgn" />
     <None Remove="Games\Fischer_Byrne_1956.pgn" />
     <None Remove="Games\Fischer_Spassky_1992_Game29.pgn" />
+    <None Remove="Games\Kvicala_NN_1869_CastlingMate.pgn" />
+    <None Remove="Games\Wiede_Goetz_1880_PromotionMate.pgn" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Games\Fischer_Altusky_1954.pgn" />
     <EmbeddedResource Include="Games\Fischer_Byrne_1956.pgn" />
     <EmbeddedResource Include="Games\Fischer_Spassky_1992_Game29.pgn" />
+    <EmbeddedResource Include="Games\Kvicala_NN_1869_CastlingMate.pgn" />
+    <EmbeddedResource Include="Games\Wiede_Goetz_1880_PromotionMate.pgn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Games\Kvicala_NN_1869_CastlingMate.pgn" />
   </ItemGroup>
 
 </Project>

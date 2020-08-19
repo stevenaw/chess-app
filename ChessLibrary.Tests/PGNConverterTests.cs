@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using static ChessLibrary.Tests.TestData.Scenarios;
 
 namespace ChessLibrary.Tests
 {
@@ -26,13 +27,31 @@ namespace ChessLibrary.Tests
             foreach (var move in pgn.Moves)
             {
                 var result = game.Move(move);
-                Assume.That(result, Is.EqualTo(ErrorCondition.None));
+                Warn.If(result, Is.Not.EqualTo(ErrorCondition.None), $"Unexpected result for move {move}");
             }
 
             var fenSerializer = new FenSerializer();
             var actualFen = fenSerializer.Serialize(game.CurrentState.Board);
 
             Assert.That(actualFen, Is.EqualTo(expectedFen));
+        }
+
+        [Test]
+        [TestCaseSource(typeof(MatingScenarios), nameof(MatingScenarios.All))]
+        public async Task ReplayedGameEndsInCheckmate(string scenario)
+        {
+            var pgnStr = await ResourceHelpers.GetEmbeddedPGN(scenario);
+            var pgnSerializer = new PGNSerializer();
+            var pgn = await pgnSerializer.Deserialize(new StringReader(pgnStr));
+
+            var game = new Game();
+            foreach (var move in pgn.Moves)
+            {
+                var result = game.Move(move);
+                Warn.If(result, Is.Not.EqualTo(ErrorCondition.None), $"Unexpected result for move {move}");
+            }
+
+            Assert.That(game.AttackState, Is.EqualTo(AttackState.Checkmate));
         }
 
         public static IEnumerable<string> PgnScenarios
