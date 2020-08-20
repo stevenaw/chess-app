@@ -215,6 +215,10 @@ namespace ChessLibrary
                 ? ReadOnlySpan<char>.Empty
                 : trimmedInput.Slice(moveNotation.Length);
 
+            var promotion = GetPromotion(moveDescriptors, isWhiteMove);
+            if (promotion != SquareContents.Empty)
+                moveDescriptors = moveDescriptors.Length > 2 ? moveDescriptors.Slice(2) : ReadOnlySpan<char>.Empty;
+
             var annotation = GetAnnotation(moveDescriptors);
             var attackState = GetAttackState(moveDescriptors);
 
@@ -246,8 +250,6 @@ namespace ChessLibrary
             parsedState.EndFile = Char.ToLower(moveNotation[squareIdx--]);
 
 
-            // Read promotion (if present)
-            var promotion = GetPromotion(moveDescriptors, isWhiteMove);
             var lastRankForColor = isWhiteMove ? Constants.Board.NumberOfRows : 1;
 
             if (promotion != 0)
@@ -564,7 +566,7 @@ namespace ChessLibrary
 
         private static SquareContents GetPromotion(ReadOnlySpan<char> descriptor, bool isWhiteTurn)
         {
-            if (descriptor.Length == 2 && descriptor[0] == '=')
+            if (descriptor.Length >= 2 && descriptor[0] == '=')
                 return GetSquareContents(descriptor[1], isWhiteTurn);
 
             return SquareContents.Empty;
