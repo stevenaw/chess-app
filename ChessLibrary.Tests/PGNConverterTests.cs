@@ -6,7 +6,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using static ChessLibrary.Tests.TestData.Scenarios;
 
 namespace ChessLibrary.Tests
 {
@@ -37,7 +36,7 @@ namespace ChessLibrary.Tests
         }
 
         [Test]
-        [TestCaseSource(typeof(MatingScenarios), nameof(MatingScenarios.All))]
+        [TestCaseSource(typeof(Scenarios.MatingScenarios), nameof(Scenarios.MatingScenarios.All))]
         public async Task ReplayedGameEndsInCheckmate(string scenario)
         {
             var pgnStr = await ResourceHelpers.GetEmbeddedPGN(scenario);

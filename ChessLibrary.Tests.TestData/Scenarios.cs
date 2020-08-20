@@ -5,19 +5,21 @@ namespace ChessLibrary.Tests.TestData
 {
     public static class Scenarios
     {
-        public const string Fischer_Altusky_1954 = "Fischer_Altusky_1954";
-        public const string Fischer_Byrne_1956 = "Fischer_Byrne_1956";
-        public const string Fischer_Spassky_1992_Game29 = "Fischer_Spassky_1992_Game29";
+        public static readonly string Fischer_Altusky_1954 = "Fischer_Altusky_1954";
+        public static readonly string Fischer_Byrne_1956 = "Fischer_Byrne_1956";
+        public static readonly string Fischer_Spassky_1992_Game29 = "Fischer_Spassky_1992_Game29";
 
         public static class MatingScenarios
         {
-            public const string MateByPromotion = "Wiede_Goetz_1880_PromotionMate";
-            public const string MateByCastling = "Kvicala_NN_1869_CastlingMate";
+            public static readonly string MateByPromotion = "Wiede_Goetz_1880_MatePromotion";
+            public static readonly string MateByCastling = "Kvicala_NN_1869_MateCastling";
+            public static readonly string MateByDiscovery = "Lasker_Thomas_1912_MateDiscovery";
 
             public static readonly string[] All = new[]
             {
                 MateByPromotion,
-                MateByCastling
+                MateByCastling,
+                MateByDiscovery
             };
         }
 
@@ -39,7 +41,9 @@ namespace ChessLibrary.Tests.TestData
                 // https://www.chessgames.com/perl/chessgame?gid=1075778
                 { MatingScenarios.MateByPromotion, "rnb1kbnr/pppp1ppp/8/8/4q3/1P5P/P1PP1K2/RNBQ1BNn" },
                 // https://www.chessgames.com/perl/chessgame?gid=1272123
-                { MatingScenarios.MateByCastling, "r1b4r/2q3b1/p2kpQ1p/2p1N3/2p1p3/8/PPP2PPP/2KR3R" }
+                { MatingScenarios.MateByCastling, "r1b4r/2q3b1/p2kpQ1p/2p1N3/2p1p3/8/PPP2PPP/2KR3R" },
+                // https://www.chessgames.com/perl/chessgame?gid=1259009
+                { MatingScenarios.MateByDiscovery, "rn3r2/pbppq1p1/1p2pN2/8/3P2NP/6P1/PPPKBP1R/R5k1" }
             }
         );
     }
