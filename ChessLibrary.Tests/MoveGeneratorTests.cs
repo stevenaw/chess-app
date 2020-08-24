@@ -236,5 +236,29 @@ namespace ChessLibrary.Tests
             Assert.That(validMoves, Does.Not.Contain(new Square('d', 6)));
         }
 
+        [TestCase("8/8/8/7k/8/8/7P/7K", "Kh4")]
+        [TestCase("8/8/8/8/7k/8/7P/7K", "Kh3")]
+        public void King_CanMoveIntoPawnMovementPath(string fen, string move)
+        {
+            var serializer = new FenSerializer();
+            var board = serializer.Deserialize(fen);
+            var game = new Game(board, PieceColor.Black);
+
+            var result = game.Move(move);
+
+            Assert.That(result, Is.EqualTo(ErrorCondition.None));
+        }
+
+        [TestCase("8/8/8/8/7k/8/7P/7K", "Kg3")]
+        public void King_UnableMoveIntoPawnMovementPath(string fen, string move)
+        {
+            var serializer = new FenSerializer();
+            var board = serializer.Deserialize(fen);
+            var game = new Game(board, PieceColor.Black);
+
+            var result = game.Move(move);
+
+            Assert.That(result, Is.EqualTo(ErrorCondition.InvalidMovement));
+        }
     }
 }
