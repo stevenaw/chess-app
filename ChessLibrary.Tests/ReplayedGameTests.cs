@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 namespace ChessLibrary.Tests
 {
     [TestFixture]
-    public class PGNConverterTests
+    public class ReplayedGameTests
     {
         [Test]
         [TestCaseSource(nameof(PgnScenarios))]
         public async Task ReplayedGameMatchesExpectedFEN(string scenario)
         {
-            var pgnStr = await ResourceHelpers.GetEmbeddedPGN(scenario);
             var pgnSerializer = new PGNSerializer();
-            var pgn = await pgnSerializer.Deserialize(new StringReader(pgnStr));
+            using var stream = ResourceHelpers.GetEmbeddedPGNStream(scenario);
+            var pgn = await pgnSerializer.DeserializeAsync(new StreamReader(stream));
 
             var expectedFen = Scenarios.FinalPositions[scenario];
 
@@ -39,9 +39,9 @@ namespace ChessLibrary.Tests
         [TestCaseSource(typeof(Scenarios.MatingScenarios), nameof(Scenarios.MatingScenarios.All))]
         public async Task ReplayedGameEndsInCheckmate(string scenario)
         {
-            var pgnStr = await ResourceHelpers.GetEmbeddedPGN(scenario);
             var pgnSerializer = new PGNSerializer();
-            var pgn = await pgnSerializer.Deserialize(new StringReader(pgnStr));
+            using var stream = ResourceHelpers.GetEmbeddedPGNStream(scenario);
+            var pgn = await pgnSerializer.DeserializeAsync(new StreamReader(stream));
 
             var game = new Game();
             foreach (var move in pgn.Moves)

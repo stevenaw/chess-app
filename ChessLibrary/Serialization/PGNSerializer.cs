@@ -22,9 +22,8 @@ namespace ChessLibrary.Serialization
             public const string Result = "Result";
         }
 
-        public async Task Serialize(PGNMetadata pgn, TextWriter writer)
+        public async Task SerializeAsync(PGNMetadata pgn, TextWriter writer)
         {
-            // TODO: Async I/O
             await writer.WriteLineAsync($"[{WellKnownTags.Event} \"{pgn.Event}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.Site} \"{pgn.Site}\"]");
             await writer.WriteLineAsync($"[{WellKnownTags.Date} \"{pgn.Date}\"]");
@@ -67,7 +66,7 @@ namespace ChessLibrary.Serialization
             await writer.WriteAsync(pgn.Result);
         }
 
-        public async Task<PGNMetadata> Deserialize(TextReader reader)
+        public async Task<PGNMetadata> DeserializeAsync(TextReader reader)
         {
             var pgn = new PGNMetadata();
 

@@ -23,11 +23,11 @@ namespace ChessLibrary.Tests
             var result = string.Empty;
             using (var writer = new StringWriter())
             {
-                await serializer.Serialize(pgn, writer);
+                await serializer.SerializeAsync(pgn, writer);
                 result = writer.ToString();
             }
 
-            var expectedResult = await ResourceHelpers.GetEmbeddedPGN(scenario);
+            var expectedResult = await ResourceHelpers.GetEmbeddedPGNString(scenario);
 
             Assert.That(result, Is.EqualTo(expectedResult));
         }
@@ -38,13 +38,13 @@ namespace ChessLibrary.Tests
         {
             (string scenario, PGNMetadata expected) = args;
 
-            var fileContents = await ResourceHelpers.GetEmbeddedPGN(scenario);
+            var fileContents = await ResourceHelpers.GetEmbeddedPGNString(scenario);
             var serializer = new PGNSerializer();
             PGNMetadata actual;
 
             using (var reader = new StringReader(fileContents))
             {
-                actual = await serializer.Deserialize(reader);
+                actual = await serializer.DeserializeAsync(reader);
             }
 
             Assert.That(actual.White, Is.EqualTo(expected.White));
@@ -61,13 +61,13 @@ namespace ChessLibrary.Tests
         {
             (string scenario, PGNMetadata expected) = args;
 
-            var fileContents = await ResourceHelpers.GetEmbeddedPGN(scenario);
+            var fileContents = await ResourceHelpers.GetEmbeddedPGNString(scenario);
             var serializer = new PGNSerializer();
             PGNMetadata actual;
 
             using (var reader = new StringReader(fileContents))
             {
-                actual = await serializer.Deserialize(reader);
+                actual = await serializer.DeserializeAsync(reader);
             }
 
             Assert.That(actual.Moves, Is.EqualTo(expected.Moves));

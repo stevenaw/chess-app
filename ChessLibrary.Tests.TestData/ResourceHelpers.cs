@@ -6,15 +6,20 @@ namespace ChessLibrary.Tests.TestHelpers
 {
     public static class ResourceHelpers
     {
-        public static async Task<string> GetEmbeddedPGN(string scenario)
+        public static async Task<string> GetEmbeddedPGNString(string scenario)
+        {
+            using var s = GetEmbeddedPGNStream(scenario);
+            using var sr = new StreamReader(s);
+
+            return await sr.ReadToEndAsync();
+        }
+
+        public static Stream GetEmbeddedPGNStream(string scenario)
         {
             var resourceName = $"ChessLibrary.Tests.TestData.Games.{scenario}.pgn";
-            using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            if (s == null)
-                return string.Empty;
+            var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
 
-            using var sr = new StreamReader(s);
-            return await sr.ReadToEndAsync();
+            return s ?? Stream.Null;
         }
     }
 }
