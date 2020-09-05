@@ -155,7 +155,6 @@ namespace ChessLibrary
         }
 
 
-        // TODO: Can this be DRYed out?
         private static ulong GenerateAllMovesForPiece(GameState state, ulong square, ulong opponentMoves)
         {
             // Detect type of piece
@@ -169,12 +168,11 @@ namespace ChessLibrary
             //   ✔ Account for can't castle while in check
 
             var board = state.Board;
-            var normalMovement = GenerateStandardMovesForPiece(board, square);
+            var normalMovement = GenerateBasicMovesForPiece(board, square);
 
             if ((square & board.Pawns) != 0)
             {
                 var enPassant = GetEnPassantSquares(square, board, state.PrecedingMove);
-                // TODO: Extract pawn capturing to here?
                 return (normalMovement | enPassant);
             }
             else if ((square & board.Kings) != 0)
@@ -188,7 +186,7 @@ namespace ChessLibrary
             return normalMovement;
         }
 
-        internal static ulong GenerateStandardMovesForPiece(BoardState board, ulong square)
+        internal static ulong GenerateBasicMovesForPiece(BoardState board, ulong square)
         {
             if ((square & board.Queens) != 0)
             {
@@ -369,7 +367,7 @@ namespace ChessLibrary
                     if ((state.Pawns & lastMoveEndSquare) != 0
                         && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
                     {
-                        // TODO: Probably a better way to do all this using bit twiddling
+                        // TODO: Store 'en passant square' in game state instead of bit twiddling.
                         var isWhite = (input & state.WhitePieces) != 0;
                         var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
                         var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);

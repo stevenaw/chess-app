@@ -66,9 +66,5 @@ namespace ChessLibrary
                     return "*";
             }
         }
-        public static string GetDate(DateTime date)
-        {
-            return $"{date.Year}.{date.Month.ToString("00")}.{date.Day.ToString("00")}";
-        }
     }
 }

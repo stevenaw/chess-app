@@ -123,7 +123,6 @@ namespace ChessLibrary
             var whiteAttack = MoveGenerator.GenerateSquaresAttackedBy(newState, newBoard.WhitePieces);
             var blackAttack = MoveGenerator.GenerateSquaresAttackedBy(newState, newBoard.BlackPieces);
 
-            // TODO: 'Squares attacked by pawns' here will only show if square is CURRENTLY occupied, rather than prospective attacks
             var squaresAttackedBy = new IndexedTuple<ulong>(whiteAttack, blackAttack);
 
             var ownMovements = squaresAttackedBy.Get(didBlackMove);
