@@ -335,5 +335,20 @@ namespace ChessLibrary.Tests
             targetSquare = game.GetSquareContents('d', 5);
             Assert.That(targetSquare, Is.EqualTo(SquareContents.Black | SquareContents.Pawn));
         }
+
+        [Test]
+        public void PawnPromotion_WillDetectCheckmate()
+        {
+            const string fen = "rnb1kbnr/pppp1ppp/8/8/4q3/1P5P/P1PP1Kp1/RNBQ1BNR";
+            const string move = "gxh1=N#";
+
+            var board = new FenSerializer().Deserialize(fen);
+            var game = new Game(board, PieceColor.Black);
+
+            var result = game.Move(move);
+
+            Assert.That(result, Is.EqualTo(ErrorCondition.None));
+            Assert.That(game.AttackState, Is.EqualTo(AttackState.Checkmate));
+        }
     }
 }

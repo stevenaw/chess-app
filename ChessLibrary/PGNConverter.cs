@@ -30,8 +30,8 @@ namespace ChessLibrary
 
         private static List<string> GetMoves(Game game)
         {
-            // TODO: Better way to reverse
-            var history = game.History.ToArray().Reverse().ToArray();
+            var history = game.History.ToArray();
+            Array.Reverse(history);
 
             var moves = new List<string>(history.Length - 1);
             for (var i = 0; i < history.Length - 1; i++)

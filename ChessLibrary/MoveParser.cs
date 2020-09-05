@@ -139,7 +139,7 @@ namespace ChessLibrary
                         var mask = pieceMask & (1UL << i);
                         if (mask != 0)
                         {
-                            var moves = MoveGenerator.GenerateBasicMovesForPiece(board, mask);
+                            var moves = MoveGenerator.GenerateStatelessMovesForPiece(board, mask);
                             if ((moves & endSquareBit) != 0)
                                 otherPossibleStartSquares.Add(BitTranslator.TranslateToSquare(mask));
                         }

@@ -168,7 +168,7 @@ namespace ChessLibrary
             //   ✔ Account for can't castle while in check
 
             var board = state.Board;
-            var normalMovement = GenerateBasicMovesForPiece(board, square);
+            var normalMovement = GenerateStatelessMovesForPiece(board, square);
 
             if ((square & board.Pawns) != 0)
             {
@@ -186,7 +186,7 @@ namespace ChessLibrary
             return normalMovement;
         }
 
-        internal static ulong GenerateBasicMovesForPiece(BoardState board, ulong square)
+        internal static ulong GenerateStatelessMovesForPiece(BoardState board, ulong square)
         {
             if ((square & board.Queens) != 0)
             {
