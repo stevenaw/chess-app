@@ -70,7 +70,7 @@ namespace ChessLibrary
             if ((CurrentTurn & endSquare) != 0)
                 return ErrorCondition.CantTakeOwnPiece; // Can't end move on own piece
 
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(CurrentState, startSquare);
+            ulong allMoves = MoveGenerator.GenerateValidMovesForPiece(CurrentState, startSquare);
             if ((endSquare & allMoves) == 0)
                 return ErrorCondition.InvalidMovement; // End square is not a valid move
 
@@ -120,14 +120,14 @@ namespace ChessLibrary
             var newBoard = newState.Board;
             var didBlackMove = ((endSquare & newBoard.BlackPieces) != 0) ? 1 : 0;
 
-            var whiteMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.WhitePieces, 0);
-            var blackMoves = MoveGenerator.GenerateStandardMoves(newState, newBoard.BlackPieces, 0);
+            var whiteAttack = MoveGenerator.GenerateSquaresAttackedBy(newState, newBoard.WhitePieces);
+            var blackAttack = MoveGenerator.GenerateSquaresAttackedBy(newState, newBoard.BlackPieces);
 
             // TODO: 'Squares attacked by pawns' here will only show if square is CURRENTLY occupied, rather than prospective attacks
-            var squaresAttackedBy = new IndexedTuple<ulong>(whiteMoves, blackMoves);
+            var squaresAttackedBy = new IndexedTuple<ulong>(whiteAttack, blackAttack);
 
             var ownMovements = squaresAttackedBy.Get(didBlackMove);
-            var opponentMovements = MoveGenerator.GenerateMoves(newState, opponentPieces, ownMovements);
+            var opponentMovements = MoveGenerator.GenerateValidMoves(newState, opponentPieces, ownMovements);
 
             var opponentKingUnderAttack = (opponentPieces & newBoard.Kings & ownMovements) != 0;
             var opponentCanMove = opponentMovements != 0;
@@ -170,7 +170,7 @@ namespace ChessLibrary
                 throw new InvalidOperationException();
 
             var square = BitTranslator.TranslateToBit(file, rank);
-            ulong allMoves = MoveGenerator.GenerateMovesForPiece(CurrentState, square);
+            ulong allMoves = MoveGenerator.GenerateValidMovesForPiece(CurrentState, square);
 
             return BitTranslator.TranslateToSquares(allMoves);
         }
