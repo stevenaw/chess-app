@@ -2,7 +2,6 @@
 Chess engine in C# with CLI interface
 
 A ground-up re-build of a [former student project](https://github.com/stevenaw/2PlayerChess), this engine is built with a performance-first mindset using an approach that will support both human-human and human-computer games.
-It makes extensive use of bit fields, and will only work on big endian architectures.
 
 ## CLI
 

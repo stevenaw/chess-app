@@ -7,8 +7,6 @@ namespace ChessLibrary.ConsoleApp
     {
         static void Main()
         {
-            ExitIfLittleEndian();
-
             var game = new Game();
             bool keepPlaying;
             BoardRenderer.PrintBoard(game);
@@ -22,16 +20,6 @@ namespace ChessLibrary.ConsoleApp
 
                 Console.WriteLine();
             } while (keepPlaying);
-        }
-
-        private static void ExitIfLittleEndian()
-        {
-            if (!BitConverter.IsLittleEndian)
-            {
-                Console.Error.WriteLine("This application requires a big endian architecture. Press any key to exit");
-                Console.ReadKey();
-                Environment.Exit(1);
-            }
         }
 
         private static Command GetCommand(PieceColor turn)
