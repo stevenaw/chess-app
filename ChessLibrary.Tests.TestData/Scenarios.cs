@@ -14,12 +14,16 @@ namespace ChessLibrary.Tests.TestData
             public static readonly string MateByPromotion = "Wiede_Goetz_1880_MatePromotion";
             public static readonly string MateByCastling = "Kvicala_NN_1869_MateCastling";
             public static readonly string MateByDiscovery = "Lasker_Thomas_1912_MateDiscovery";
+            public static readonly string MateByEnPassant = "Korepanova_Tishkov_2007_MateEnPassant";
+            public static readonly string MateByEnPassantDiscovery = "Gundersen_Faul_1928_MateEnPassantDiscovery";
 
             public static readonly string[] All = new[]
             {
                 MateByPromotion,
                 MateByCastling,
-                MateByDiscovery
+                MateByDiscovery,
+                MateByEnPassant,
+                MateByEnPassantDiscovery
             };
         }
 
@@ -43,7 +47,11 @@ namespace ChessLibrary.Tests.TestData
                 // https://www.chessgames.com/perl/chessgame?gid=1272123
                 { MatingScenarios.MateByCastling, "r1b4r/2q3b1/p2kpQ1p/2p1N3/2p1p3/8/PPP2PPP/2KR3R" },
                 // https://www.chessgames.com/perl/chessgame?gid=1259009
-                { MatingScenarios.MateByDiscovery, "rn3r2/pbppq1p1/1p2pN2/8/3P2NP/6P1/PPPKBP1R/R5k1" }
+                { MatingScenarios.MateByDiscovery, "rn3r2/pbppq1p1/1p2pN2/8/3P2NP/6P1/PPPKBP1R/R5k1" },
+                // https://www.chessgames.com/perl/chessgame?gid=1886010
+                { MatingScenarios.MateByEnPassant, "5r2/1n6/2p3k1/b1Pb3p/P2P2pP/Q3PpP1/1B4KR/4q3" },
+                // https://www.chessgames.com/perl/chessgame?gid=1242924
+                { MatingScenarios.MateByEnPassantDiscovery, "r1bq1r2/pp2n3/4N1Pk/3pPp2/1b1n2Q1/2N5/PP3PP1/R1B1K2R" }
             }
         );
     }

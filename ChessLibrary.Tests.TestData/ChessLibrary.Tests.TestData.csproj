@@ -9,6 +9,8 @@
     <None Remove="Games\Fischer_Altusky_1954.pgn" />
     <None Remove="Games\Fischer_Byrne_1956.pgn" />
     <None Remove="Games\Fischer_Spassky_1992_Game29.pgn" />
+    <None Remove="Games\Gundersen_Faul_1928_MateEnPassantDiscovery.pgn" />
+    <None Remove="Games\Korepanova_Tishkov_2007_MateEnPassant.pgn" />
     <None Remove="Games\Kvicala_NN_1869_MateCastling.pgn" />
     <None Remove="Games\Lasker_Thomas_1912_MateDiscovery.pgn" />
     <None Remove="Games\Wiede_Goetz_1880_MatePromotion.pgn" />
@@ -18,6 +20,8 @@
     <EmbeddedResource Include="Games\Fischer_Altusky_1954.pgn" />
     <EmbeddedResource Include="Games\Fischer_Byrne_1956.pgn" />
     <EmbeddedResource Include="Games\Fischer_Spassky_1992_Game29.pgn" />
+    <EmbeddedResource Include="Games\Gundersen_Faul_1928_MateEnPassantDiscovery.pgn" />
+    <EmbeddedResource Include="Games\Korepanova_Tishkov_2007_MateEnPassant.pgn" />
     <EmbeddedResource Include="Games\Kvicala_NN_1869_MateCastling.pgn" />
     <EmbeddedResource Include="Games\Lasker_Thomas_1912_MateDiscovery.pgn" />
     <EmbeddedResource Include="Games\Wiede_Goetz_1880_MatePromotion.pgn" />
