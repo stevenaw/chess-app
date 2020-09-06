@@ -33,7 +33,7 @@ namespace ChessLibrary
             }
             else if (move.PromotedPiece != SquareContents.Empty)
             {
-                newBoard = newBoard.SetPiece(endSquare, move.PromotedPiece);
+                newBoard = newBoard.ClearPiece(endSquare).SetPiece(endSquare, move.PromotedPiece);
             }
             else if (isCastling)
             {

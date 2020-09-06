@@ -1,6 +1,7 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -336,14 +337,37 @@ namespace ChessLibrary.Tests
             Assert.That(targetSquare, Is.EqualTo(SquareContents.Black | SquareContents.Pawn));
         }
 
+
+        [Test]
+        public void PawnPromotion_WillClearPawnFromFinalSquare()
+        {
+            const string fen = "rnb1kbnr/pppp1ppp/8/8/4q3/1P5P/P1PP1Kp1/RNBQ1BNR";
+            const string move = "gxh1=N#";
+
+            var fenBoard = new FenSerializer().Deserialize(fen);
+            var game = new Game(fenBoard, PieceColor.Black);
+
+            var result = game.Move(move);
+
+            var board = game.CurrentState.Board;
+
+            var targetSquare = BitTranslator.TranslateToBit('h', 1);
+
+            Assert.That(board.Pawns & targetSquare, Is.EqualTo(0));
+            Assert.That(board.Knights & targetSquare, Is.EqualTo(targetSquare));
+
+            Assert.That(board.WhitePieces & targetSquare, Is.EqualTo(0));
+            Assert.That(board.BlackPieces & targetSquare, Is.EqualTo(targetSquare));
+        }
+
         [Test]
         public void PawnPromotion_WillDetectCheckmate()
         {
             const string fen = "rnb1kbnr/pppp1ppp/8/8/4q3/1P5P/P1PP1Kp1/RNBQ1BNR";
             const string move = "gxh1=N#";
 
-            var board = new FenSerializer().Deserialize(fen);
-            var game = new Game(board, PieceColor.Black);
+            var fenBoard = new FenSerializer().Deserialize(fen);
+            var game = new Game(fenBoard, PieceColor.Black);
 
             var result = game.Move(move);
 

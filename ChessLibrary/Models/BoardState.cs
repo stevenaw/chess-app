@@ -60,6 +60,12 @@ namespace ChessLibrary.Models
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BoardState ClearPiece(ulong bitSquare)
+        {
+            return BoardStateMutator.ClearPiece(this, bitSquare);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal BoardState SetPiece(Square square, SquareContents contents)
         {
             return BoardStateMutator.SetPiece(this, BitTranslator.TranslateToBit(square.File, square.Rank), contents);
