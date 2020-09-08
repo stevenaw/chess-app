@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Games\Belov_Prohorov_1991.pgn" />
     <None Remove="Games\Fischer_Altusky_1954.pgn" />
     <None Remove="Games\Fischer_Byrne_1956.pgn" />
     <None Remove="Games\Fischer_Spassky_1992_Game29.pgn" />
@@ -13,10 +14,13 @@
     <None Remove="Games\Korepanova_Tishkov_2007_MateEnPassant.pgn" />
     <None Remove="Games\Kvicala_NN_1869_MateCastling.pgn" />
     <None Remove="Games\Lasker_Thomas_1912_MateDiscovery.pgn" />
+    <None Remove="Games\Nikolic_Arsovic_1989.pgn" />
+    <None Remove="Games\Stepak_Mashian_1980.pgn" />
     <None Remove="Games\Wiede_Goetz_1880_MatePromotion.pgn" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Games\Belov_Prohorov_1991.pgn" />
     <EmbeddedResource Include="Games\Fischer_Altusky_1954.pgn" />
     <EmbeddedResource Include="Games\Fischer_Byrne_1956.pgn" />
     <EmbeddedResource Include="Games\Fischer_Spassky_1992_Game29.pgn" />
@@ -24,11 +28,8 @@
     <EmbeddedResource Include="Games\Korepanova_Tishkov_2007_MateEnPassant.pgn" />
     <EmbeddedResource Include="Games\Kvicala_NN_1869_MateCastling.pgn" />
     <EmbeddedResource Include="Games\Lasker_Thomas_1912_MateDiscovery.pgn" />
+    <EmbeddedResource Include="Games\Nikolic_Arsovic_1989.pgn" />
+    <EmbeddedResource Include="Games\Stepak_Mashian_1980.pgn" />
     <EmbeddedResource Include="Games\Wiede_Goetz_1880_MatePromotion.pgn" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Games\Kvicala_NN_1869_MateCastling.pgn" />
-  </ItemGroup>
-
 </Project>

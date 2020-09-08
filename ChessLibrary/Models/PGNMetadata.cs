@@ -2,7 +2,6 @@
 
 namespace ChessLibrary.Models
 {
-    // TODO: Immutable?
     public struct PGNMetadata
     {
         public string Event { get; set; }

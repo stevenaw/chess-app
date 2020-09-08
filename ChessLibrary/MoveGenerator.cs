@@ -353,7 +353,7 @@ namespace ChessLibrary
 
         private static ulong GetEnPassantSquares(ulong input, BoardState state, Move previousMove)
         {
-            // TODO: Instead of this whole thing, consider just storing the en passant square in game state. There will only be 1 per ply.
+            // TODO: Just store the en passant square in game state. There will only be 1 per ply.
             if (!Move.Equals(previousMove, Move.Empty))
             {
                 var squareForGeneration = BitTranslator.TranslateToSquare(input);
@@ -367,7 +367,6 @@ namespace ChessLibrary
                     if ((state.Pawns & lastMoveEndSquare) != 0
                         && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
                     {
-                        // TODO: Store 'en passant square' in game state instead of bit twiddling.
                         var isWhite = (input & state.WhitePieces) != 0;
                         var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
                         var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);

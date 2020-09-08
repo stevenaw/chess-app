@@ -27,7 +27,6 @@ namespace ChessLibrary.Tests.TestData
             };
         }
 
-        // TODO: Read in from JSON file instead??
         public static ReadOnlyDictionary<string, string> FinalPositions = new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>()
             {
@@ -51,7 +50,16 @@ namespace ChessLibrary.Tests.TestData
                 // https://www.chessgames.com/perl/chessgame?gid=1886010
                 { MatingScenarios.MateByEnPassant, "5r2/1n6/2p3k1/b1Pb3p/P2P2pP/Q3PpP1/1B4KR/4q3" },
                 // https://www.chessgames.com/perl/chessgame?gid=1242924
-                { MatingScenarios.MateByEnPassantDiscovery, "r1bq1r2/pp2n3/4N1Pk/3pPp2/1b1n2Q1/2N5/PP3PP1/R1B1K2R" }
+                { MatingScenarios.MateByEnPassantDiscovery, "r1bq1r2/pp2n3/4N1Pk/3pPp2/1b1n2Q1/2N5/PP3PP1/R1B1K2R" },
+
+                // Other unique situations
+                // -----------------------
+                // https://www.chessgames.com/perl/chessgame?gid=1316514  // 5 Queens in a game
+                { "Belov_Prohorov_1991", "8/7k/6bp/8/4P1Q1/8/8/2K1q3" },
+                // https://www.chessgames.com/perl/chessgame?gid=1268705  // Longest game
+                { "Nikolic_Arsovic_1989", "8/6r1/8/8/3K4/3B4/5R2/3k4" },
+                // https://www.chessgames.com/perl/chessgame?gid=1297307  // Longest decisive game
+                { "Stepak_Mashian_1980", "8/5P1q/4K3/4Q3/8/8/5k2/8" },
             }
         );
     }

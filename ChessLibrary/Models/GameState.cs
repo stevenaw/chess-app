@@ -7,7 +7,6 @@ namespace ChessLibrary.Models
         public readonly BoardState Board { get; }
         public readonly Move PrecedingMove { get; }
 
-        // TODO: Change this from a tuple to something else?
         public readonly ImmutableStack<(BoardState, ulong)> PossibleRepeatedHistory { get; }
 
         public readonly AttackState AttackState { get; }
