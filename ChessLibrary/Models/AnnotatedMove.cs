@@ -2,9 +2,9 @@
 {
     public readonly struct AnnotatedMove
     {
-        public readonly Move Move { get; }
-        public readonly MoveAnnotation Annotation { get; }
-        public readonly AttackState AttackState { get; }
+        public readonly Move Move;
+        public readonly MoveAnnotation Annotation;
+        public readonly AttackState AttackState;
 
         public AnnotatedMove(Move move, MoveAnnotation annotation, AttackState attackState)
         {
@@ -22,24 +22,24 @@
                 && a == b;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return (obj is AnnotatedMove mv) && Equals(this, mv);
         }
 
         public override int GetHashCode()
         {
-            return Move.GetHashCode() ^ Annotation.GetHashCode() ^ AttackState.GetHashCode();
+            return Move.GetHashCode() ^ ((int)Annotation) ^ ((int)AttackState);
         }
 
         public static bool operator ==(AnnotatedMove left, AnnotatedMove right)
         {
-            return left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(AnnotatedMove left, AnnotatedMove right)
         {
-            return !(left == right);
+            return !Equals(left, right);
         }
     }
 }

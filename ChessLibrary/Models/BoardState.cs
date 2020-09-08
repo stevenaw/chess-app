@@ -26,17 +26,17 @@ namespace ChessLibrary.Models
          *    |---------------------------------------------------------------|
          *        A       B       C       D       E       F       G       H
          */
-        public ulong WhitePieces { get; }
-        public ulong BlackPieces { get; }
+        public readonly ulong WhitePieces;
+        public readonly ulong BlackPieces;
 
-        public ulong Pawns { get; }
-        public ulong Bishops { get; }
-        public ulong Knights { get; }
-        public ulong Rooks { get; }
-        public ulong Kings { get; }
-        public ulong Queens { get; }
+        public readonly ulong Pawns;
+        public readonly ulong Bishops;
+        public readonly ulong Knights;
+        public readonly ulong Rooks;
+        public readonly ulong Kings;
+        public readonly ulong Queens;
 
-        public ulong AllPieces => WhitePieces | BlackPieces;
+        public readonly ulong AllPieces => WhitePieces | BlackPieces;
 
         public BoardState(
             ulong white, ulong black, ulong pawns, ulong knights,
@@ -129,7 +129,7 @@ namespace ChessLibrary.Models
             );
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is BoardState bs)
                 return Equals(this, bs);

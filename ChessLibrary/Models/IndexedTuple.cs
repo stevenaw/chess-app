@@ -9,15 +9,8 @@ namespace ChessLibrary.Models
         private T _second;
 #pragma warning restore IDE0044 // Add readonly modifier
 
-        public T First
-        {
-            get { return _first; }
-        }
-
-        public T Second
-        {
-            get { return _second; }
-        }
+        public T First => _first;
+        public T Second => _second;
 
         public IndexedTuple(T first, T second)
         {

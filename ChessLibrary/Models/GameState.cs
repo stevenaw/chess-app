@@ -4,14 +4,14 @@ namespace ChessLibrary.Models
 {
     internal readonly struct GameState
     {
-        public readonly BoardState Board { get; }
-        public readonly Move PrecedingMove { get; }
+        public readonly BoardState Board;
+        public readonly Move PrecedingMove;
 
-        public readonly ImmutableStack<(BoardState, ulong)> PossibleRepeatedHistory { get; }
+        public readonly ImmutableStack<(BoardState, ulong)> PossibleRepeatedHistory;
 
-        public readonly AttackState AttackState { get; }
-        public readonly ulong PiecesOnStartSquares { get; }
-        public readonly IndexedTuple<ulong> SquaresAttackedBy { get; }
+        public readonly AttackState AttackState;
+        public readonly ulong PiecesOnStartSquares;
+        public readonly IndexedTuple<ulong> SquaresAttackedBy;
 
         public GameState(
             BoardState board,

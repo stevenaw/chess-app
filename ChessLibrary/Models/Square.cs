@@ -5,8 +5,8 @@ namespace ChessLibrary.Models
     [DebuggerDisplay("{File}{Rank}")]
     public readonly struct Square
     {
-        public readonly char File { get; }
-        public readonly int Rank { get; }
+        public readonly char File;
+        public readonly int Rank;
 
         public Square(char file, int rank)
         {
@@ -14,7 +14,7 @@ namespace ChessLibrary.Models
             Rank = rank;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return (obj is Square other) && Equals(other);
         }

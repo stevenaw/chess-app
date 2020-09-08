@@ -2,11 +2,11 @@
 {
     public readonly struct Move
     {
-        public readonly char StartFile { get; }
-        public readonly int StartRank { get; }
-        public readonly char EndFile { get; }
-        public readonly int EndRank { get; }
-        public readonly SquareContents PromotedPiece { get; }
+        public readonly char StartFile;
+        public readonly int StartRank;
+        public readonly char EndFile;
+        public readonly int EndRank;
+        public readonly SquareContents PromotedPiece;
 
         public Move(char startFile, int startRank, char endFile, int endRank) : this(startFile, startRank, endFile, endRank, SquareContents.Empty) { }
         public Move(char startFile, int startRank, char endFile, int endRank, SquareContents promotedPiece)
@@ -29,7 +29,7 @@
                 && a.StartRank == b.StartRank;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return (obj is Move mv) && Equals(this, mv);
         }
@@ -45,12 +45,12 @@
 
         public static bool operator ==(Move left, Move right)
         {
-            return left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(Move left, Move right)
         {
-            return !(left == right);
+            return !Equals(left, right);
         }
     }
 }
