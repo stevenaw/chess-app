@@ -104,6 +104,7 @@ namespace ChessLibrary.Tests
 
         [TestCase("Nb1 c3")]
         [TestCase("Nb1 - c3")]
+        [TestCase("a")]
         public void TryParseMove_ReturnsFalseWhenInvalid(string input)
         {
             var board = BoardState.DefaultPositions;

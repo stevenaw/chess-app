@@ -210,7 +210,13 @@ namespace ChessLibrary
             var isWhiteMove = piecesOnCurrentSide == state.WhitePieces;
 
             var moveNotation = TrimMoveDescriptors(trimmedInput);
-            var moveDescriptors = moveNotation.IsEmpty || moveNotation.Length == trimmedInput.Length
+            if (moveNotation.IsEmpty)
+            {
+                result = AnnotatedMove.Empty;
+                return false;
+            }    
+
+            var moveDescriptors = moveNotation.Length == trimmedInput.Length
                 ? ReadOnlySpan<char>.Empty
                 : trimmedInput.Slice(moveNotation.Length);
 
