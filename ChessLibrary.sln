@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Tests", "Chess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Benchmarks", "ChessLibrary.Benchmarks\ChessLibrary.Benchmarks.csproj", "{E692886F-6F64-4478-A14F-247506CB0A87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessLibrary.Tests.TestData", "ChessLibrary.Tests.TestData\ChessLibrary.Tests.TestData.csproj", "{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Tests.TestData", "ChessLibrary.Tests.TestData\ChessLibrary.Tests.TestData.csproj", "{CE6F0C04-8A31-4509-9D63-28D143F0E8CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{D3D2DE97-6F9C-4F6A-9E75-5FFAF4FB4EA4}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

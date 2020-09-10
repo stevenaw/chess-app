@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.ConsoleApp
@@ -11,15 +10,16 @@ namespace ChessLibrary.ConsoleApp
             var firstArg = (args.FirstOrDefault() ?? string.Empty).ToLower();
             switch (firstArg)
             {
-                case "replay":
+                case Modes.Replay:
                     {
-                        var game = ReplayGame.FromArgs(args);
-                        if (game != null)
-                            await game.Run();
+                        var replayArgs = ReplayGameArgs.FromCliArgs(args.Skip(1).ToArray());
+                        var game = new ReplayGame(replayArgs.FileName, replayArgs.MsTurnDelay);
+                        
+                        await game.Run();
                         break;
                     }
 
-                case "play":
+                case Modes.Play:
                 case "":
                     {
                         var game = new InteractiveGame();

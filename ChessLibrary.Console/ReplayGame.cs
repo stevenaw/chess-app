@@ -1,6 +1,5 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,23 +15,6 @@ namespace ChessLibrary.ConsoleApp
         {
             _file = file;
             _msPerMove = msPerMove;
-        }
-
-        public static ReplayGame FromArgs(string[] args)
-        {
-            if (args.Length < 2)
-                throw new ArgumentException("Please specify a PGN file to replay.");
-
-            var file = args[1];
-            int turnDelay = 1000;
-            if (args.Length > 2)
-            {
-                if (!int.TryParse(args[2], out turnDelay) || turnDelay <= 0)
-                    throw new ArgumentException("Invalid turn delay specified. Must be greater than 0 integer.");
-            }
-
-            var game = new ReplayGame(file, turnDelay);
-            return game;
         }
 
         public async Task Run()
