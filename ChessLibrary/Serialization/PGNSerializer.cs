@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChessLibrary.Serialization
 {
-    class PGNSerializer
+    public class PGNSerializer
     {
         // 64 chars per line (2 for line ending)
         private const int LineLength = 62;

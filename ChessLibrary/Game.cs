@@ -12,6 +12,14 @@ namespace ChessLibrary
         private ulong CurrentTurn { get; set; }
         public AttackState AttackState { get { return CurrentState.AttackState; } }
 
+        public bool IsOngoing
+        {
+            get
+            {
+                return AttackState == AttackState.None || AttackState == AttackState.Check;
+            }
+        }
+
         public Game() : this(BoardState.DefaultPositions, PieceColor.White)
         { }
 

@@ -26,6 +26,7 @@ namespace ChessLibrary.ConsoleApp
             { SquareContents.Black | SquareContents.Pawn, 'p' },
         };
 
+        // TODO: Include option to update board in-place (only rows of start, end of move)
         public static void PrintBoard(Game game, IEnumerable<Square> highlighted)
         {
             const string rankDivider = "  -----------------";

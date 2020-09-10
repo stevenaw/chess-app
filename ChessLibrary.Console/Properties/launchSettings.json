@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ChessLibrary.ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "replay \"..\\..\\..\\..\\ChessLibrary.Tests.TestData\\Games\\Fischer_Altusky_1954.pgn\""
+    }
+  }
+}
