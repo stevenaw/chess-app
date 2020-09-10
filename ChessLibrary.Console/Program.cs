@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChessLibrary.ConsoleApp
@@ -12,15 +13,9 @@ namespace ChessLibrary.ConsoleApp
             {
                 case "replay":
                     {
-                        // TODO: Better error reporting, move arg validation into "ReplayGame"
-                        var file = args[1];
-                        int turnDelay = 1000;
-                        if (args.Length > 2 && !int.TryParse(args[2], out turnDelay))
-                            turnDelay = 1000;
-
-                        var game = new ReplayGame(file, turnDelay);
-                        
-                        await game.Run();
+                        var game = ReplayGame.FromArgs(args);
+                        if (game != null)
+                            await game.Run();
                         break;
                     }
 
