@@ -54,4 +54,5 @@ to control the time delay between moves (in seconds). The default delay is 1 sec
 Example:
 
 `ChessApp.exe replay ..\my-pgn-file.pgn`
+
 `ChessApp.exe replay C:\temp\my-other pgn-file.pgn 2.5`
