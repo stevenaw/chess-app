@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary", "ChessLibrary\ChessLibrary.csproj", "{4434E45A-CB26-4130-8CD8-71AA064588F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.ConsoleApp", "ChessLibrary.Console\ChessLibrary.ConsoleApp.csproj", "{8B3C862E-C17B-4CF4-94BD-B12FE8C740C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.ConsoleApp", "ChessLibrary.ConsoleApp\ChessLibrary.ConsoleApp.csproj", "{8B3C862E-C17B-4CF4-94BD-B12FE8C740C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary.Tests", "ChessLibrary.Tests\ChessLibrary.Tests.csproj", "{B74FA5BF-3C9C-4AEE-97F7-8EE004ABD9E4}"
 EndProject
