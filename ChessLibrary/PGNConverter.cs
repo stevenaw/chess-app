@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace ChessLibrary
 {
-    // TODO: Tests
     public static class PGNConverter
     {
         public static PGNMetadata ConvertFromGame(Game game)
@@ -32,21 +31,21 @@ namespace ChessLibrary
             var history = game.History.ToArray();
             Array.Reverse(history);
 
-            var moves = new List<string>(history.Length - 1);
-            for (var i = 0; i < history.Length - 1; i++)
+            var moves = new string[history.Length - 1];
+            for (var i = 1; i < history.Length; i++)
             {
-                var move = history[i + 1].PrecedingMove;
-                var board = history[i].Board;
-                var result = history[i + 1].AttackState;
+                var move = history[i].PrecedingMove;
+                var board = history[i - 1].Board;
+                var result = history[i].AttackState;
 
                 var moveStr = MoveParser.ToMoveString(move, board, result);
                 if (moveStr.StartsWith('0'))
                     moveStr = moveStr.Replace('0', 'O');
 
-                moves[i] = moveStr;
+                moves[i - 1] = moveStr;
             }
 
-            return moves;
+            return new List<string>(moves);
         }
 
         private static string GetResult(Game game)

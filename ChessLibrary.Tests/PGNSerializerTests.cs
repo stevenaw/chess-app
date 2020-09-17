@@ -73,6 +73,28 @@ namespace ChessLibrary.Tests
             Assert.That(actual.Moves, Is.EqualTo(expected.Moves));
         }
 
+
+        [TestCaseSource(nameof(ParsingScenarios))]
+        public async Task RoundTrip_Serialization((string scenario, PGNMetadata metadata) args)
+        {
+            (string scenario, PGNMetadata expected) = args;
+
+            var fileContents = await ResourceHelpers.GetEmbeddedPGNString(scenario);
+            var serializer = new PGNSerializer();
+            PGNMetadata actualMetadata;
+
+            using (var reader = new StringReader(fileContents))
+            {
+                actualMetadata = await serializer.DeserializeAsync(reader);
+            }
+
+            var actualGame = PGNConverter.ConvertToGame(actualMetadata);
+            var backToMetadata = PGNConverter.ConvertFromGame(actualGame);
+
+            Assert.That(backToMetadata.Moves, Is.EqualTo(expected.Moves));
+        }
+
+
         private static IEnumerable<(string scenario, PGNMetadata metadata)> ParsingScenarios
         {
             get

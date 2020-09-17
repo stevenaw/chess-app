@@ -328,7 +328,6 @@ namespace ChessLibrary.Tests
             Assert.That(move.Move.EndFile, Is.EqualTo(endSq.File));
         }
 
-        // TODO: More tests
         [TestCase("8/8/8/8/8/8/8/R6R", "Rac1", SquareContents.Rook | SquareContents.White, "a1", "c1")]
         [TestCase("8/8/8/8/8/8/8/R6R", "Rhc1", SquareContents.Rook | SquareContents.White, "h1", "c1")]
         [TestCase("5R2/8/8/8/8/8/8/5R2", "R1f2", SquareContents.Rook | SquareContents.White, "f1", "f2")]
