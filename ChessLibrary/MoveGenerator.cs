@@ -172,8 +172,7 @@ namespace ChessLibrary
 
             if ((square & board.Pawns) != 0)
             {
-                var enPassant = GetEnPassantSquares(square, board, state.PrecedingMove);
-                return (normalMovement | enPassant);
+                return (normalMovement | state.EnPassantSquare);
             }
             else if ((square & board.Kings) != 0)
             {
@@ -349,33 +348,6 @@ namespace ChessLibrary
                 return (ShiftRight(input, 7) & ~FileA)
                     | (ShiftRight(input, 9) & ~FileH);
             }
-        }
-
-        private static ulong GetEnPassantSquares(ulong input, BoardState state, Move previousMove)
-        {
-            // TODO: Just store the en passant square in game state. There will only be 1 per ply.
-            if (!Move.Equals(previousMove, Move.Empty))
-            {
-                var squareForGeneration = BitTranslator.TranslateToSquare(input);
-
-                // Previous move ended right next to this piece
-                if (squareForGeneration.Rank == previousMove.EndRank
-                    && Math.Abs((int)squareForGeneration.File - (int)previousMove.EndFile) == 1)
-                {
-                    // Previous move was also a pawn which had moved up 2
-                    var lastMoveEndSquare = BitTranslator.TranslateToBit(previousMove.EndFile, previousMove.EndRank);
-                    if ((state.Pawns & lastMoveEndSquare) != 0
-                        && Math.Abs((int)previousMove.StartRank - (int)previousMove.EndRank) == 2)
-                    {
-                        var isWhite = (input & state.WhitePieces) != 0;
-                        var captureRow = isWhite ? ShiftLeft(input, 8) : ShiftRight(input, 8);
-                        var shifted = previousMove.EndFile > squareForGeneration.File ? ShiftLeft(captureRow, 1) : ShiftRight(captureRow, 1);
-                        return shifted;
-                    }
-                }
-            }
-
-            return 0;
         }
 
         private static ulong FillDiagonals(ulong input, BoardState state)

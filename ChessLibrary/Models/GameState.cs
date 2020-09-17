@@ -11,6 +11,7 @@ namespace ChessLibrary.Models
 
         public readonly AttackState AttackState;
         public readonly ulong PiecesOnStartSquares;
+        public readonly ulong EnPassantSquare;
         public readonly IndexedTuple<ulong> SquaresAttackedBy;
 
         public GameState(
@@ -19,6 +20,7 @@ namespace ChessLibrary.Models
             ImmutableStack<(BoardState, ulong)> history,
             AttackState attackState,
             ulong piecesOnStartSquares,
+            ulong enPassantSquare,
             IndexedTuple<ulong> squaresAttackedBy
         )
         {
@@ -27,12 +29,13 @@ namespace ChessLibrary.Models
             PrecedingMove = previousMove;
             PossibleRepeatedHistory = history;
             PiecesOnStartSquares = piecesOnStartSquares;
+            EnPassantSquare = enPassantSquare;
             SquaresAttackedBy = squaresAttackedBy;
         }
 
         public GameState SetAttackState(AttackState state, IndexedTuple<ulong> squaresAttackedBy)
         {
-            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, PiecesOnStartSquares, squaresAttackedBy);
+            return new GameState(Board, PrecedingMove, PossibleRepeatedHistory, state, PiecesOnStartSquares, EnPassantSquare, squaresAttackedBy);
         }
 
         public static GameState Initialize(BoardState boardState)
@@ -43,6 +46,7 @@ namespace ChessLibrary.Models
                 ImmutableStack<(BoardState, ulong)>.Empty,
                 AttackState.None,
                 boardState.AllPieces,
+                0UL,
                 IndexedTuple<ulong>.Empty
             );
         }
