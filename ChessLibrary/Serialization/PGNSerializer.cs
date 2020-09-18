@@ -1,6 +1,7 @@
 ﻿using ChessLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ namespace ChessLibrary.Serialization
             await writer.WriteLineAsync();
 
             var linePos = 0;
-            for (var i = 0; i < pgn.Moves.Count; i++)
+            for (var i = 0; i < pgn.Moves.Length; i++)
             {
                 var moveNumber = string.Empty;
                 if (i % 2 == 0)
@@ -120,7 +121,8 @@ namespace ChessLibrary.Serialization
 
                 currentLine = await reader.ReadLineAsync();
             }
-            pgn.Moves = moves;
+
+            pgn.Moves = moves.ToArray();
 
             return pgn;
         }

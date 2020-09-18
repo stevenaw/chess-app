@@ -116,7 +116,7 @@ namespace ChessLibrary.Tests
                     ,Nc4,Nxc4,Bxc4,Nb6,Ne5,Rae8,Bxf7+,Rxf7,Nxf7,Rxe1+,Qxe1
                     ,Kxf7,Qe3,Qg5,Qxg5,hxg5,b3,Ke6,a3,Kd6,axb4,cxb4,Ra5,Nd5
                     ,f3,Bc8,Kf2,Bf5,Ra7,g6,Ra6+,Kc5,Ke1,Nf4,g3,Nxh3,Kd2
-                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToList()
+                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToArray()
                 };
 
                 yield return (scenario, metadata);
@@ -139,7 +139,7 @@ namespace ChessLibrary.Tests
                             ,Ra4,Qxb6,Nxd1,h3,Rxa2,Kh2,Nxf2,Re1,Rxe1
                             ,Qd8+,Bf8,Nxe1,Bd5,Nf3,Ne4,Qb8,b5,h4,h5,Ne5,Kg7,Kg1,Bc5+,Kf1
                             ,Ng3+,Ke1,Bb4+,Kd1,Bb3+,Kc1,Ne2+,Kb1,Nc3+
-                            ,Kc1,Rc2#".Split(',').Select(o => o.Trim()).ToList()
+                            ,Kc1,Rc2#".Split(',').Select(o => o.Trim()).ToArray()
                 };
 
                 yield return (scenario, metadata);
@@ -155,7 +155,7 @@ namespace ChessLibrary.Tests
                     Result = "0-1",
                     White = "Jacob Altusky",
                     Black = "Robert James Fischer",
-                    Moves = @"e4,e5,Nf3,Nc6,Bb5,a6,Ba4,d6,d4,b5,Bb3,Bg4,Bxf7+,Kxf7,Ng5+,Qxg5".Split(',').Select(o => o.Trim()).ToList()
+                    Moves = @"e4,e5,Nf3,Nc6,Bb5,a6,Ba4,d6,d4,b5,Bb3,Bg4,Bxf7+,Kxf7,Ng5+,Qxg5".Split(',').Select(o => o.Trim()).ToArray()
                 };
 
                 yield return (scenario, metadata);
@@ -182,7 +182,7 @@ namespace ChessLibrary.Tests
                     ,Nc4,Nxc4,Bxc4,Nb6,Ne5,Rae8,Bxf7+,Rxf7,Nxf7,Rxe1+,Qxe1
                     ,Kxf7,Qe3,Qg5,Qxg5,hxg5,b3,Ke6,a3,Kd6,axb4,cxb4,Ra5,Nd5
                     ,f3,Bc8,Kf2,Bf5,Ra7,g6,Ra6+,Kc5,Ke1,Nf4,g3,Nxh3,Kd2
-                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToList()
+                    ,Kb5,Rd6,Kc5,Ra6,Nf2,g4,Bd3,Re6".Split(',').Select(o => o.Trim()).ToArray()
                 };
 
                 yield return (scenario, metadata);
