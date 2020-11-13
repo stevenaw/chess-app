@@ -42,7 +42,7 @@ namespace ChessLibrary
             // - Then check if multiple pieces of same type can move to end square, then output first rank or file of moved piece
             // - Then output piece notation if piece is not a pawn
             //
-            // - Now that the move string is built, splice to only used tokens and convert to readonlyspan<char>
+            // - Now that the move string is built, splice to only used tokens
 
 
             var startSquareBit = BitTranslator.TranslateToBit(move.StartFile, move.StartRank);
@@ -81,7 +81,6 @@ namespace ChessLibrary
 
                     var copyLocation = buffer.Slice(lastIdx + 1);
                     return copyLocation.ToString();
-                    //return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(copyLocation), copyLocation.Length);
                 }
             }
 
@@ -168,7 +167,6 @@ namespace ChessLibrary
 
             var segment = buffer.Slice(lastIdx + 1);
             return segment.ToString();
-            //return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(segment), segment.Length);
         }
 
         public static Square ParseSquare(string input)

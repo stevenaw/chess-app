@@ -6,15 +6,15 @@ namespace ChessLibrary.ConsoleApp
 {
     public static class EnumHelper
     {
-        private static Dictionary<AttackState, string> AttackStrings = BuildEnumStrings<AttackState>();
-        private static Dictionary<ErrorCondition, string> ErrorStrings = BuildEnumStrings<ErrorCondition>();
+        private static readonly Dictionary<AttackState, string> AttackStrings = BuildEnumStrings<AttackState>();
+        private static readonly Dictionary<ErrorCondition, string> ErrorStrings = BuildEnumStrings<ErrorCondition>();
 
-        private static Dictionary<T, string> BuildEnumStrings<T>() where T : Enum
+        private static Dictionary<T, string> BuildEnumStrings<T>() where T : struct, Enum
         {
             var dict = new Dictionary<T, string>();
 
-            foreach (var value in (T[])Enum.GetValues(typeof(T)))
-                dict[value] = value.ToString();
+            foreach (var value in Enum.GetValues<T>())
+                dict[value] = Enum.GetName(value)!;
 
             return dict;
         }

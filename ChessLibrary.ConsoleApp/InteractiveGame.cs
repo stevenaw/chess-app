@@ -24,7 +24,7 @@ namespace ChessLibrary.ConsoleApp
 
         private static InteractiveGameCommand GetCommand(PieceColor turn)
         {
-            Console.Write($"Enter command ({turn}'s turn): ");
+            Console.Write($"Enter command ({Enum.GetName(turn)}'s turn): ");
             var input = (Console.ReadLine() ?? string.Empty).Trim();
 
             var endOfCommandName = input.IndexOf(' ');

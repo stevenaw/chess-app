@@ -14,7 +14,7 @@ namespace ChessLibrary.Tests
         {
             get
             {
-                var annotations = (MoveAnnotation[])Enum.GetValues(typeof(MoveAnnotation));
+                var annotations = Enum.GetValues<MoveAnnotation>();
                 var map = annotations.ToDictionary(
                     o => o,
                     o => MoveDescriptionHelper.GetAnnotationString(o)
