@@ -13,7 +13,7 @@ namespace ChessLibrary.ConsoleApp
                 case Modes.Replay:
                     {
                         var replayArgs = ReplayGameArgs.FromCliArgs(args.Skip(1).ToArray());
-                        var game = new ReplayGame(replayArgs.FileName, replayArgs.MsTurnDelay);
+                        var game = new ReplayGame(replayArgs.FileName, replayArgs.MoveDelay);
                         
                         await game.Run();
                         break;

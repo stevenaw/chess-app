@@ -1,5 +1,6 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,12 +10,12 @@ namespace ChessLibrary.ConsoleApp
     public class ReplayGame
     {
         private readonly string _file;
-        private readonly int _msPerMove;
+        private readonly TimeSpan _moveDelay;
 
-        public ReplayGame(string file, int msPerMove)
+        public ReplayGame(string file, TimeSpan moveDelay)
         {
             _file = file;
-            _msPerMove = msPerMove;
+            _moveDelay = moveDelay;
         }
 
         public async Task Run()
@@ -28,7 +29,7 @@ namespace ChessLibrary.ConsoleApp
 
                 foreach(var move in pgn.Moves)
                 {
-                    await Task.Delay(_msPerMove);
+                    await Task.Delay(_moveDelay);
                     game.Move(move);
                     BoardRenderer.PrintBoard(game);
                 }

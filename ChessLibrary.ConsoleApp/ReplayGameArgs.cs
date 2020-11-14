@@ -6,12 +6,12 @@ namespace ChessLibrary.ConsoleApp
     internal readonly struct ReplayGameArgs
     {
         public readonly string FileName;
-        public readonly int MsTurnDelay;
+        public readonly TimeSpan MoveDelay;
 
-        public ReplayGameArgs(string fileName, int msTurnDelay)
+        public ReplayGameArgs(string fileName, TimeSpan moveDelay)
         {
             FileName = fileName;
-            MsTurnDelay = msTurnDelay;
+            MoveDelay = moveDelay;
         }
 
         public static ReplayGameArgs FromCliArgs(string[] args)
@@ -28,7 +28,7 @@ namespace ChessLibrary.ConsoleApp
                     throw new ArgumentException("Invalid turn delay specified. Must be greater than 0.");
             }
 
-            return new ReplayGameArgs(file, (int)(turnDelay * 1000));
+            return new ReplayGameArgs(file, TimeSpan.FromSeconds(turnDelay));
         }
     }
 }
