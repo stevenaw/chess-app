@@ -6,8 +6,10 @@ strategy:
   matrix:
     windows:
       imageName: 'windows-latest'
-    linux:
-      imageName: 'ubuntu-latest'
+    #linux:
+    #  imageName: 'ubuntu-latest'
+    #macos:
+    #  imageName: 'macos-latest'
       
 pool:
   vmImage: $(imageName)
