@@ -31,19 +31,16 @@ namespace ChessLibrary.ConsoleApp
         {
             const string rankDivider = "  -----------------";
 
-            using var output = new StreamWriter(Console.OpenStandardOutput());
-
             Span<bool> highlightSquares = stackalloc bool[64];
             foreach (var sq in highlighted)
                 highlightSquares[BitTranslator.GetSquareIndex(sq.File, sq.Rank)] = true;
 
-            output.Write(rankDivider);
-            output.Write(Environment.NewLine);
+            Console.WriteLine(rankDivider);
 
             for (var rank = 8; rank > 0; rank--)
             {
-                output.Write((char)(rank + '0'));
-                output.Write(" |");
+                Console.Write((char)(rank + '0'));
+                Console.Write(" |");
 
                 for (var file = 'a'; file <= 'h'; file++)
                 {
@@ -54,8 +51,6 @@ namespace ChessLibrary.ConsoleApp
 
                     if (highlightSquares[currentIndex])
                     {
-                        output.Flush();
-
                         Console.BackgroundColor = ConsoleColor.Yellow;
                         Console.ForegroundColor = ConsoleColor.Black;
                         Console.Write(representation);
@@ -64,27 +59,25 @@ namespace ChessLibrary.ConsoleApp
                     }
                     else
                     {
-                        output.Write(representation);
+                        Console.Write(representation);
                     }
 
-                    output.Write('|');
+                    Console.Write('|');
                 }
 
-                output.Write(Environment.NewLine);
-                output.Write(rankDivider);
-                output.Write(Environment.NewLine);
+                Console.WriteLine();
+                Console.WriteLine(rankDivider);
             }
 
-            output.Write("  ");
+            Console.Write("  ");
             for (var file = 'A'; file <= 'H'; file++)
             {
-                output.Write(' ');
-                output.Write(file);
+                Console.Write(' ');
+                Console.Write(file);
             }
-            output.Write(Environment.NewLine);
-            output.Write(Environment.NewLine);
 
-            output.Flush();
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         public static void PrintBoard(Game game)
