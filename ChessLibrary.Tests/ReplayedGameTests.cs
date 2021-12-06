@@ -3,9 +3,6 @@ using ChessLibrary.Serialization;
 using ChessLibrary.Tests.TestData;
 using ChessLibrary.Tests.TestHelpers;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ChessLibrary.Tests
 {

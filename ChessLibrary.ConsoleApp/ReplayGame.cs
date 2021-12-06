@@ -1,9 +1,5 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ChessLibrary.ConsoleApp
 {

@@ -1,5 +1,4 @@
 ﻿using ChessLibrary.Models;
-using System;
 
 namespace ChessLibrary.Serialization
 {
@@ -52,7 +51,7 @@ namespace ChessLibrary.Serialization
             }
 
             // Return as a string
-            return endResult.Slice(0, currIndex).ToString();
+            return endResult[..currIndex].ToString();
         }
 
         public BoardState Deserialize(string input)
@@ -120,23 +119,16 @@ namespace ChessLibrary.Serialization
         {
             var colour = Char.IsUpper(symbol) ? SquareContents.White : SquareContents.Black;
 
-            switch (Char.ToUpper(symbol))
+            return Char.ToUpper(symbol) switch
             {
-                case Constants.PieceNotation.Pawn:
-                    return colour | SquareContents.Pawn;
-                case Constants.PieceNotation.Knight:
-                    return colour | SquareContents.Knight;
-                case Constants.PieceNotation.Bishop:
-                    return colour | SquareContents.Bishop;
-                case Constants.PieceNotation.Rook:
-                    return colour | SquareContents.Rook;
-                case Constants.PieceNotation.Queen:
-                    return colour | SquareContents.Queen;
-                case Constants.PieceNotation.King:
-                    return colour | SquareContents.King;
-                default:
-                    throw new InvalidOperationException("Unsupported piece notation: " + symbol);
-            }
+                Constants.PieceNotation.Pawn => colour | SquareContents.Pawn,
+                Constants.PieceNotation.Knight => colour | SquareContents.Knight,
+                Constants.PieceNotation.Bishop => colour | SquareContents.Bishop,
+                Constants.PieceNotation.Rook => colour | SquareContents.Rook,
+                Constants.PieceNotation.Queen => colour | SquareContents.Queen,
+                Constants.PieceNotation.King => colour | SquareContents.King,
+                _ => throw new InvalidOperationException("Unsupported piece notation: " + symbol),
+            };
         }
 
         private static char ToNotation(BoardState board, ulong squareMask)

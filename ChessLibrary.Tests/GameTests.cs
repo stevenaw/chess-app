@@ -1,8 +1,6 @@
 ﻿using ChessLibrary.Models;
 using ChessLibrary.Serialization;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ChessLibrary.Tests
 {

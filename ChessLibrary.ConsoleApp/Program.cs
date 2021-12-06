@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-namespace ChessLibrary.ConsoleApp
+﻿namespace ChessLibrary.ConsoleApp
 {
     class Program
     {

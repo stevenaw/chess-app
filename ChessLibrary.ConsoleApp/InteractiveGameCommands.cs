@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ChessLibrary.ConsoleApp
+﻿namespace ChessLibrary.ConsoleApp
 {
     internal static class InteractiveGameCommands
     {

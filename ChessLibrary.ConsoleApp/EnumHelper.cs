@@ -1,6 +1,4 @@
 ﻿using ChessLibrary.Models;
-using System;
-using System.Collections.Generic;
 
 namespace ChessLibrary.ConsoleApp
 {

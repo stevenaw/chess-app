@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChessLibrary.Models
+﻿namespace ChessLibrary.Models
 {
     [Flags]
     public enum SquareContents

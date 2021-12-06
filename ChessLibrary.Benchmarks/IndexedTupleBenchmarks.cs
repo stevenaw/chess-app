@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
 using System.Runtime.CompilerServices;
 
 namespace ChessLibrary.Benchmarks
