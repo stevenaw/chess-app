@@ -1,6 +1,6 @@
-﻿using ChessLibrary.Models;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using ChessLibrary.Models;
 
 namespace ChessLibrary
 {
@@ -11,11 +11,9 @@ namespace ChessLibrary
             if (rank < 1 || rank > 8)
                 return false;
 
-            int fileNumber = Char.ToLower(file) - 'a';
-
-            if (fileNumber < 0 || fileNumber > 7)
-                return false;
-            return true;
+            // (file | 0x20) = flip the casing bit. ie ToLowerAscii()
+            int fileNumber = (file | 0x20) - 'a';
+            return fileNumber >= 0 && fileNumber <= 7;
         }
 
         internal static ulong TranslateToBit(char file, int rank)
@@ -27,7 +25,7 @@ namespace ChessLibrary
 
         public static int GetSquareIndex(char file, int rank)
         {
-            int fileNumber = Char.ToLower(file) - 'a';
+            int fileNumber = (file | 0x20) - 'a';
             int idx = ((rank - 1) * 8) + fileNumber;
             return idx;
         }
