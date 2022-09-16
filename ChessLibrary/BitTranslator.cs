@@ -6,13 +6,14 @@ namespace ChessLibrary
 {
     public static class BitTranslator
     {
+        private const int AsciiCasingBit = 0x20;
+
         internal static bool IsValidSquare(char file, int rank)
         {
             if (rank < 1 || rank > 8)
                 return false;
 
-            // (file | 0x20) = flip the casing bit. ie ToLowerAscii()
-            int fileNumber = (file | 0x20) - 'a';
+            int fileNumber = (file | AsciiCasingBit) - 'a';
             return fileNumber >= 0 && fileNumber <= 7;
         }
 
@@ -25,7 +26,7 @@ namespace ChessLibrary
 
         public static int GetSquareIndex(char file, int rank)
         {
-            int fileNumber = (file | 0x20) - 'a';
+            int fileNumber = (file | AsciiCasingBit) - 'a';
             int idx = ((rank - 1) * 8) + fileNumber;
             return idx;
         }
