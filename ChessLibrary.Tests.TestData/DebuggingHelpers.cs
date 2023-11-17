@@ -6,7 +6,7 @@ namespace ChessLibrary.Tests.TestHelpers
     {
         public static string RenderBitboard(ulong mask)
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(64 + (Environment.NewLine.Length * 8));
             for(var i = 7; i >= 0; i--)
             {
                 for (var j = 0; j < 8; j++)
