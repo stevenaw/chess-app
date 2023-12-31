@@ -16,14 +16,14 @@ namespace ChessLibrary.Tests.TestData
             public static readonly string MateByEnPassant = "Korepanova_Tishkov_2007_MateEnPassant";
             public static readonly string MateByEnPassantDiscovery = "Gundersen_Faul_1928_MateEnPassantDiscovery";
 
-            public static readonly string[] All = new[]
-            {
+            public static readonly string[] All =
+            [
                 MateByPromotion,
                 MateByCastling,
                 MateByDiscovery,
                 MateByEnPassant,
                 MateByEnPassantDiscovery
-            };
+            ];
         }
 
         public static ReadOnlyDictionary<string, string> FinalPositions = new ReadOnlyDictionary<string, string>(

@@ -89,7 +89,7 @@ namespace ChessLibrary.Tests
 
             var actualValue = serializer.Serialize(board);
 
-            Assert.AreEqual(defaultFen, actualValue);
+            Assert.That(actualValue, Is.EqualTo(defaultFen));
         }
     }
 }

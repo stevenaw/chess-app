@@ -1,3 +1,3 @@
 ﻿using NUnit.Framework;
 
-[assembly: Parallelizable]
+[assembly: Parallelizable(ParallelScope.Children)]
