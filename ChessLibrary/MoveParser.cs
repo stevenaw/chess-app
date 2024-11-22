@@ -196,7 +196,7 @@ namespace ChessLibrary
 
 
             var trimmedInput = input.AsSpan().Trim();
-            if (trimmedInput.IsEmpty || trimmedInput.IndexOf(' ') != -1)
+            if (trimmedInput.IsEmpty || trimmedInput.Contains(' '))
             {
                 result = AnnotatedMove.Empty;
                 return false;
