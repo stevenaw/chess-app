@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="ChessLibrary/ChessLibrary.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="azure-pipelines.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="ChessLibrary.Benchmarks/ChessLibrary.Benchmarks.csproj" />
+  <Project Path="ChessLibrary.ConsoleApp/ChessLibrary.ConsoleApp.csproj" />
+  <Project Path="ChessLibrary.Tests/ChessLibrary.Tests.csproj" />
+  <Project Path="ChessLibrary.Tests.TestData/ChessLibrary.Tests.TestData.csproj" />
+</Solution>
